@@ -1,0 +1,22 @@
+Variable(v),hasVariableName(v:i)->int(i).
+isAnnotatedTrusted[v]=i->Variable(v),boolean(i).
+AnnotationOf[v] = a ->Variable(v),string(a).
+SpecialVariable[v]=sv->Variable(v),string(sv).
+SubtypeConstraint[v2,v1] = s -> Variable(v1),Variable(v2),boolean(s).
+isAnnotatedTrusted[v2]=true <- isAnnotatedTrusted[v1]=true, SubtypeConstraint[v2,v1]=true.
+isAnnotatedTrusted[v2]=false <- isAnnotatedTrusted[v1]=false, SubtypeConstraint[v1,v2]=true.
+EqualityConstraint[v1,v2]=e-> Variable(v1),Variable(v2),boolean(e).
+isAnnotatedTrusted[v2]=true <- isAnnotatedTrusted[v1]=true, EqualityConstraint[v1,v2]=true.
+isAnnotatedTrusted[v2]=false <- isAnnotatedTrusted[v1]=false, EqualityConstraint[v1,v2]=true.
+isAnnotatedTrusted[v2]=true <- isAnnotatedTrusted[v1]=true, EqualityConstraint[v2,v1]=true.
+isAnnotatedTrusted[v2]=false <- isAnnotatedTrusted[v1]=false, EqualityConstraint[v2,v1]=true.
+InequalityConstraint[v1,v2]=n->Variable(v1),Variable(v2),boolean(n).
+isAnnotatedTrusted[v2]=false <- isAnnotatedTrusted[v1]=true, InequalityConstraint[v1,v2]=true.
+isAnnotatedTrusted[v2]=true <- isAnnotatedTrusted[v1]=false, InequalityConstraint[v1,v2]=true.
+isAnnotatedTrusted[v2]=false <- isAnnotatedTrusted[v1]=true, InequalityConstraint[v2,v1]=true.
+isAnnotatedTrusted[v2]=true <- isAnnotatedTrusted[v1]=false, InequalityConstraint[v2,v1]=true.
+AnnotationOf[v]="Ostrusted"<-isAnnotatedTrusted[v]=true.
+AnnotationOf[v]="Osuntrusted"<-isAnnotatedTrusted[v]=false.
+isAnnotatedTrusted[v]=true <- hasVariableName(v:-1).
+isAnnotatedTrusted[v]=false <- hasVariableName(v:-2).
+
