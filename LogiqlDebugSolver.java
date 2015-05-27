@@ -33,9 +33,9 @@ import ostrusted.quals.OsUntrusted;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 /**
- * Debug solver prints out variables and constraints.
+ * 
  *
- * @author mcarthur
+ * @author Jianchu Li, Zane Lin
  *
  */
 
