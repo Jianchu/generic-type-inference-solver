@@ -72,7 +72,13 @@ public class LogicSolver implements InferenceSolver {
         allTypes = qualHierarchy.getTypeQualifiers();
         Set<String> allTypesInString = new HashSet<String>();
         String encodingForEqualityConModifier = "";
+        String encodingForInequalityConModifier = "";
+        String encodingForEqualityConstraint = "";
+        String encodingForInequalityConstraint = "";
+        String encodingForComparableConstraint = "";
+        String encodingForSubtypeConTopBottom = "";
         String basicEncoding = "";
+
         for (AnnotationMirror i : allTypes) {
             allTypesInString.add(i.toString().replaceAll("[.@]", "_"));
         }
@@ -81,9 +87,25 @@ public class LogicSolver implements InferenceSolver {
         basicEncoding = getBasicString(allTypesInString, basicEncoding);
         encodingForEqualityConModifier = getEncodingForEqualityConModifier(
                 allTypesInString, encodingForEqualityConModifier);
-        print();
+        encodingForInequalityConModifier = getEncodingForInequalityConModifier(
+                allTypesInString, encodingForInequalityConModifier);
+        encodingForEqualityConstraint = getEncodingForEualityConstraint(
+                allTypesInString, encodingForEqualityConstraint);
+        encodingForInequalityConstraint = getEncodingForIneualityConstraint(
+                allTypesInString, encodingForInequalityConstraint);
+        encodingForComparableConstraint = getEncodingForComparableConstraint(
+                allTypesInString, encodingForComparableConstraint);
+        encodingForSubtypeConTopBottom= getEncodingForSubtypeConTopBottom(
+                allTypesInString, encodingForSubtypeConTopBottom);
+        //print();
         System.out.println(basicEncoding);
         System.out.println(encodingForEqualityConModifier);
+        System.out.println(encodingForInequalityConModifier);
+        System.out.println(encodingForEqualityConstraint);
+        System.out.println(encodingForInequalityConstraint);
+        System.out.println(encodingForComparableConstraint);
+        System.out.println(encodingForSubtypeConTopBottom);
+        //TODO: encoding for subtype constraint 
         return null;
 
     }
@@ -94,14 +116,16 @@ public class LogicSolver implements InferenceSolver {
             String supertypeFori = "";
             for (AnnotationMirror j : allTypes) {
                 if (hierarchy.isSubtype(j, i)) {
-                    subtypeFori = subtypeFori + " " + j.toString();
+                    subtypeFori = subtypeFori + " "
+                            + j.toString().replaceAll("[.@]", "_");
                 }
                 if (hierarchy.isSubtype(i, j)) {
-                    supertypeFori = supertypeFori + " " + j.toString();
+                    supertypeFori = supertypeFori + " "
+                            + j.toString().replaceAll("[.@]", "_");
                 }
             }
-            supertype.put(i.toString(), supertypeFori);
-            subtype.put(i.toString(), subtypeFori);
+            supertype.put(i.toString().replaceAll("[.@]", "_"), supertypeFori);
+            subtype.put(i.toString().replaceAll("[.@]", "_"), subtypeFori);
         }
     }
 
@@ -109,16 +133,155 @@ public class LogicSolver implements InferenceSolver {
         for (AnnotationMirror i : allTypes) {
             String notComparableFori = "";
             for (AnnotationMirror j : allTypes) {
-                if (!subtype.get(i.toString()).contains(j.toString())
-                        && !subtype.get(j.toString()).contains(i.toString())) {
-                    notComparableFori = notComparableFori + " " + j.toString();
+                if (!subtype.get(i.toString().replaceAll("[.@]", "_"))
+                        .contains(j.toString().replaceAll("[.@]", "_"))
+                        && !subtype.get(j.toString().replaceAll("[.@]", "_"))
+                                .contains(i.toString().replaceAll("[.@]", "_"))) {
+                    notComparableFori = notComparableFori + " "
+                            + j.toString().replaceAll("[.@]", "_");
                 }
             }
             if (!notComparableFori.equals("")) {
-                notComparable.put(i.toString(), notComparableFori);
+                notComparable.put(i.toString().replaceAll("[.@]", "_"),
+                        notComparableFori);
             }
 
         }
+    }
+
+    public String getEncodingForEualityConstraint(Set<String> allTypesInString,
+            String encodingForEqualityConstraint) {
+        for (String s : allTypesInString) {
+            encodingForEqualityConstraint = encodingForEqualityConstraint
+                    + isAnnotated + s
+                    + "[v1] = true <- equalityConstraint[v1,v2] = true, "
+                    + isAnnotated + s + "[v2] = true.\n";
+            encodingForEqualityConstraint = encodingForEqualityConstraint
+                    + isAnnotated + s
+                    + "[v2] = true <- equalityConstraint[v1,v2] = true, "
+                    + isAnnotated + s + "[v1] = true.\n";
+
+        }
+        return encodingForEqualityConstraint;
+    }
+
+    public String getEncodingForSubtypeConTopBottom(
+            Set<String> allTypesInString, String encodingForSubtypeConTopBottom) {
+        String[] subtypeFors;
+        for (String subkey : subtype.keySet()) {
+            subtypeFors = subtype.get(subkey).split(" ");
+            if (subtypeFors.length == allTypesInString.size() + 1) {
+                encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                        + isAnnotated + subkey
+                        + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
+                        + isAnnotated + subkey + "[v1] = true.\n";
+            }   
+        }
+        for (String superkey : supertype.keySet()) {
+            subtypeFors = supertype.get(superkey).split(" ");
+            if (subtypeFors.length == allTypesInString.size() + 1) {
+                encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                        + isAnnotated + superkey
+                        + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
+                        + isAnnotated + superkey + "[v2] = true.\n";
+            }   
+        }
+        return encodingForSubtypeConTopBottom;
+    }
+
+    public String getEncodingForComparableConstraint(
+            Set<String> allTypesInString, String encodingForComparableConstraint) {
+        String variableMaybeAnnotated = "";
+        if (notComparable.isEmpty() != true) {
+            String[] notComparableForkey;
+            for (String key : notComparable.keySet()) {
+                notComparableForkey = notComparable.get(key).split(" ");
+                for (String s : notComparableForkey) {
+                    if (!s.equals("")) {
+                        encodingForComparableConstraint = encodingForComparableConstraint
+                                + cannotBeAnnotated
+                                + key
+                                + "[v1] = true <- comparableConstraint[v1,v2] = true, "
+                                + isAnnotated + s + "[v2] = true.\n";
+                        encodingForComparableConstraint = encodingForComparableConstraint
+                                + cannotBeAnnotated
+                                + key
+                                + "[v2] = true <- comparableConstraint[v1,v2] = true, "
+                                + isAnnotated + s + "[v1] = true.\n";
+                        for (String ss : allTypesInString) {
+                            if (!ss.equals(s)) {
+                                variableMaybeAnnotated = variableMaybeAnnotated
+                                        + mayBeAnnotated
+                                        + ss
+                                        + "[v1] = true <- comparableConstraint[v1,v2] = true, "
+                                        + isAnnotated + key + "[v2] = true, !"
+                                        + cannotBeAnnotated + ss
+                                        + "[v1] = true.\n";
+                                variableMaybeAnnotated = variableMaybeAnnotated
+                                        + mayBeAnnotated
+                                        + ss
+                                        + "[v2] = true <- comparableConstraint[v1,v2] = true, "
+                                        + isAnnotated + key + "[v1] = true, !"
+                                        + cannotBeAnnotated + ss
+                                        + "[v2] = true.\n";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        encodingForComparableConstraint = encodingForComparableConstraint
+                + variableMaybeAnnotated;
+        return encodingForComparableConstraint;
+    }
+
+    public String getEncodingForIneualityConstraint(
+            Set<String> allTypesInString, String encodingForInequalityConstraint) {
+        String variableMaybeAnnotated = "";
+        for (String s : allTypesInString) {
+            encodingForInequalityConstraint = encodingForInequalityConstraint
+                    + cannotBeAnnotated + s
+                    + "[v1] = true <- inequalityConstraint[v1,v2] = true, "
+                    + isAnnotated + s + "[v2] = true.\n";
+            encodingForInequalityConstraint = encodingForInequalityConstraint
+                    + cannotBeAnnotated + s
+                    + "[v2] = true <- inequalityConstraint[v1,v2] = true, "
+                    + isAnnotated + s + "[v1] = true.\n";
+            for (String ss : allTypesInString) {
+                if (s != ss) {
+                    variableMaybeAnnotated = variableMaybeAnnotated
+                            + mayBeAnnotated
+                            + ss
+                            + "[v1] = true <- inequalityConstraint[v1,v2] = true, "
+                            + isAnnotated + s + "[v2] = true, !"
+                            + cannotBeAnnotated + ss + "[v1] = true.\n";
+                    variableMaybeAnnotated = variableMaybeAnnotated
+                            + mayBeAnnotated
+                            + ss
+                            + "[v2] = true <- inequalityConstraint[v1,v2] = true, "
+                            + isAnnotated + s + "[v1] = true, !"
+                            + cannotBeAnnotated + ss + "[v2] = true.\n";
+                }
+            }
+        }
+        encodingForInequalityConstraint = encodingForInequalityConstraint
+                + variableMaybeAnnotated;
+        return encodingForInequalityConstraint;
+
+    }
+
+    public String getEncodingForInequalityConModifier(
+            Set<String> allTypesInString,
+            String encodingForInequalityConModifier) {
+        for (String s : allTypesInString) {
+            encodingForInequalityConModifier = encodingForInequalityConModifier
+                    + cannotBeAnnotated
+                    + s
+                    + "[v1] = true <- inequalityConstraintContainsModifier[v1,v2] = true, v2 = \""
+                    + s + "\".\n";
+        }
+
+        return encodingForInequalityConModifier;
     }
 
     public String getEncodingForEqualityConModifier(
@@ -164,6 +327,7 @@ public class LogicSolver implements InferenceSolver {
     }
 
     public void print() {
+
         Set<String> Keys = subtype.keySet();
         System.out.println("subtype relation:");
         for (String a : Keys) {
@@ -181,6 +345,6 @@ public class LogicSolver implements InferenceSolver {
             System.out.println("for: " + c + ", not Comparable with: "
                     + notComparable.get(c));
         }
-
     }
 }
+
