@@ -76,9 +76,9 @@ public class LogicSolver implements InferenceSolver {
         String encodingForInequalityConstraint = "";
         String encodingForComparableConstraint = "";
         String encodingForSubtypeConTopBottom = "";
+        String encodingForSubtypeConstraint = "";
         String encodingForAdaptationConstraint = "";
         String basicEncoding = "";
-
         for (AnnotationMirror i : allTypes) {
             allTypesInString.add(i.toString().replaceAll("[.@]", "_"));
         }
@@ -97,6 +97,8 @@ public class LogicSolver implements InferenceSolver {
                 allTypesInString, encodingForComparableConstraint);
         encodingForSubtypeConTopBottom = getEncodingForSubtypeConTopBottom(
                 allTypesInString, encodingForSubtypeConTopBottom);
+        encodingForSubtypeConstraint = getEncodingForSubtypeConstraint(
+                allTypesInString, encodingForSubtypeConstraint);
         encodingForAdaptationConstraint = getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
         // print();
@@ -107,7 +109,9 @@ public class LogicSolver implements InferenceSolver {
         System.out.println(encodingForInequalityConstraint);
         System.out.println(encodingForComparableConstraint);
         System.out.println(encodingForSubtypeConTopBottom);
+        System.out.println(encodingForSubtypeConstraint);
         System.out.println(encodingForAdaptationConstraint);
+        // TODO: delete top bottom
         return null;
 
     }
@@ -165,6 +169,67 @@ public class LogicSolver implements InferenceSolver {
 
         }
         return encodingForEqualityConstraint;
+    }
+
+    public String getEncodingForSubtypeConstraint(Set<String> allTypesInString,
+            String encodingForSubtypeConTopBottom) {
+        String[] subtypeFors;
+        String[] supertypeFors;
+        for (String subkey : allTypesInString) {
+            subtypeFors = subtype.get(subkey).split(" ");
+            supertypeFors = supertype.get(subkey).split(" ");
+            for (int i = 1; i < subtypeFors.length; i++) {
+                if (!subtypeFors[i].equals(subkey)
+                        && !subtypeFors[i].equals(" ")) {
+                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                            + cannotBeAnnotated
+                            + subkey
+                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
+                            + isAnnotated + subtypeFors[i] + "[v2] = true.\n";
+                }
+                if (!subtypeFors[i].equals(" ")) {
+                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                            + mayBeAnnotated
+                            + subkey
+                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
+                            + isAnnotated
+                            + subtypeFors[i]
+                            + "[v1] = true, "
+                            + "!"
+                            + cannotBeAnnotated
+                            + subkey
+                            + "[v2] = true.\n";
+                }
+            }
+
+            for (int j = 1; j < supertypeFors.length; j++) {
+                if (!supertypeFors[j].equals(subkey)
+                        && !supertypeFors[j].equals(" ")) {
+                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                            + cannotBeAnnotated
+                            + subkey
+                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
+                            + isAnnotated + supertypeFors[j] + "[v1] = true.\n";
+                }
+                if (!supertypeFors[j].equals(" ")) {
+                    if (supertypeFors.length == 2)
+                        encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                                + mayBeAnnotated
+                                + subkey
+                                + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
+                                + isAnnotated
+                                + supertypeFors[j]
+                                + "[v2] = true, "
+                                + "!"
+                                + cannotBeAnnotated
+                                + subkey + "[v1] = true.\n";
+                }
+
+            }
+        }
+
+        return encodingForSubtypeConTopBottom;
+
     }
 
     public String getEncodingForSubtypeConTopBottom(
