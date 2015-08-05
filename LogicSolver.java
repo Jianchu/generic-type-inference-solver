@@ -186,8 +186,7 @@ public class LogicSolver implements InferenceSolver {
                             + subkey
                             + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
                             + isAnnotated + subtypeFors[i] + "[v2] = true.\n";
-                }
-                if (!subtypeFors[i].equals(" ")) {
+                } if (!subtypeFors[i].equals(" ") && !(subkey.equals(top) && subtypeFors[i].equals(top))) {
                     encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                             + mayBeAnnotated
                             + subkey
@@ -210,19 +209,18 @@ public class LogicSolver implements InferenceSolver {
                             + subkey
                             + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
                             + isAnnotated + supertypeFors[j] + "[v1] = true.\n";
-                }
-                if (!supertypeFors[j].equals(" ")) {
-                    if (supertypeFors.length == 2)
-                        encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
-                                + mayBeAnnotated
-                                + subkey
-                                + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
-                                + isAnnotated
-                                + supertypeFors[j]
-                                + "[v2] = true, "
-                                + "!"
-                                + cannotBeAnnotated
-                                + subkey + "[v1] = true.\n";
+                } if (!supertypeFors[j].equals(" ") && !(subkey.equals(bottom) && supertypeFors[j].equals(bottom))) {
+                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
+                            + mayBeAnnotated
+                            + subkey
+                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
+                            + isAnnotated
+                            + supertypeFors[j]
+                            + "[v2] = true, "
+                            + "!"
+                            + cannotBeAnnotated
+                            + subkey
+                            + "[v1] = true.\n";
                 }
 
             }
@@ -231,7 +229,6 @@ public class LogicSolver implements InferenceSolver {
         return encodingForSubtypeConTopBottom;
 
     }
-
     public String getEncodingForSubtypeConTopBottom(
             Set<String> allTypesInString, String encodingForSubtypeConTopBottom) {
         String[] subtypeFors;
