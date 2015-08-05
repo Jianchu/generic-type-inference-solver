@@ -59,6 +59,7 @@ public class LogicSolver implements InferenceSolver {
     final String isAnnotated = "isAnnotated";
     final String mayBeAnnotated = "mayBeAnnotated";
     final String cannotBeAnnotated = "cannotBeAnnotated";
+
     @Override
     public Map<Integer, AnnotationMirror> solve(
             Map<String, String> configuration, Collection<Slot> slots,
@@ -75,8 +76,9 @@ public class LogicSolver implements InferenceSolver {
         String encodingForInequalityConstraint = "";
         String encodingForComparableConstraint = "";
         String encodingForSubtypeConTopBottom = "";
-        String encodingForSubtypeConstraint = "";
+        String encodingForAdaptationConstraint = "";
         String basicEncoding = "";
+
         for (AnnotationMirror i : allTypes) {
             allTypesInString.add(i.toString().replaceAll("[.@]", "_"));
         }
@@ -95,8 +97,7 @@ public class LogicSolver implements InferenceSolver {
                 allTypesInString, encodingForComparableConstraint);
         encodingForSubtypeConTopBottom = getEncodingForSubtypeConTopBottom(
                 allTypesInString, encodingForSubtypeConTopBottom);
-        encodingForSubtypeConstraint = getEncodingForSubtypeConstraint(
-                allTypesInString, encodingForSubtypeConstraint);
+        encodingForAdaptationConstraint = getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
         // print();
         System.out.println(basicEncoding);
@@ -106,9 +107,7 @@ public class LogicSolver implements InferenceSolver {
         System.out.println(encodingForInequalityConstraint);
         System.out.println(encodingForComparableConstraint);
         System.out.println(encodingForSubtypeConTopBottom);
-        System.out.println(encodingForSubtypeConstraint);
-
-        // TODO: delete top bottom
+        System.out.println(encodingForAdaptationConstraint);
         return null;
 
     }
@@ -166,66 +165,6 @@ public class LogicSolver implements InferenceSolver {
 
         }
         return encodingForEqualityConstraint;
-    }
-
-    public String getEncodingForSubtypeConstraint(Set<String> allTypesInString,
-            String encodingForSubtypeConTopBottom) {
-        String[] subtypeFors;
-        String[] supertypeFors;
-        for (String subkey : allTypesInString) {
-            subtypeFors = subtype.get(subkey).split(" ");
-            supertypeFors = supertype.get(subkey).split(" ");
-            for (int i = 1; i < subtypeFors.length; i++) {
-                if (!subtypeFors[i].equals(subkey)
-                        && !subtypeFors[i].equals(" ")) {
-                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
-                            + cannotBeAnnotated
-                            + subkey
-                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated + subtypeFors[i] + "[v2] = true.\n";
-                } if (!subtypeFors[i].equals(" ")) {
-                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
-                            + mayBeAnnotated
-                            + subkey
-                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated
-                            + subtypeFors[i]
-                            + "[v1] = true, "
-                            + "!"
-                            + cannotBeAnnotated
-                            + subkey
-                            + "[v2] = true.\n";
-                }
-            }
-
-            for (int j = 1; j < supertypeFors.length; j++) {
-                if (!supertypeFors[j].equals(subkey)
-                        && !supertypeFors[j].equals(" ")) {
-                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
-                            + cannotBeAnnotated
-                            + subkey
-                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated + supertypeFors[j] + "[v1] = true.\n";
-                } if (!supertypeFors[j].equals(" ")) {
-                    if (supertypeFors.length ==2)
-                    encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
-                            + mayBeAnnotated
-                            + subkey
-                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated
-                            + supertypeFors[j]
-                            + "[v2] = true, "
-                            + "!"
-                            + cannotBeAnnotated
-                            + subkey
-                            + "[v1] = true.\n";
-                }
-
-            }
-        }
-
-        return encodingForSubtypeConTopBottom;
-
     }
 
     public String getEncodingForSubtypeConTopBottom(
@@ -389,6 +328,16 @@ public class LogicSolver implements InferenceSolver {
 
     }
 
+    public String getEncodingForAdaptationConstraint(
+            String encodingForAdaptationConstraint) {
+        encodingForAdaptationConstraint = "isAnnotatedPeer[v3] = true <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedPeer[v1] = true, isAnnotatedPeer[v2] = true. \n"
+                + "isAnnotatedRep[v3] = true <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedRep[v1] = true, isAnnotatedPeer[v2] = true. \n"
+                + "isAnnotatedAny[v3] = true <- adaptationConstraint[_,v2,v3] = true, isAnnotatedAny[v2] = true. \n"
+                + "AnnotationOf[v3] = AnnotationOf[v2] <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedSelf[v1] = true. \n"
+                + "isAnnotatedLost[v3] = true <- adaptationConstraint[v1,v2,v3] = true, (!isAnnotatedPeer[v1] = true;!isAnnotatedPeer[v2] = true),(!isAnnotatedPeer[v2] = true;!isAnnotatedRep[v1] = true),!isAnnotatedAny[v2] = true,!isAnnotatedSelf[v1] = true. \n";
+        return encodingForAdaptationConstraint;
+    }
+
     public void print() {
 
         Set<String> Keys = subtype.keySet();
@@ -410,3 +359,4 @@ public class LogicSolver implements InferenceSolver {
         }
     }
 }
+
