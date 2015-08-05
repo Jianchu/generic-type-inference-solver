@@ -54,20 +54,18 @@ public class LogicSolver implements InferenceSolver {
     Map<String, String> supertype = new HashMap<String, String>();
     Map<String, String> notComparable = new HashMap<String, String>();
     Set<? extends AnnotationMirror> allTypes;
-    Set<? extends AnnotationMirror> top;
-    Set<? extends AnnotationMirror> bottom;
+    String top ="";
+    String bottom = "";
     final String isAnnotated = "isAnnotated";
     final String mayBeAnnotated = "mayBeAnnotated";
     final String cannotBeAnnotated = "cannotBeAnnotated";
-
+    
     @Override
     public Map<Integer, AnnotationMirror> solve(
             Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
-        top = qualHierarchy.getTopAnnotations();
-        bottom = qualHierarchy.getBottomAnnotations();
         allTypes = qualHierarchy.getTypeQualifiers();
         Set<String> allTypesInString = new HashSet<String>();
         String encodingForEqualityConModifier = "";
@@ -82,6 +80,7 @@ public class LogicSolver implements InferenceSolver {
         for (AnnotationMirror i : allTypes) {
             allTypesInString.add(i.toString().replaceAll("[.@]", "_"));
         }
+        getTopBottomQualifier(qualHierarchy);
         getSubSupertype(qualHierarchy);
         getNotComparable();
         basicEncoding = getBasicString(allTypesInString, basicEncoding);
@@ -111,11 +110,19 @@ public class LogicSolver implements InferenceSolver {
         System.out.println(encodingForSubtypeConTopBottom);
         System.out.println(encodingForSubtypeConstraint);
         System.out.println(encodingForAdaptationConstraint);
-        // TODO: delete top bottom
         return null;
 
     }
 
+    public void getTopBottomQualifier(QualifierHierarchy hierarchy){
+        for (AnnotationMirror i :hierarchy.getTopAnnotations()){
+            top = i.toString().replaceAll("[.@]", "_");
+        }
+        for (AnnotationMirror j :hierarchy.getBottomAnnotations()){
+            bottom = j.toString().replaceAll("[.@]", "_");
+        }
+    }
+    
     public void getSubSupertype(QualifierHierarchy hierarchy) {
         for (AnnotationMirror i : allTypes) {
             String subtypeFori = "";
@@ -229,6 +236,7 @@ public class LogicSolver implements InferenceSolver {
         return encodingForSubtypeConTopBottom;
 
     }
+
     public String getEncodingForSubtypeConTopBottom(
             Set<String> allTypesInString, String encodingForSubtypeConTopBottom) {
         String[] subtypeFors;
