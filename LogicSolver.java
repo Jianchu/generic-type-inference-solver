@@ -400,11 +400,11 @@ public class LogicSolver implements InferenceSolver {
 
     public String getEncodingForAdaptationConstraint(
             String encodingForAdaptationConstraint) {
-        encodingForAdaptationConstraint = "isAnnotatedPeer[v3] = true <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedPeer[v1] = true, isAnnotatedPeer[v2] = true. \n"
-                + "isAnnotatedRep[v3] = true <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedRep[v1] = true, isAnnotatedPeer[v2] = true. \n"
-                + "isAnnotatedAny[v3] = true <- adaptationConstraint[_,v2,v3] = true, isAnnotatedAny[v2] = true. \n"
-                + "AnnotationOf[v3] = AnnotationOf[v2] <- adaptationConstraint[v1,v2,v3] = true, isAnnotatedSelf[v1] = true. \n"
-                + "isAnnotatedLost[v3] = true <- adaptationConstraint[v1,v2,v3] = true, (!isAnnotatedPeer[v1] = true;!isAnnotatedPeer[v2] = true),(!isAnnotatedPeer[v2] = true;!isAnnotatedRep[v1] = true),!isAnnotatedAny[v2] = true,!isAnnotatedSelf[v1] = true. \n";
+        InferenceChecker IC = new GUTIChecker();
+        GUTIChecker GC = (GUTIChecker) IC;
+        if (IC instanceof AdaptationInference ){
+            encodingForAdaptationConstraint= GC.viewpointEncodingFor();
+        }
         return encodingForAdaptationConstraint;
     }
 
