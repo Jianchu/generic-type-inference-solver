@@ -167,12 +167,12 @@ public class LogicSolver implements InferenceSolver {
         for (String s : allTypesInString) {
             encodingForEqualityConstraint = encodingForEqualityConstraint
                     + isAnnotated + s
-                    + "[v1] = true <- equalityConstraint[v1,v2] = true, "
-                    + isAnnotated + s + "[v2] = true.\n";
+                    + "(v1) <- equalityConstraint(v1,v2), "
+                    + isAnnotated + s + "(v2).\n";
             encodingForEqualityConstraint = encodingForEqualityConstraint
                     + isAnnotated + s
-                    + "[v2] = true <- equalityConstraint[v1,v2] = true, "
-                    + isAnnotated + s + "[v1] = true.\n";
+                    + "(v2)<- equalityConstraint(v1,v2), "
+                    + isAnnotated + s + "(v1).\n";
 
         }
         return encodingForEqualityConstraint;
@@ -191,20 +191,20 @@ public class LogicSolver implements InferenceSolver {
                     encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                             + cannotBeAnnotated
                             + subkey
-                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated + subtypeFors[i] + "[v2] = true.\n";
+                            + "(v1) <- subtypeConstraint(v1,v2), "
+                            + isAnnotated + subtypeFors[i] + "(v2).\n";
                 } if (!subtypeFors[i].equals(" ") && !(subkey.equals(top) && subtypeFors[i].equals(top))) {
                     encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                             + mayBeAnnotated
                             + subkey
-                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
+                            + "(v2) <- subtypeConstraint(v1,v2), "
                             + isAnnotated
                             + subtypeFors[i]
-                            + "[v1] = true, "
+                            + "(v1), "
                             + "!"
                             + cannotBeAnnotated
                             + subkey
-                            + "[v2] = true.\n";
+                            + "(v2).\n";
                 }
             }
 
@@ -214,20 +214,20 @@ public class LogicSolver implements InferenceSolver {
                     encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                             + cannotBeAnnotated
                             + subkey
-                            + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
-                            + isAnnotated + supertypeFors[j] + "[v1] = true.\n";
+                            + "(v2) <- subtypeConstraint(v1,v2), "
+                            + isAnnotated + supertypeFors[j] + "(v1).\n";
                 } if (!supertypeFors[j].equals(" ") && !(subkey.equals(bottom) && supertypeFors[j].equals(bottom))) {
                     encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                             + mayBeAnnotated
                             + subkey
-                            + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
+                            + "(v1) <- subtypeConstraint(v1,v2), "
                             + isAnnotated
                             + supertypeFors[j]
-                            + "[v2] = true, "
+                            + "(v2), "
                             + "!"
                             + cannotBeAnnotated
                             + subkey
-                            + "[v1] = true.\n";
+                            + "(v1).\n";
                 }
 
             }
@@ -245,8 +245,8 @@ public class LogicSolver implements InferenceSolver {
             if (subtypeFors.length == allTypesInString.size() + 1) {
                 encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                         + isAnnotated + subkey
-                        + "[v2] = true <- subtypeConstraint[v1,v2] = true, "
-                        + isAnnotated + subkey + "[v1] = true.\n";
+                        + "(v2) <- subtypeConstraint(v1,v2), "
+                        + isAnnotated + subkey + "(v1).\n";
             }
         }
         for (String superkey : supertype.keySet()) {
@@ -254,8 +254,8 @@ public class LogicSolver implements InferenceSolver {
             if (subtypeFors.length == allTypesInString.size() + 1) {
                 encodingForSubtypeConTopBottom = encodingForSubtypeConTopBottom
                         + isAnnotated + superkey
-                        + "[v1] = true <- subtypeConstraint[v1,v2] = true, "
-                        + isAnnotated + superkey + "[v2] = true.\n";
+                        + "(v1) <- subtypeConstraint(v1,v2), "
+                        + isAnnotated + superkey + "(v2).\n";
             }
         }
         return encodingForSubtypeConTopBottom;
@@ -273,29 +273,29 @@ public class LogicSolver implements InferenceSolver {
                         encodingForComparableConstraint = encodingForComparableConstraint
                                 + cannotBeAnnotated
                                 + key
-                                + "[v1] = true <- comparableConstraint[v1,v2] = true, "
-                                + isAnnotated + s + "[v2] = true.\n";
+                                + "(v1)<- comparableConstraint(v1,v2), "
+                                + isAnnotated + s + "(v2).\n";
                         encodingForComparableConstraint = encodingForComparableConstraint
                                 + cannotBeAnnotated
                                 + key
-                                + "[v2] = true <- comparableConstraint[v1,v2] = true, "
-                                + isAnnotated + s + "[v1] = true.\n";
+                                + "(v2)<- comparableConstraint(v1,v2), "
+                                + isAnnotated + s + "(v1).\n";
                         for (String ss : allTypesInString) {
                             if (!ss.equals(s)) {
                                 variableMaybeAnnotated = variableMaybeAnnotated
                                         + mayBeAnnotated
                                         + ss
-                                        + "[v1] = true <- comparableConstraint[v1,v2] = true, "
-                                        + isAnnotated + key + "[v2] = true, !"
+                                        + "(v1) <- comparableConstraint(v1,v2), "
+                                        + isAnnotated + key + "(v2), !"
                                         + cannotBeAnnotated + ss
-                                        + "[v1] = true.\n";
+                                        + "(v1).\n";
                                 variableMaybeAnnotated = variableMaybeAnnotated
                                         + mayBeAnnotated
                                         + ss
-                                        + "[v2] = true <- comparableConstraint[v1,v2] = true, "
-                                        + isAnnotated + key + "[v1] = true, !"
+                                        + "(v2) <- comparableConstraint(v1,v2), "
+                                        + isAnnotated + key + "(v1), !"
                                         + cannotBeAnnotated + ss
-                                        + "[v2] = true.\n";
+                                        + "(v2).\n";
                             }
                         }
                     }
@@ -313,26 +313,26 @@ public class LogicSolver implements InferenceSolver {
         for (String s : allTypesInString) {
             encodingForInequalityConstraint = encodingForInequalityConstraint
                     + cannotBeAnnotated + s
-                    + "[v1] = true <- inequalityConstraint[v1,v2] = true, "
-                    + isAnnotated + s + "[v2] = true.\n";
+                    + "(v1) <- inequalityConstraint(v1,v2), "
+                    + isAnnotated + s + "(v2).\n";
             encodingForInequalityConstraint = encodingForInequalityConstraint
                     + cannotBeAnnotated + s
-                    + "[v2] = true <- inequalityConstraint[v1,v2] = true, "
-                    + isAnnotated + s + "[v1] = true.\n";
+                    + "(v2) <- inequalityConstraint(v1,v2), "
+                    + isAnnotated + s + "(v1).\n";
             for (String ss : allTypesInString) {
                 if (s != ss) {
                     variableMaybeAnnotated = variableMaybeAnnotated
                             + mayBeAnnotated
                             + ss
-                            + "[v1] = true <- inequalityConstraint[v1,v2] = true, "
-                            + isAnnotated + s + "[v2] = true, !"
-                            + cannotBeAnnotated + ss + "[v1] = true.\n";
+                            + "(v1) <- inequalityConstraint(v1,v2), "
+                            + isAnnotated + s + "(v2), !"
+                            + cannotBeAnnotated + ss + "(v1).\n";
                     variableMaybeAnnotated = variableMaybeAnnotated
                             + mayBeAnnotated
                             + ss
-                            + "[v2] = true <- inequalityConstraint[v1,v2] = true, "
-                            + isAnnotated + s + "[v1] = true, !"
-                            + cannotBeAnnotated + ss + "[v2] = true.\n";
+                            + "(v2) <- inequalityConstraint(v1,v2), "
+                            + isAnnotated + s + "(v1), !"
+                            + cannotBeAnnotated + ss + "(v2).\n";
                 }
             }
         }
@@ -349,7 +349,7 @@ public class LogicSolver implements InferenceSolver {
             encodingForInequalityConModifier = encodingForInequalityConModifier
                     + cannotBeAnnotated
                     + s
-                    + "[v1] = true <- inequalityConstraintContainsModifier[v1,v2] = true, v2 = \""
+                    + "(v1) <- inequalityConstraintContainsModifier(v1,v2), v2 = \""
                     + s + "\".\n";
         }
 
@@ -362,7 +362,7 @@ public class LogicSolver implements InferenceSolver {
             encodingForEqualityConModifier = encodingForEqualityConModifier
                     + isAnnotated
                     + s
-                    + "[v2] = true <- equalityConstraintContainsModifier[v1,v2] = true, v1 = \""
+                    + "(v2) <- equalityConstraintContainsModifier(v1,v2), v1 = \""
                     + s + "\".\n";
         }
         return encodingForEqualityConModifier;
@@ -379,20 +379,20 @@ public class LogicSolver implements InferenceSolver {
                 + "\norderedAnnotationOf[v] = a -> int(v), string(a)."
                 + "\norderedAnnotationOf[v] = a <- AnnotationOf[v]=a, orderVariable[_]=v."
                 + "\nAnnotationOf[v] = a -> variable(v), string(a)."
-                + "\nadaptationConstraint[v1,v2,v3] = a -> variable(v1), variable(v2), variable(v3), boolean(a)."
-                + "\nequalityConstraint[v1,v2] = e -> variable(v1), variable(v2), boolean(e)."
-                + "\nequalityConstraintContainsModifier[v1,v2] = e -> modifier(v1), variable(v2), boolean(e)."
-                + "\ninequalityConstraint[v1,v2] = e -> variable(v1), variable(v2), boolean(e)."
-                + "\ninequalityConstraintContainsModifier[v1,v2] = e -> modifier(v2), variable(v1), boolean(e)."
-                + "\ncomparableConstraint[v1,v2] = e -> variable(v1), variable(v2), boolean(e)."
-                + "\nsubtypeConstraint[v1,v2] = s -> variable(v1), variable(v2), boolean(s).\n";
+                + "\nadaptationConstraint(v1,v2,v3) -> variable(v1), variable(v2), variable(v3)."
+                + "\nequalityConstraint(v1,v2) -> variable(v1), variable(v2)."
+                + "\nequalityConstraintContainsModifier(v1,v2) -> modifier(v1), variable(v2)."
+                + "\ninequalityConstraint(v1,v2)-> variable(v1), variable(v2)."
+                + "\ninequalityConstraintContainsModifier(v1,v2) -> modifier(v2), variable(v1)."
+                + "\ncomparableConstraint(v1,v2) -> variable(v1), variable(v2)."
+                + "\nsubtypeConstraint(v1,v2) -> variable(v1), variable(v2).\n";
         for (String s : allTypesInString) {
             basicEncoding = basicEncoding + isAnnotated + s
-                    + "[v]=i ->variable(v),boolean(i).\n" + mayBeAnnotated + s
-                    + "[v]=i ->variable(v),boolean(i).\n" + cannotBeAnnotated
-                    + s + "[v]=i ->variable(v),boolean(i).\n"
+                    + "(v) ->variable(v).\n" + mayBeAnnotated + s
+                    + "(v) ->variable(v).\n" + cannotBeAnnotated
+                    + s + "(v) ->variable(v).\n"
                     + "AnnotationOf[v] = \"" + s + "\" <-isAnnotated" + s
-                    + "[v] = true.\n";
+                    + "(v).\n";
         }
         return basicEncoding;
 
@@ -429,4 +429,3 @@ public class LogicSolver implements InferenceSolver {
         }
     }
 }
-
