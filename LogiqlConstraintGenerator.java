@@ -72,7 +72,6 @@ public class LogiqlConstraintGenerator {
                 allTypesInString, encodingForSubtypeConstraint);
         encodingForAdaptationConstraint = getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
-        // print();
         writeFile(basicEncoding + encodingForEqualityConModifier
                 + encodingForInequalityConModifier
                 + encodingForEqualityConstraint
@@ -372,11 +371,11 @@ public class LogiqlConstraintGenerator {
 
     public String getEncodingForAdaptationConstraint(
             String encodingForAdaptationConstraint) {
-        // InferenceChecker IC = new GUTIChecker();
-        // GUTIChecker GC = (GUTIChecker) IC;
-        // if (IC instanceof AdaptationInference ){
-        // encodingForAdaptationConstraint= GC.viewpointEncodingFor();
-        // }
+         InferenceChecker IC = new GUTIChecker();
+         GUTIChecker GC = (GUTIChecker) IC;
+         if (IC instanceof AdaptationInference ){
+         encodingForAdaptationConstraint= GC.viewpointEncodingFor();
+         }
         return encodingForAdaptationConstraint;
     }
     
@@ -392,27 +391,6 @@ public class LogiqlConstraintGenerator {
             pw.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public void print() {
-
-        Set<String> Keys = subtype.keySet();
-        System.out.println("subtype relation:");
-        for (String a : Keys) {
-            System.out.println("supertype: " + a + ",subtype: "
-                    + subtype.get(a));
-        }
-        System.out.println("supertype relation");
-        for (String b : Keys) {
-            System.out.println("subtype: " + b + ",supertype: "
-                    + supertype.get(b));
-        }
-        System.out.println("notComparableFori");
-        Set<String> Keys1 = notComparable.keySet();
-        for (String c : Keys1) {
-            System.out.println("for: " + c + ", not Comparable with: "
-                    + notComparable.get(c));
         }
     }
 }

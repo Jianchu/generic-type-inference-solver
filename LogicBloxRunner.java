@@ -43,7 +43,8 @@ public class LogicBloxRunner {
                 try {
                     while ((s = stdInput.readLine()) != null) {
                         if (i == 3){
-                            inReply = inReply + s + "\n";                           
+                            inReply = inReply + s + "\n";
+                            //System.out.println(s);
                         }
                     }                   
                 } catch (NumberFormatException | IOException e) {
@@ -75,7 +76,6 @@ public class LogicBloxRunner {
     }
     
     private void writeFile(String output){
-        System.out.println(output);
         try {
             String writePath = Path + "/logicbloxOutput.txt";
             File f = new File(writePath);

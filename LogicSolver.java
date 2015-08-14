@@ -30,6 +30,7 @@ public class LogicSolver implements InferenceSolver {
             Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
+        Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
         final String currentPath = new File("").getAbsolutePath();
         
         LogiqlConstraintGenerator constraintGenerator = new LogiqlConstraintGenerator(qualHierarchy);
@@ -51,7 +52,13 @@ public class LogicSolver implements InferenceSolver {
             e.printStackTrace();
         }
         
-        return null;
+        InsertionTool insertTool = new InsertionTool (slots, qualHierarchy);
+        result = insertTool.insertToSource();
+        for (int i : result.keySet()){
+            System.out.println("Slot ID: "+ i + "  Annotation: " + result.get(i).toString());
+        }
+        
+        return result;
     }
 
 }
