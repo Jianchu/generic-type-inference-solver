@@ -52,8 +52,8 @@ public class LogicSolver implements InferenceSolver {
             e.printStackTrace();
         }
         
-        InsertionTool insertTool = new InsertionTool (slots, qualHierarchy);
-        result = insertTool.insertToSource();
+        DecodingTool DecodeTool = new DecodingTool (slots, qualHierarchy);
+        result = DecodeTool.insertToSource();
         for (int i : result.keySet()){
             System.out.println("Slot ID: "+ i + "  Annotation: " + result.get(i).toString());
         }
@@ -62,3 +62,4 @@ public class LogicSolver implements InferenceSolver {
     }
 
 }
+

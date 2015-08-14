@@ -25,14 +25,14 @@ import checkers.inference.model.Slot;
  *
  */
 
-public class InsertionTool{
+public class DecodingTool{
     Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
     Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
     Collection<Slot> slots;
     QualifierHierarchy qualHierarchy;
     private final String currentPath = new File("").getAbsolutePath();     
     
-    public InsertionTool(Collection<Slot> slots,QualifierHierarchy qualHierarchy){
+    public DecodingTool(Collection<Slot> slots,QualifierHierarchy qualHierarchy){
         this.slots = slots;
         this.qualHierarchy = qualHierarchy;
     }
