@@ -24,17 +24,23 @@ public class LogiqlConstraintGenerator {
     Map<String, String> subtype = new HashMap<String, String>();
     Map<String, String> supertype = new HashMap<String, String>();
     Map<String, String> notComparable = new HashMap<String, String>();
+    Map<AnnotationMirror,String> qualifierName = new HashMap<AnnotationMirror,String>();
     Set<? extends AnnotationMirror> allTypes;
     String top = "";
     String bottom = "";
-    final String isAnnotated = "isAnnotated";
-    final String mayBeAnnotated = "mayBeAnnotated";
-    final String cannotBeAnnotated = "cannotBeAnnotated";
+    String path = "";
+    final String isAnnotated;
+    final String mayBeAnnotated;
+    final String cannotBeAnnotated;
     QualifierHierarchy qualHierarchy;
-    private final String currentPath = new File("").getAbsolutePath();
 
-    public LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy) {
+    public LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
+            String path) {
         this.qualHierarchy = qualHierarchy;
+        this.path = path;
+        isAnnotated = "isAnnotated";
+        mayBeAnnotated = "mayBeAnnotated";
+        cannotBeAnnotated = "cannotBeAnnotated";
     }
 
     public void GenerateLogiqlEncoding() throws IOException {
@@ -49,8 +55,9 @@ public class LogiqlConstraintGenerator {
         StringBuilder encodingForSubtypeConstraint = new StringBuilder();
         StringBuilder encodingForAdaptationConstraint = new StringBuilder();
         StringBuilder basicEncoding = new StringBuilder();
+        mapSimpleOriginalName();
         for (AnnotationMirror i : allTypes) {
-            allTypesInString.add(i.toString().replaceAll("[.@]", "_"));
+            allTypesInString.add(qualifierName.get(i));
         }
         getTopBottomQualifier(qualHierarchy);
         getSubSupertype(qualHierarchy);
@@ -90,54 +97,59 @@ public class LogiqlConstraintGenerator {
         // System.out.println(encodingForSubtypeConTopBottom);
         // System.out.println(encodingForSubtypeConstraint);
         // System.out.println(encodingForAdaptationConstraint);
-
+    }
+    
+    private void mapSimpleOriginalName() {
+        for (AnnotationMirror modifier : qualHierarchy.getTypeQualifiers()) {
+            qualifierName.put(modifier,
+                    modifier.toString().replaceAll("[.@]", "_"));
+        }
     }
 
-    public void getTopBottomQualifier(QualifierHierarchy hierarchy) {
+    private void getTopBottomQualifier(QualifierHierarchy hierarchy) {
         for (AnnotationMirror i : hierarchy.getTopAnnotations()) {
-            top = i.toString().replaceAll("[.@]", "_");
+            top = qualifierName.get(i);
         }
         for (AnnotationMirror j : hierarchy.getBottomAnnotations()) {
-            bottom = j.toString().replaceAll("[.@]", "_");
+            bottom = qualifierName.get(j);
         }
     }
 
-    public void getSubSupertype(QualifierHierarchy hierarchy) {
+    private void getSubSupertype(QualifierHierarchy hierarchy) {
         for (AnnotationMirror i : allTypes) {
             String subtypeFori = "";
             String supertypeFori = "";
             for (AnnotationMirror j : allTypes) {
                 if (hierarchy.isSubtype(j, i)) {
                     subtypeFori = subtypeFori + " "
-                            + j.toString().replaceAll("[.@]", "_");
+                            + qualifierName.get(j);
                 }
                 if (hierarchy.isSubtype(i, j)) {
                     supertypeFori = supertypeFori + " "
-                            + j.toString().replaceAll("[.@]", "_");
+                            + qualifierName.get(j);
                 }
             }
-            supertype.put(i.toString().replaceAll("[.@]", "_"), supertypeFori);
-            subtype.put(i.toString().replaceAll("[.@]", "_"), subtypeFori);
+            supertype.put(qualifierName.get(i), supertypeFori);
+            subtype.put(qualifierName.get(i), subtypeFori);
         }
     }
 
-    public void getNotComparable() {
+    private void getNotComparable() {
         for (AnnotationMirror i : allTypes) {
             String notComparableFori = "";
             for (AnnotationMirror j : allTypes) {
-                if (!subtype.get(i.toString().replaceAll("[.@]", "_"))
-                        .contains(j.toString().replaceAll("[.@]", "_"))
-                        && !subtype.get(j.toString().replaceAll("[.@]", "_"))
-                                .contains(i.toString().replaceAll("[.@]", "_"))) {
+                if (!subtype.get(qualifierName.get(i))
+                        .contains(qualifierName.get(j))
+                        && !subtype.get(qualifierName.get(j))
+                                .contains(qualifierName.get(i))) {
                     notComparableFori = notComparableFori + " "
-                            + j.toString().replaceAll("[.@]", "_");
+                            + qualifierName.get(j);
                 }
             }
             if (!notComparableFori.equals("")) {
-                notComparable.put(i.toString().replaceAll("[.@]", "_"),
+                notComparable.put(qualifierName.get(i),
                         notComparableFori);
             }
-
         }
     }
 
@@ -200,7 +212,6 @@ public class LogiqlConstraintGenerator {
         }
 
         return encodingForSubtypeConstraint;
-
     }
 
     public StringBuilder getEncodingForSubtypeConTopBottom(
@@ -298,7 +309,6 @@ public class LogiqlConstraintGenerator {
         }
         encodingForInequalityConstraint.append(variableMaybeAnnotated);
         return encodingForInequalityConstraint;
-
     }
 
     public StringBuilder getEncodingForInequalityConModifier(
@@ -355,25 +365,21 @@ public class LogiqlConstraintGenerator {
                     + "(v).\n");
         }
         return basicEncoding;
-
     }
 
     public StringBuilder getEncodingForAdaptationConstraint(
             StringBuilder encodingForAdaptationConstraint) {
-        // InferenceChecker IC = new GUTIChecker();
-        // GUTIChecker GC = (GUTIChecker) IC;
-        // if (IC instanceof AdaptationInference ){
-        // encodingForAdaptationConstraint= GC.viewpointEncodingFor();
-        // }
+         InferenceChecker IC = new GUTIChecker();
+         GUTIChecker GC = (GUTIChecker) IC;
+         if (IC instanceof AdaptationInference ){
+         encodingForAdaptationConstraint= GC.viewpointEncodingFor();
+         }
         return encodingForAdaptationConstraint;
     }
 
     private void writeFile(StringBuilder output) {
-        File file = new File(currentPath);
-        String Base = file.getParent().toString();
-        String Path = Base + "/src/checkers/inference/solver/LogiqlDebugSolver";
         try {
-            String writePath = Path + "/LogiqlEncoding.logic";
+            String writePath = path + "/LogiqlEncoding.logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
             pw.write(output.toString());

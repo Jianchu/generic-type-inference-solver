@@ -3,7 +3,6 @@ package checkers.inference.solver.LogiqlDebugSolver;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,19 +24,21 @@ import checkers.inference.model.Slot;
  *
  */
 
-public class DecodingTool{
+public class DecodingTool {
     Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
     Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
     Collection<Slot> slots;
     QualifierHierarchy qualHierarchy;
-    private final String currentPath = new File("").getAbsolutePath();     
-    
-    public DecodingTool(Collection<Slot> slots,QualifierHierarchy qualHierarchy){
+    private final String path;
+
+    public DecodingTool(Collection<Slot> slots,
+            QualifierHierarchy qualHierarchy, String path) {
         this.slots = slots;
         this.qualHierarchy = qualHierarchy;
+        this.path = path;
     }
-    
-    public  Map<Integer, AnnotationMirror> insertToSource() {
+
+    public Map<Integer, AnnotationMirror> insertToSource() {
         setDefault();
         mapSimpleOriginalName();
         try {
@@ -45,48 +46,46 @@ public class DecodingTool{
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
         return result;
     }
-    
-    private void mapSimpleOriginalName(){
-        for (AnnotationMirror modifier : qualHierarchy.getTypeQualifiers()){
-            qualifierName.put(modifier.toString().replaceAll("[.@]", "_"), modifier);
+
+    private void mapSimpleOriginalName() {
+        for (AnnotationMirror modifier : qualHierarchy.getTypeQualifiers()) {
+            qualifierName.put(modifier.toString().replaceAll("[.@]", "_"),
+                    modifier);
         }
     }
-    
-    private void DecodeLogicBloxOutput() throws FileNotFoundException  {
-        File file = new File(currentPath);
-        String Base = file.getParent().toString();
-        String Path = Base + "/src/checkers/inference/solver/LogiqlDebugSolver";
-        String readPath = Path + "/logicbloxOutput.txt";
+
+    private void DecodeLogicBloxOutput() throws FileNotFoundException {
+        String readPath = path + "/logicbloxOutput.txt";
         InputStream in = new FileInputStream(readPath);
-        BufferedReader reader = new BufferedReader (new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;
         try {
-            while ((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 String[] s = line.replaceAll("\"", "").split(" ");
                 int slotID = Integer.parseInt(s[0]);
-                AnnotationMirror annotation =qualifierName.get(s[s.length-1]);
+                AnnotationMirror annotation = qualifierName
+                        .get(s[s.length - 1]);
                 result.put(slotID, annotation);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }                       
+        }
     }
 
-    private void setDefault(){
+    private void setDefault() {
         AnnotationMirror topQualifier = getTopQualifier();
         for (int i = 0; i < slots.size(); i++) {
             result.put(i, topQualifier);
         }
     }
-    
-    private AnnotationMirror getTopQualifier(){
+
+    private AnnotationMirror getTopQualifier() {
         AnnotationMirror topQualifier = null;
-        for (AnnotationMirror i : qualHierarchy.getTopAnnotations()){
-             topQualifier = i;
+        for (AnnotationMirror i : qualHierarchy.getTopAnnotations()) {
+            topQualifier = i;
         }
-        return topQualifier; 
+        return topQualifier;
     }
 }

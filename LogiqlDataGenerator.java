@@ -22,18 +22,21 @@ import checkers.inference.model.VariableSlot;
 public class LogiqlDataGenerator {
     Collection<Slot> slots;
     Collection<Constraint> constraints;
-    private final String currentPath = new File("").getAbsolutePath();
-    boolean flag = false;
-    int constantSlot = -1;
+    String path;
+    boolean flag;
+    int constantSlot;
 
     public LogiqlDataGenerator(Collection<Slot> slots,
-            Collection<Constraint> constraints) {
+            Collection<Constraint> constraints, String path) {
         this.slots = slots;
         this.constraints = constraints;
+        this.path = path;
+        flag = false;
+        constantSlot = -1;
     }
 
     public void GenerateLogiqlData() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         for (Constraint constraint : constraints) {
             List<Slot> slot = constraint.getSlots();
             if (slot.get(0) != slot.get(1)) {
@@ -42,38 +45,39 @@ public class LogiqlDataGenerator {
                 String nameOfConstraint = getConstraintName(constraint
                         .getClass().getSimpleName());
                 if (vStr[0] != vStr[1]) {
-                    output = output + writeOutputString(nameOfConstraint, vStr, slot);
+                    output.append(writeOutputString(nameOfConstraint, vStr,
+                            slot));
                 }
             }
             flag = false;
             constantSlot = -1;
         }
-        writeFile(output);
+        writeFile(output.toString());
     }
-
 
     private String writeOutputString(String nameOfConstraint, String[] vStr,
             List<Slot> slot) {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         if (flag == true && constantSlot == 0) {
-            output = "+modifier(" + vStr[0] + "),+hasmodifierName[" + vStr[0]
-                    + "]=" + "\"" + vStr[0] + "\"," + "+variable(_" + vStr[1]
-                    + "),+hasvariableName[_" + vStr[1] + "]=" + vStr[1] + ","
-                    + "+" + nameOfConstraint + "(" + vStr[0] + "," + "_"
-                    + vStr[1] + ").\n";
+            output.append("+modifier(" + vStr[0] + "),+hasmodifierName["
+                    + vStr[0] + "]=" + "\"" + vStr[0] + "\"," + "+variable(_"
+                    + vStr[1] + "),+hasvariableName[_" + vStr[1] + "]="
+                    + vStr[1] + "," + "+" + nameOfConstraint + "(" + vStr[0]
+                    + "," + "_" + vStr[1] + ").\n");
         } else if (flag == true && constantSlot == 1) {
-            output = "+variable(_" + vStr[0] + "),+hasvariableName[_" + vStr[0]
-                    + "]=" + vStr[0] + "," + "+modifier(" + vStr[1]
+            output.append("+variable(_" + vStr[0] + "),+hasvariableName[_"
+                    + vStr[0] + "]=" + vStr[0] + "," + "+modifier(" + vStr[1]
                     + "),+hasmodifierName[" + vStr[1] + "]=" + "\"" + vStr[1]
                     + "\"," + "+" + nameOfConstraint + "(" + "_" + vStr[0]
-                    + "," + vStr[1] + ").\n";
+                    + "," + vStr[1] + ").\n");
         } else {
-            output = output + "+variable(_" + vStr[0] + "),+hasvariableName[_"
-                    + vStr[0] + "]=" + vStr[0] + "," + "+variable(_" + vStr[1] + "),+hasvariableName[_"
-                    + vStr[1] + "]=" + vStr[1] + "," + "+" + nameOfConstraint + "(" + "_" + vStr[0] + "," + "_"
-                    + vStr[1] + ").\n";
+            output.append("+variable(_" + vStr[0] + "),+hasvariableName[_"
+                    + vStr[0] + "]=" + vStr[0] + "," + "+variable(_" + vStr[1]
+                    + "),+hasvariableName[_" + vStr[1] + "]=" + vStr[1] + ","
+                    + "+" + nameOfConstraint + "(" + "_" + vStr[0] + "," + "_"
+                    + vStr[1] + ").\n");
         }
-        return output;
+        return output.toString();
     }
 
     /*
@@ -122,13 +126,10 @@ public class LogiqlDataGenerator {
         }
         return nameOfConstraint;
     }
-    
-    private void writeFile(String output){
-        File file = new File(currentPath);
-        String Base = file.getParent().toString();
-        String Path = Base + "/src/checkers/inference/solver/LogiqlDebugSolver";
+
+    private void writeFile(String output) {
         try {
-            String writePath = Path + "/data.logic";
+            String writePath = path + "/data.logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
             pw.write(output);
@@ -137,5 +138,4 @@ public class LogiqlDataGenerator {
             e.printStackTrace();
         }
     }
-
 }
