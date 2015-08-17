@@ -16,7 +16,7 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
 
 /**
- * 
+ * LogicSolver InferenceSolver and return a HashMap contains solved constraint.
  *
  * @author Jianchu Li
  *
@@ -30,12 +30,21 @@ public class LogicSolver implements InferenceSolver {
             Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
+        /**
+         * result is the HashMap that will be returned. path is the location of
+         * LogiqlDebugSolver folder.
+         */
         Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
         final String currentPath = new File("").getAbsolutePath();
         File file = new File(currentPath);
         String base = file.getParent().toString();
         String path = base + "/src/checkers/inference/solver/LogiqlDebugSolver";
 
+        /**
+         * creating a instance of LogiqlConstraintGenerator and running
+         * GenerateLogiqlEncoding method, in order to generate the logiql fixed
+         * encoding part of current type system.
+         */
         LogiqlConstraintGenerator constraintGenerator = new LogiqlConstraintGenerator(
                 qualHierarchy, path);
         try {
@@ -44,10 +53,20 @@ public class LogicSolver implements InferenceSolver {
             e.printStackTrace();
         }
 
+        /**
+         * creating a instance of dataGenerator and running GenerateLogiqlData
+         * method, in order to generate the logiql encoding for current input
+         * program.
+         */
         LogiqlDataGenerator dataGenerator = new LogiqlDataGenerator(slots,
                 constraints, path);
         dataGenerator.GenerateLogiqlData();
 
+        /**
+         * creating a instance of LogicBloxRunner and running runLogicBlox
+         * method, in order to send all the encoding to LogicBlox, and get the
+         * result from LogicBlox.
+         */
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(path);
         try {
             runLogicBlox.runLogicBlox();
@@ -57,6 +76,11 @@ public class LogicSolver implements InferenceSolver {
             e.printStackTrace();
         }
 
+        /**
+         * creating a instance of DecodeTool and running insertToSource method,
+         * in order to decode the result from LogicBlox, and put the result to
+         * HashMap result.
+         */
         DecodingTool DecodeTool = new DecodingTool(slots, qualHierarchy, path);
         result = DecodeTool.insertToSource();
         for (int i : result.keySet()) {
