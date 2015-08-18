@@ -18,8 +18,10 @@ import javax.lang.model.element.AnnotationMirror;
 import checkers.inference.model.Slot;
 
 /**
+ * DecodingTool decodes the result from LogicBlox, change the form to human
+ * readable form and put the result to HashMap result and return it to
+ * LogicSolver.
  * 
- *
  * @author Jianchu Li
  *
  */
@@ -56,6 +58,12 @@ public class DecodingTool {
         }
     }
 
+    /**
+     * DecodeLogicBloxOutput decodes the LogicBloxOutput, and put it in HashMap
+     * result.
+     * 
+     * @throws FileNotFoundException
+     */
     private void DecodeLogicBloxOutput() throws FileNotFoundException {
         String readPath = path + "/logicbloxOutput.txt";
         InputStream in = new FileInputStream(readPath);
@@ -74,6 +82,10 @@ public class DecodingTool {
         }
     }
 
+    /**
+     * in the beginning, set every slot's modifier be the top modifier of
+     * current type system.
+     */
     private void setDefault() {
         AnnotationMirror topQualifier = getTopQualifier();
         for (int i = 0; i < slots.size(); i++) {
