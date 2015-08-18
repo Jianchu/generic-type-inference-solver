@@ -482,11 +482,11 @@ public class LogiqlConstraintGenerator {
      */
     public StringBuilder getEncodingForAdaptationConstraint(
             StringBuilder encodingForAdaptationConstraint) {
-        // InferenceChecker IC = new GUTIChecker();
-        // GUTIChecker GC = (GUTIChecker) IC;
-        // if (IC instanceof AdaptationInference ){
-        // encodingForAdaptationConstraint= GC.viewpointEncodingFor();
-        // }
+         InferenceChecker IC = new GUTIChecker();
+         GUTIChecker GC = (GUTIChecker) IC;
+         if (IC instanceof AdaptationInference ){
+         encodingForAdaptationConstraint= GC.viewpointEncodingFor();
+         }
         return encodingForAdaptationConstraint;
     }
 
