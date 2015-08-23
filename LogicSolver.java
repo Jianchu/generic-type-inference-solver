@@ -47,11 +47,7 @@ public class LogicSolver implements InferenceSolver {
          */
         LogiqlConstraintGenerator constraintGenerator = new LogiqlConstraintGenerator(
                 qualHierarchy, path);
-        try {
             constraintGenerator.GenerateLogiqlEncoding();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         /**
          * creating a instance of dataGenerator and running GenerateLogiqlData
@@ -60,7 +56,7 @@ public class LogicSolver implements InferenceSolver {
          */
         LogiqlDataGenerator dataGenerator = new LogiqlDataGenerator(slots,
                 constraints, path);
-        dataGenerator.GenerateLogiqlData();
+        dataGenerator.generateLogiqlData();
 
         /**
          * creating a instance of LogicBloxRunner and running runLogicBlox
@@ -68,13 +64,7 @@ public class LogicSolver implements InferenceSolver {
          * result from LogicBlox.
          */
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(path);
-        try {
             runLogicBlox.runLogicBlox();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         /**
          * creating a instance of DecodeTool and running insertToSource method,
@@ -89,6 +79,4 @@ public class LogicSolver implements InferenceSolver {
         }
         return result;
     }
-
 }
-
