@@ -475,7 +475,7 @@ class LogiqlConstraintGenerator {
          InferenceChecker IC = new GUTIChecker();
          GUTIChecker GC = (GUTIChecker) IC;
          if (IC instanceof AdaptationInference ){
-         encodingForAdaptationConstraint= GC.viewpointEncodingFor();
+         encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
          }
     }
 
