@@ -55,7 +55,7 @@ public class LogiqlConstraintGenerator {
         StringBuilder encodingForComparableConstraint = new StringBuilder();
         StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
         StringBuilder encodingForSubtypeConstraint = new StringBuilder();
-        StringBuilder encodingForAdaptationConstraint = new StringBuilder();
+        String encodingForAdaptationConstraint = "";
         StringBuilder basicEncoding = new StringBuilder();
         mapSimpleOriginalName();
         for (AnnotationMirror i : allTypes) {
@@ -64,22 +64,22 @@ public class LogiqlConstraintGenerator {
         getTopBottomQualifier(qualHierarchy);
         getSubSupertype(qualHierarchy);
         getNotComparable();
-        basicEncoding = getBasicString(allTypesInString, basicEncoding);
-        encodingForEqualityConModifier = getEncodingForEqualityConModifier(
-                allTypesInString, encodingForEqualityConModifier);
-        encodingForInequalityConModifier = getEncodingForInequalityConModifier(
-                allTypesInString, encodingForInequalityConModifier);
-        encodingForEqualityConstraint = getEncodingForEqualityConstraint(
-                allTypesInString, encodingForEqualityConstraint);
-        encodingForInequalityConstraint = getEncodingForInequalityConstraint(
-                allTypesInString, encodingForInequalityConstraint);
-        encodingForComparableConstraint = getEncodingForComparableConstraint(
-                allTypesInString, encodingForComparableConstraint);
-        encodingForSubtypeConTopBottom = getEncodingForSubtypeConTopBottom(
-                allTypesInString, encodingForSubtypeConTopBottom);
-        encodingForSubtypeConstraint = getEncodingForSubtypeConstraint(
-                allTypesInString, encodingForSubtypeConstraint);
-        encodingForAdaptationConstraint = getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
+        getBasicString(allTypesInString, basicEncoding);
+        getEncodingForEqualityConModifier(allTypesInString,
+                encodingForEqualityConModifier);
+        getEncodingForInequalityConModifier(allTypesInString,
+                encodingForInequalityConModifier);
+        getEncodingForEqualityConstraint(allTypesInString,
+                encodingForEqualityConstraint);
+        getEncodingForInequalityConstraint(allTypesInString,
+                encodingForInequalityConstraint);
+        getEncodingForComparableConstraint(allTypesInString,
+                encodingForComparableConstraint);
+        getEncodingForSubtypeConTopBottom(allTypesInString,
+                encodingForSubtypeConTopBottom);
+        getEncodingForSubtypeConstraint(allTypesInString,
+                encodingForSubtypeConstraint);
+        getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
         writeFile(basicEncoding.append(encodingForEqualityConModifier)
                 .append(encodingForInequalityConModifier)
@@ -480,13 +480,13 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForAdaptationConstraint is the encoding of adaptation
      *          constraint for universe type system.
      */
-    public StringBuilder getEncodingForAdaptationConstraint(
-            StringBuilder encodingForAdaptationConstraint) {
-         InferenceChecker IC = new GUTIChecker();
-         GUTIChecker GC = (GUTIChecker) IC;
-         if (IC instanceof AdaptationInference ){
-         encodingForAdaptationConstraint= GC.viewpointEncodingFor();
-         }
+    public String getEncodingForAdaptationConstraint(
+            String encodingForAdaptationConstraint) {
+        InferenceChecker IC = new GUTIChecker();
+        GUTIChecker GC = (GUTIChecker) IC;
+        if (IC instanceof AdaptationInference) {
+            encodingForAdaptationConstraint = GC.viewpointEncodingFor();
+        }
         return encodingForAdaptationConstraint;
     }
 
