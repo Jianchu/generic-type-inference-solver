@@ -21,14 +21,14 @@ import checkers.inference.model.VariableSlot;
  *
  */
 
-public class LogiqlDataGenerator {
+class LogiqlDataGenerator {
     Collection<Slot> slots;
     Collection<Constraint> constraints;
     String path;
     boolean flag;
     int constantSlot;
 
-    public LogiqlDataGenerator(Collection<Slot> slots,
+    protected LogiqlDataGenerator(Collection<Slot> slots,
             Collection<Constraint> constraints, String path) {
         this.slots = slots;
         this.constraints = constraints;
@@ -37,7 +37,7 @@ public class LogiqlDataGenerator {
         constantSlot = -1;
     }
 
-    public void GenerateLogiqlData() {
+    protected void GenerateLogiqlData() {
         StringBuilder output = new StringBuilder();
         for (Constraint constraint : constraints) {
             List<Slot> slot = constraint.getSlots();
