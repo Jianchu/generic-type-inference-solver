@@ -21,7 +21,7 @@ import org.checkerframework.framework.type.QualifierHierarchy;
  *
  */
 
-public class LogiqlConstraintGenerator {
+class LogiqlConstraintGenerator {
 
     Map<String, String> subtype = new HashMap<String, String>();
     Map<String, String> supertype = new HashMap<String, String>();
@@ -36,7 +36,7 @@ public class LogiqlConstraintGenerator {
     final String cannotBeAnnotated;
     QualifierHierarchy qualHierarchy;
 
-    public LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
+    protected LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
             String path) {
         this.qualHierarchy = qualHierarchy;
         this.path = path;
@@ -45,7 +45,7 @@ public class LogiqlConstraintGenerator {
         cannotBeAnnotated = "cannotBeAnnotated";
     }
 
-    public void GenerateLogiqlEncoding() throws IOException {
+    protected void GenerateLogiqlEncoding() throws IOException {
         allTypes = qualHierarchy.getTypeQualifiers();
         Set<String> allTypesInString = new HashSet<String>();
         StringBuilder encodingForEqualityConModifier = new StringBuilder();
@@ -55,7 +55,7 @@ public class LogiqlConstraintGenerator {
         StringBuilder encodingForComparableConstraint = new StringBuilder();
         StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
         StringBuilder encodingForSubtypeConstraint = new StringBuilder();
-        String encodingForAdaptationConstraint = "";
+        StringBuilder encodingForAdaptationConstraint =  new StringBuilder();
         StringBuilder basicEncoding = new StringBuilder();
         mapSimpleOriginalName();
         for (AnnotationMirror i : allTypes) {
@@ -79,8 +79,7 @@ public class LogiqlConstraintGenerator {
                 encodingForSubtypeConTopBottom);
         getEncodingForSubtypeConstraint(allTypesInString,
                 encodingForSubtypeConstraint);
-        getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
-
+        encodingForAdaptationConstraint= getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
         writeFile(basicEncoding.append(encodingForEqualityConModifier)
                 .append(encodingForInequalityConModifier)
                 .append(encodingForEqualityConstraint)
@@ -178,8 +177,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForEqualityConstraint, which is the logiql encoding of
      *          equality constraint for current type system.
      */
-    public StringBuilder getEncodingForEqualityConstraint(
-            Set<String> allTypesInString,
+    private void getEncodingForEqualityConstraint(Set<String> allTypesInString,
             StringBuilder encodingForEqualityConstraint) {
         for (String s : allTypesInString) {
             encodingForEqualityConstraint.append(isAnnotated + s
@@ -188,9 +186,7 @@ public class LogiqlConstraintGenerator {
             encodingForEqualityConstraint.append(isAnnotated + s
                     + "(v2)<- equalityConstraint(v1,v2), " + isAnnotated + s
                     + "(v1).\n");
-
         }
-        return encodingForEqualityConstraint;
     }
 
     /**
@@ -204,8 +200,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForSubtypeConstraint, which is the logiql encoding of
      *          subtype constraint for current type system.
      */
-    public StringBuilder getEncodingForSubtypeConstraint(
-            Set<String> allTypesInString,
+    private void getEncodingForSubtypeConstraint(Set<String> allTypesInString,
             StringBuilder encodingForSubtypeConstraint) {
         String[] subtypeFors;
         String[] supertypeFors;
@@ -246,7 +241,6 @@ public class LogiqlConstraintGenerator {
 
             }
         }
-        return encodingForSubtypeConstraint;
     }
 
     /**
@@ -262,7 +256,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForSubtypeConTopBottom, which is the logiql encoding of
      *          subtype constraint for current type system.
      */
-    public StringBuilder getEncodingForSubtypeConTopBottom(
+    private void getEncodingForSubtypeConTopBottom(
             Set<String> allTypesInString,
             StringBuilder encodingForSubtypeConTopBottom) {
         String[] subtypeFors;
@@ -282,7 +276,6 @@ public class LogiqlConstraintGenerator {
                         + superkey + "(v2).\n");
             }
         }
-        return encodingForSubtypeConTopBottom;
     }
 
     /**
@@ -296,7 +289,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForComparableConstraint, which is the logiql encoding of
      *          comparable constraint for current type system.
      */
-    public StringBuilder getEncodingForComparableConstraint(
+    private void getEncodingForComparableConstraint(
             Set<String> allTypesInString,
             StringBuilder encodingForComparableConstraint) {
         StringBuilder variableMaybeAnnotated = new StringBuilder();
@@ -339,7 +332,6 @@ public class LogiqlConstraintGenerator {
             }
         }
         encodingForComparableConstraint.append(variableMaybeAnnotated);
-        return encodingForComparableConstraint;
     }
 
     /**
@@ -354,7 +346,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForInequalityConstraint, which is the logiql encoding of
      *          inequality constraint for current type system.
      */
-    public StringBuilder getEncodingForInequalityConstraint(
+    private void getEncodingForInequalityConstraint(
             Set<String> allTypesInString,
             StringBuilder encodingForInequalityConstraint) {
         StringBuilder variableMaybeAnnotated = new StringBuilder();
@@ -379,7 +371,6 @@ public class LogiqlConstraintGenerator {
             }
         }
         encodingForInequalityConstraint.append(variableMaybeAnnotated);
-        return encodingForInequalityConstraint;
     }
 
     /**
@@ -394,7 +385,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForInequalityConModifier, which is the logiql encoding
      *          of inequality constraint for current type system.
      */
-    public StringBuilder getEncodingForInequalityConModifier(
+    private void getEncodingForInequalityConModifier(
             Set<String> allTypesInString,
             StringBuilder encodingForInequalityConModifier) {
         for (String s : allTypesInString) {
@@ -404,8 +395,6 @@ public class LogiqlConstraintGenerator {
                             + "(v1) <- inequalityConstraintContainsModifier(v1,v2), v2 = \""
                             + s + "\".\n");
         }
-
-        return encodingForInequalityConModifier;
     }
 
     /**
@@ -420,7 +409,7 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForEqualityConModifier, which is the logiql encoding of
      *          equality constraint for current type system.
      */
-    public StringBuilder getEncodingForEqualityConModifier(
+    private void getEncodingForEqualityConModifier(
             Set<String> allTypesInString,
             StringBuilder encodingForEqualityConModifier) {
         for (String s : allTypesInString) {
@@ -430,7 +419,6 @@ public class LogiqlConstraintGenerator {
                             + "(v2) <- equalityConstraintContainsModifier(v1,v2), v1 = \""
                             + s + "\".\n");
         }
-        return encodingForEqualityConModifier;
     }
 
     /**
@@ -443,7 +431,7 @@ public class LogiqlConstraintGenerator {
      *            is the return value.
      * @returns basicEncoding.
      */
-    public StringBuilder getBasicString(Set<String> allTypesInString,
+    private void getBasicString(Set<String> allTypesInString,
             StringBuilder basicEncoding) {
         basicEncoding
                 .append("variable(v), hasvariableName(v:i) -> int(i)."
@@ -469,7 +457,6 @@ public class LogiqlConstraintGenerator {
                     + "AnnotationOf[v] = \"" + s + "\" <-isAnnotated" + s
                     + "(v).\n");
         }
-        return basicEncoding;
     }
 
     /**
@@ -480,8 +467,8 @@ public class LogiqlConstraintGenerator {
      * @returns encodingForAdaptationConstraint is the encoding of adaptation
      *          constraint for universe type system.
      */
-    public String getEncodingForAdaptationConstraint(
-            String encodingForAdaptationConstraint) {
+    private StringBuilder getEncodingForAdaptationConstraint(
+            StringBuilder encodingForAdaptationConstraint) {
         InferenceChecker IC = new GUTIChecker();
         GUTIChecker GC = (GUTIChecker) IC;
         if (IC instanceof AdaptationInference) {
@@ -493,17 +480,14 @@ public class LogiqlConstraintGenerator {
     /**
      * write all encoding generated by this class to file LogiqlEncoding.logic.
      * 
+     * @throws FileNotFoundException
+     * 
      */
-    private void writeFile(StringBuilder output) {
-        try {
-            String writePath = path + "/LogiqlEncoding.logic";
-            File f = new File(writePath);
-            PrintWriter pw = new PrintWriter(f);
-            pw.write(output.toString());
-            pw.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void writeFile(StringBuilder output) throws FileNotFoundException {
+        String writePath = path + "/LogiqlEncoding.logic";
+        File f = new File(writePath);
+        PrintWriter pw = new PrintWriter(f);
+        pw.write(output.toString());
+        pw.close();
     }
 }
-
