@@ -26,21 +26,21 @@ import checkers.inference.model.Slot;
  *
  */
 
-public class DecodingTool {
+class DecodingTool {
     Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
     Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
     Collection<Slot> slots;
     QualifierHierarchy qualHierarchy;
     private final String path;
 
-    public DecodingTool(Collection<Slot> slots,
+    protected DecodingTool(Collection<Slot> slots,
             QualifierHierarchy qualHierarchy, String path) {
         this.slots = slots;
         this.qualHierarchy = qualHierarchy;
         this.path = path;
     }
 
-    public Map<Integer, AnnotationMirror> insertToSource() {
+    protected Map<Integer, AnnotationMirror> insertToSource() {
         setDefault();
         mapSimpleOriginalName();
         try {

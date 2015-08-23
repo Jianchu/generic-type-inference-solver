@@ -15,12 +15,12 @@ import java.io.PrintWriter;
  *
  */
 
-public class LogicBloxRunner {
+class LogicBloxRunner {
 
     private String inReply = "";
     private final String path;
 
-    public LogicBloxRunner(String path) {
+    protected LogicBloxRunner(String path) {
         this.path = path;
     }
     
@@ -31,7 +31,7 @@ public class LogicBloxRunner {
      * @throws InterruptedException
      */
 
-    public void runLogicBlox() throws IOException, InterruptedException {
+    protected void runLogicBlox() throws IOException, InterruptedException {
         String[] command = new String[7];
         command[0] = "lb create pltest";
         command[1] = "lb addblock pltest -f" + path + "/LogiqlEncoding.logic";
