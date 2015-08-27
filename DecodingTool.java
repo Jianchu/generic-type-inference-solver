@@ -1,4 +1,4 @@
-package checkers.inference.solver.LogiqlDebugSolver;
+package checkers.inference.solver.LogicSolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
@@ -26,21 +26,21 @@ import checkers.inference.model.Slot;
  *
  */
 
-class DecodingTool {
+public class DecodingTool {
     Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
     Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
     Collection<Slot> slots;
     QualifierHierarchy qualHierarchy;
     private final String path;
 
-    protected DecodingTool(Collection<Slot> slots,
+    public DecodingTool(Collection<Slot> slots,
             QualifierHierarchy qualHierarchy, String path) {
         this.slots = slots;
         this.qualHierarchy = qualHierarchy;
         this.path = path;
     }
 
-    protected Map<Integer, AnnotationMirror> insertToSource() {
+    public Map<Integer, AnnotationMirror> insertToSource() {
         setDefault();
         mapSimpleOriginalName();
         try {

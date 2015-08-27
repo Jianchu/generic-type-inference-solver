@@ -1,7 +1,6 @@
-package checkers.inference.solver.LogiqlDebugSolver;
+package checkers.inference.solver.LogicSolver;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,7 +20,7 @@ import org.checkerframework.framework.type.QualifierHierarchy;
  *
  */
 
-class LogiqlConstraintGenerator {
+public class LogiqlConstraintGenerator {
 
     Map<String, String> subtype = new HashMap<String, String>();
     Map<String, String> supertype = new HashMap<String, String>();
@@ -36,7 +35,7 @@ class LogiqlConstraintGenerator {
     final String cannotBeAnnotated;
     QualifierHierarchy qualHierarchy;
 
-    protected LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
+    public LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
             String path) {
         this.qualHierarchy = qualHierarchy;
         this.path = path;
@@ -45,7 +44,7 @@ class LogiqlConstraintGenerator {
         cannotBeAnnotated = "cannotBeAnnotated";
     }
 
-    protected void GenerateLogiqlEncoding() {
+    public void GenerateLogiqlEncoding() {
         allTypes = qualHierarchy.getTypeQualifiers();
         Set<String> allTypesInString = new HashSet<String>();
         StringBuilder encodingForEqualityConModifier = new StringBuilder();
@@ -472,11 +471,11 @@ class LogiqlConstraintGenerator {
      */
     private void getEncodingForAdaptationConstraint(
             StringBuilder encodingForAdaptationConstraint) {
-         InferenceChecker IC = new GUTIChecker();
-         GUTIChecker GC = (GUTIChecker) IC;
-         if (IC instanceof AdaptationInference ){
-         encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
-         }
+//         InferenceChecker IC = new GUTIChecker();
+//         GUTIChecker GC = (GUTIChecker) IC;
+//         if (IC instanceof AdaptationInference ){
+//         encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
+//         }
     }
 
     /**

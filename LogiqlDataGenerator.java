@@ -1,4 +1,4 @@
-package checkers.inference.solver.LogiqlDebugSolver;
+package checkers.inference.solver.LogicSolver;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -21,14 +21,14 @@ import checkers.inference.model.VariableSlot;
  *
  */
 
-class LogiqlDataGenerator {
+public class LogiqlDataGenerator {
     Collection<Slot> slots;
     Collection<Constraint> constraints;
     String path;
     boolean flag;
     int constantSlot;
 
-    protected LogiqlDataGenerator(Collection<Slot> slots,
+    public LogiqlDataGenerator(Collection<Slot> slots,
             Collection<Constraint> constraints, String path) {
         this.slots = slots;
         this.constraints = constraints;
@@ -37,7 +37,7 @@ class LogiqlDataGenerator {
         constantSlot = -1;
     }
 
-    protected void GenerateLogiqlData() {
+    public void generateLogiqlData() {
         StringBuilder output = new StringBuilder();
         for (Constraint constraint : constraints) {
             List<Slot> slot = constraint.getSlots();

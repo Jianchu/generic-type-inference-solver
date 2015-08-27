@@ -1,4 +1,4 @@
-package checkers.inference.solver.LogiqlDebugSolver;
+package checkers.inference.solver.LogicSolver;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,12 +15,12 @@ import java.io.PrintWriter;
  *
  */
 
-class LogicBloxRunner {
+public class LogicBloxRunner {
 
     private String inReply = "";
     private final String path;
 
-    protected LogicBloxRunner(String path) {
+    public LogicBloxRunner(String path) {
         this.path = path;
     }
     
@@ -31,7 +31,7 @@ class LogicBloxRunner {
      * @throws InterruptedException
      */
 
-    protected void runLogicBlox() throws IOException, InterruptedException {
+    public void runLogicBlox() {
         String[] command = new String[7];
         command[0] = "lb create pltest";
         command[1] = "lb addblock pltest -f" + path + "/LogiqlEncoding.logic";
@@ -39,7 +39,11 @@ class LogicBloxRunner {
         command[3] = "lb print pltest orderedAnnotationOf";
         command[4] = "lb delete pltest";
         for (int i = 0; i < 5; i++) {
-            getOutPut_Error(command[i], i);
+            try {
+                getOutPut_Error(command[i], i);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         writeFile(inReply);
     }

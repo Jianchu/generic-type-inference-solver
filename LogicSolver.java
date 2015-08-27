@@ -1,9 +1,8 @@
-package checkers.inference.solver.LogiqlDebugSolver;
+package checkers.inference.solver.LogicSolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class LogicSolver implements InferenceSolver {
         final String currentPath = new File("").getAbsolutePath();
         File file = new File(currentPath);
         String base = file.getParent().toString();
-        String path = base + "/src/checkers/inference/solver/LogiqlDebugSolver";
+        String path = base + "/src/checkers/inference/solver/LogicSolver";
 
         /**
          * creating a instance of LogiqlConstraintGenerator and running
