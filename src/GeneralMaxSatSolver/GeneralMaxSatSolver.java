@@ -3,10 +3,13 @@ package GeneralMaxSatSolver;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
+
+import org.sat4j.core.VecInt;
 
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
@@ -34,7 +37,7 @@ public class GeneralMaxSatSolver implements InferenceSolver{
     }
 
     private InferenceSolution solve() {
-        
+        List<VecInt> clauses = serializer.convertAll(constraints);
                 
         return null;
     }

@@ -26,6 +26,7 @@ import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
+
 public class GeneralCnfVecIntSerializer implements Serializer {
     private final SlotManager slotManager;
     private final LatticeGenerator lattice;
@@ -163,7 +164,7 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                 list.add(supertypeOfTop);
                 list.add(subtypeOfBottom);
                 VecInt[] result = list.toArray(new VecInt[list.size()]);
-                return asVecArray(-supertype.getId(), subtype.getId());
+                return result;
             }
 
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
@@ -182,7 +183,8 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                         result[i] = asVec(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
                     }
                     else{
-                        result[i] = asVec(lattice.modifierInt.get(modifiers)+ lattice.numModifiers * (slot2.getId()-1));
+                        //cannot be other modifiers
+                        result[i] = asVec(-(lattice.modifierInt.get(modifiers)+ lattice.numModifiers * (slot2.getId()-1)));
                     }
                     i++;
                 }
@@ -197,7 +199,7 @@ public class GeneralCnfVecIntSerializer implements Serializer {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {                                
                 // a <=> b which is the same as (!a v b) & (!b v a)
-                VecInt[] result = new VecInt[lattice.numModifiers];
+                VecInt[] result = new VecInt[lattice.numModifiers * 2];
                 int i = 0;
                 for (AnnotationMirror modifiers: lattice.allTypes){
                     result[i] = asVec(-(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1));
@@ -206,20 +208,68 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                 }
                 return result;
             }
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
+    }
+    
+    @Override
+    public Object serialize(InequalityConstraint constraint) {
+        return new VariableCombos<InequalityConstraint>() {
+
+            @Override
+            protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
+                return asVecArray(-(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1)));
+
+            }
+
+            @Override
+            protected VecInt[] variable_constant(VariableSlot slot1, ConstantSlot slot2, InequalityConstraint constraint) {
+                return constant_variable(slot2, slot1, constraint);
+            }
+
+            @Override
+            protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
+                // a <=> !b which is the same as (!a v !b) & (b v a)
+                VecInt[] result = new VecInt[lattice.numModifiers * 2];
+                int i = 0;
+                for (AnnotationMirror modifiers: lattice.allTypes){
+                    result[i] = asVec(-(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1)));
+                    //result[i+1] = asVec(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1));
+                    i++;
+                }
+                return result;  
+            }
 
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
+    
+    @Override
+    public Object serialize(ComparableConstraint comparableConstraint) {
+        ComparableConstraint constraint = comparableConstraint;
+        return new VariableCombos<ComparableConstraint>() {
+            @Override
+            protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, ComparableConstraint constraint) {
+                // a <=> !b which is the same as (!a v !b) & (b v a)
+                List<VecInt> list = new ArrayList<VecInt>();
+                for (AnnotationMirror modifiers: lattice.allTypes){
+                    if (!lattice.notComparableType.get(modifiers).isEmpty()){
+                        for (AnnotationMirror notComparable : lattice.notComparableType.get(modifiers)){
+                            list.add(asVec(-(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() -1 )),-(lattice.modifierInt.get(notComparable) + lattice.numModifiers * (slot2.getId()-1))));
+                        }
+                    }
+                }
+                VecInt[] result = list.toArray(new VecInt[list.size()]);
+                return result;
+            }
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
+        // TODO Auto-generated method stub
+    }
+    
+    
     @Override
     public Object serialize(ExistentialConstraint constraint) {
         // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Object serialize(InequalityConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+        return emptyClauses;
     }
 
     @Override
@@ -252,22 +302,17 @@ public class GeneralCnfVecIntSerializer implements Serializer {
         return null;
     }
 
-    @Override
-    public Object serialize(ComparableConstraint comparableConstraint) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+
 
     @Override
     public Object serialize(CombineConstraint combineConstraint) {
         // TODO Auto-generated method stub
-        return null;
+        return emptyClauses;
     }
 
     @Override
     public Object serialize(PreferenceConstraint preferenceConstraint) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("APPLY WEIGHTING FOR WEIGHTED MAX-SAT");
     }
 
     VecInt asVec(int... result) {
