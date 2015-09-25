@@ -1,7 +1,11 @@
 package GeneralMaxSatSolver;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
@@ -18,23 +22,26 @@ import checkers.inference.model.InequalityConstraint;
 import checkers.inference.model.PreferenceConstraint;
 import checkers.inference.model.RefinementVariableSlot;
 import checkers.inference.model.Serializer;
+import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
 public class GeneralCnfVecIntSerializer implements Serializer {
     private final SlotManager slotManager;
     private final LatticeGenerator lattice;
-    
-    public GeneralCnfVecIntSerializer(SlotManager slotManager,LatticeGenerator lattice){
+
+    public GeneralCnfVecIntSerializer(SlotManager slotManager,
+            LatticeGenerator lattice) {
         this.slotManager = slotManager;
         this.lattice = lattice;
     }
-    
+
     public List<VecInt> convertAll(Iterable<Constraint> constraints) {
         return convertAll(constraints, new LinkedList<VecInt>());
     }
 
-    public List<VecInt> convertAll(Iterable<Constraint> constraints, List<VecInt> results) {
+    public List<VecInt> convertAll(Iterable<Constraint> constraints,
+            List<VecInt> results) {
         for (Constraint constraint : constraints) {
             for (VecInt res : ((VecInt[]) constraint.serialize(this))) {
                 if (res.size() != 0) {
@@ -45,18 +52,162 @@ public class GeneralCnfVecIntSerializer implements Serializer {
         }
         return results;
     }
-    
 
     @Override
-    public Object serialize(SubtypeConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+    public VecInt[] serialize(SubtypeConstraint constraint) {
+        return new VariableCombos<SubtypeConstraint>() {
+
+            @Override
+            protected VecInt[] constant_variable(ConstantSlot subtype,
+                    VariableSlot supertype, SubtypeConstraint constraint) {
+                int numForsupertype = 0;
+                List<Integer> list = new ArrayList<Integer>();
+                if (subtype.getValue().equals(lattice.top)) {
+                    return asVecArray(lattice.modifierInt.get(lattice.top)
+                            + lattice.numModifiers * (supertype.getId() - 1));
+                }
+
+                for (AnnotationMirror sub : lattice.subType.get(subtype
+                        .getValue())) {
+                    if (!sub.equals(subtype.getValue())) {
+                        numForsupertype = lattice.modifierInt.get(sub)
+                                + lattice.numModifiers
+                                * (supertype.getId() - 1);
+                        list.add(-numForsupertype);
+                    }
+                }
+                VecInt[] result = new VecInt[list.size()];
+                if (list.size() > 0) {
+                    Iterator<Integer> iterator = list.iterator();
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = asVec(iterator.next().intValue());
+                    }
+                    return result;
+                }
+                return emptyClauses;
+            }
+
+            @Override
+            protected VecInt[] variable_constant(VariableSlot subtype,
+                    ConstantSlot supertype, SubtypeConstraint constraint) {
+                int numForsupertype = 0;
+                List<Integer> list = new ArrayList<Integer>();
+                if (supertype.getValue().equals(lattice.bottom)) {
+                    return asVecArray(lattice.modifierInt.get(lattice.bottom)
+                            + lattice.numModifiers * (subtype.getId() - 1));
+                }
+
+                for (AnnotationMirror sup : lattice.superType.get(supertype
+                        .getValue())) {
+                    if (!sup.equals(supertype.getValue())) {
+                        numForsupertype = lattice.modifierInt.get(sup)
+                                + lattice.numModifiers * (subtype.getId() - 1);
+                        list.add(-numForsupertype);
+                    }
+                }
+                VecInt[] result = new VecInt[list.size()];
+                if (list.size() > 0) {
+                    Iterator<Integer> iterator = list.iterator();
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = asVec(iterator.next().intValue());
+                    }
+                    return result;
+                }
+                return emptyClauses;
+            }
+
+            @Override
+            protected VecInt[] variable_variable(VariableSlot subtype,
+                    VariableSlot supertype, SubtypeConstraint constraint) {
+                VecInt supertypeOfTop = asVec(
+                        -(lattice.modifierInt.get(lattice.top) + lattice.numModifiers
+                                * (subtype.getId() - 1)),
+                        lattice.modifierInt.get(lattice.top)
+                                + lattice.numModifiers
+                                * (supertype.getId() - 1));
+                VecInt subtypeOfBottom = asVec(
+                        -(lattice.modifierInt.get(lattice.bottom) + lattice.numModifiers
+                                * (supertype.getId() - 1)),
+                        lattice.modifierInt.get(lattice.bottom)
+                                + lattice.numModifiers * (subtype.getId() - 1));
+
+                List<VecInt> list = new ArrayList<VecInt>();
+                for (AnnotationMirror modifier : lattice.allTypes) {
+                    // if we know subtype
+                    if (!modifier.equals(lattice.top)) {
+                        int[] superArray = new int[lattice.superType.get(modifier).size()];
+                        int i = 1;
+                        superArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));
+                        for (AnnotationMirror sup : lattice.superType.get(modifier)) {
+                            if (!sup.equals(modifier)) {
+                                superArray[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (subtype.getId() - 1);
+                                i++;
+                            }
+                        }
+                        list.add(asVec(superArray));
+                    }
+                    // if we know supertype
+                    if (!modifier.equals(lattice.bottom)){
+                        int[] subArray = new int[lattice.subType.get(modifier).size()];
+                        int j = 1;
+                        subArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (supertype.getId()-1));
+                        for (AnnotationMirror sub : lattice.subType.get(modifier)){
+                            if (!sub.equals(modifier)){
+                                subArray[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (supertype.getId()-1);
+                                j++;
+                            }
+                        }
+                        list.add(asVec(subArray));
+                    }
+                }
+                list.add(supertypeOfTop);
+                list.add(subtypeOfBottom);
+                VecInt[] result = list.toArray(new VecInt[list.size()]);
+                return asVecArray(-supertype.getId(), subtype.getId());
+            }
+
+        }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
 
     @Override
     public Object serialize(EqualityConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+        return new VariableCombos<EqualityConstraint>() {
+
+            @Override
+            protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
+                VecInt[] result = new VecInt[lattice.numModifiers];
+                int i =0;
+                for (AnnotationMirror modifiers : lattice.allTypes){
+                    if (slot1.getValue().equals(modifiers)){
+                        result[i] = asVec(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
+                    }
+                    else{
+                        result[i] = asVec(lattice.modifierInt.get(modifiers)+ lattice.numModifiers * (slot2.getId()-1));
+                    }
+                    i++;
+                }
+                return result;
+            }
+
+            @Override
+            protected VecInt[] variable_constant(VariableSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
+                return constant_variable(slot2, slot1, constraint);
+            }
+
+            @Override
+            protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {                                
+                // a <=> b which is the same as (!a v b) & (!b v a)
+                VecInt[] result = new VecInt[lattice.numModifiers];
+                int i = 0;
+                for (AnnotationMirror modifiers: lattice.allTypes){
+                    result[i] = asVec(-(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1));
+                    result[i+1] = asVec(-(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1));
+                    i = i + 2;
+                }
+                return result;
+            }
+
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
     @Override
@@ -118,6 +269,63 @@ public class GeneralCnfVecIntSerializer implements Serializer {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
+
+    VecInt asVec(int... result) {
+        return new VecInt(result);
+    }
+
+    VecInt[] asVecArray(int... vars) {
+        return new VecInt[] { new VecInt(vars) };
+    }
+
+    class VariableCombos<T extends Constraint> {
+
+        protected VecInt[] variable_variable(VariableSlot slot1,
+                VariableSlot slot2, T constraint) {
+            return defaultAction(slot1, slot2, constraint);
+        }
+
+        protected VecInt[] constant_variable(ConstantSlot slot1,
+                VariableSlot slot2, T constraint) {
+            return defaultAction(slot1, slot2, constraint);
+        }
+
+        protected VecInt[] variable_constant(VariableSlot slot1,
+                ConstantSlot slot2, T constraint) {
+            return defaultAction(slot1, slot2, constraint);
+        }
+
+        protected VecInt[] constant_constant(ConstantSlot slot1,
+                ConstantSlot slot2, T constraint) {
+            return defaultAction(slot1, slot2, constraint);
+        }
+
+        public VecInt[] defaultAction(Slot slot1, Slot slot2, T constraint) {
+            return emptyClauses;
+        }
+
+        public VecInt[] accept(Slot slot1, Slot slot2, T constraint) {
+            final VecInt[] result;
+            if (slot1 instanceof ConstantSlot) {
+                if (slot2 instanceof ConstantSlot) {
+                    result = constant_constant((ConstantSlot) slot1,
+                            (ConstantSlot) slot2, constraint);
+                } else {
+                    result = constant_variable((ConstantSlot) slot1,
+                            (VariableSlot) slot2, constraint);
+                }
+            } else if (slot2 instanceof ConstantSlot) {
+                result = variable_constant((VariableSlot) slot1,
+                        (ConstantSlot) slot2, constraint);
+            } else {
+                result = variable_variable((VariableSlot) slot1,
+                        (VariableSlot) slot2, constraint);
+            }
+
+            return result;
+        }
+    }
+
+    public static final VecInt[] emptyClauses = new VecInt[0];
+
 }

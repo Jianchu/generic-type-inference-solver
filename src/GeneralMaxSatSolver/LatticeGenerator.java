@@ -15,21 +15,25 @@ public class LatticeGenerator {
     Map<AnnotationMirror, Collection<AnnotationMirror>> subType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
     Map<AnnotationMirror, Collection<AnnotationMirror>> superType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
     Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
+    Map<AnnotationMirror, Integer> modifierInt = new HashMap<AnnotationMirror, Integer>();
     Set<? extends AnnotationMirror> allTypes;
     AnnotationMirror top;
     AnnotationMirror bottom;
+    int numModifiers;
 
     public LatticeGenerator(QualifierHierarchy qualHierarchy) {
         this.qualHierarchy = qualHierarchy;
         this.allTypes = qualHierarchy.getTypeQualifiers();
         this.top = qualHierarchy.getTopAnnotations().iterator().next();
         this.bottom = qualHierarchy.getBottomAnnotations().iterator().next();
+        this.numModifiers = qualHierarchy.getTypeQualifiers().size();
         getSubSupertype();
         getNotComparable();
     }
-
+   
     private void getSubSupertype() {
         for (AnnotationMirror i : allTypes) {
+            int num = 1;
             Set<AnnotationMirror> subtypeFori = new HashSet<AnnotationMirror>();
             Set<AnnotationMirror> supertypeFori = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
@@ -42,6 +46,8 @@ public class LatticeGenerator {
             }
             subType.put(i, subtypeFori);
             superType.put(i, supertypeFori);
+            modifierInt.put(i, num);
+            num++;
         }
     }
 
