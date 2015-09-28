@@ -1,5 +1,7 @@
 package GeneralMaxSatSolver;
 
+import org.checkerframework.javacutil.AnnotationUtils;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -62,15 +64,16 @@ public class GeneralCnfVecIntSerializer implements Serializer {
             protected VecInt[] constant_variable(ConstantSlot subtype,
                     VariableSlot supertype, SubtypeConstraint constraint) {
                 int numForsupertype = 0;
-                List<Integer> list = new ArrayList<Integer>();
-                if (subtype.getValue().equals(lattice.top)) {
+                List<Integer> list = new ArrayList<Integer>();      
+                if (areSameType(subtype.getValue(),lattice.top)) {
                     return asVecArray(lattice.modifierInt.get(lattice.top)
                             + lattice.numModifiers * (supertype.getId() - 1));
                 }
-
+                //AnnotationUtils.areSameIgnoringValues(a,subtype.getValue())
                 for (AnnotationMirror sub : lattice.subType.get(subtype
                         .getValue())) {
-                    if (!sub.equals(subtype.getValue())) {
+                    if (!areSameType(sub,subtype.getValue())) {
+                        
                         numForsupertype = lattice.modifierInt.get(sub)
                                 + lattice.numModifiers
                                 * (supertype.getId() - 1);
@@ -93,14 +96,14 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                     ConstantSlot supertype, SubtypeConstraint constraint) {
                 int numForsupertype = 0;
                 List<Integer> list = new ArrayList<Integer>();
-                if (supertype.getValue().equals(lattice.bottom)) {
+                if (areSameType(supertype.getValue(),lattice.bottom)) {
                     return asVecArray(lattice.modifierInt.get(lattice.bottom)
                             + lattice.numModifiers * (subtype.getId() - 1));
                 }
 
                 for (AnnotationMirror sup : lattice.superType.get(supertype
                         .getValue())) {
-                    if (!sup.equals(supertype.getValue())) {
+                    if (!areSameType(sup,supertype.getValue())) {
                         numForsupertype = lattice.modifierInt.get(sup)
                                 + lattice.numModifiers * (subtype.getId() - 1);
                         list.add(-numForsupertype);
@@ -135,28 +138,28 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                 List<VecInt> list = new ArrayList<VecInt>();
                 for (AnnotationMirror modifier : lattice.allTypes) {
                     // if we know subtype
-                    if (!modifier.equals(lattice.top)) {
-                        int[] superArray = new int[lattice.superType.get(modifier).size()];
+                    if (!areSameType(modifier,lattice.top)) {
+                        int[] superArray = new int[lattice.superType.get(modifier).size()+1];
                         int i = 1;
                         superArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));
                         for (AnnotationMirror sup : lattice.superType.get(modifier)) {
-                            if (!sup.equals(modifier)) {
-                                superArray[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (subtype.getId() - 1);
+                            //if (!areSameType(sup,modifier)) {
+                                superArray[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (supertype.getId() - 1);
                                 i++;
-                            }
+                            //}
                         }
                         list.add(asVec(superArray));
                     }
                     // if we know supertype
-                    if (!modifier.equals(lattice.bottom)){
-                        int[] subArray = new int[lattice.subType.get(modifier).size()];
+                    if (!areSameType(modifier,lattice.bottom)){
+                        int[] subArray = new int[lattice.subType.get(modifier).size()+1];
                         int j = 1;
                         subArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (supertype.getId()-1));
                         for (AnnotationMirror sub : lattice.subType.get(modifier)){
-                            if (!sub.equals(modifier)){
-                                subArray[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (supertype.getId()-1);
+                            //if (!areSameType(sub,modifier)){
+                                subArray[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (subtype.getId()-1);
                                 j++;
-                            }
+                            //}
                         }
                         list.add(asVec(subArray));
                     }
@@ -179,7 +182,7 @@ public class GeneralCnfVecIntSerializer implements Serializer {
                 VecInt[] result = new VecInt[lattice.numModifiers];
                 int i =0;
                 for (AnnotationMirror modifiers : lattice.allTypes){
-                    if (slot1.getValue().equals(modifiers)){
+                    if (areSameType(slot1.getValue(),modifiers)){
                         result[i] = asVec(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
                     }
                     else{
@@ -314,6 +317,11 @@ public class GeneralCnfVecIntSerializer implements Serializer {
     public Object serialize(PreferenceConstraint preferenceConstraint) {
         throw new UnsupportedOperationException("APPLY WEIGHTING FOR WEIGHTED MAX-SAT");
     }
+    
+    boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
+        //System.out.println(AnnotationUtils.areSameIgnoringValues(m1, m2) +"  "+ m1.toString() + "  " + m2.toString());
+        return AnnotationUtils.areSameIgnoringValues(m1, m2);
+    }
 
     VecInt asVec(int... result) {
         return new VecInt(result);
@@ -374,3 +382,4 @@ public class GeneralCnfVecIntSerializer implements Serializer {
     public static final VecInt[] emptyClauses = new VecInt[0];
 
 }
+

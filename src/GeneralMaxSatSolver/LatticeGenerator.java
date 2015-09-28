@@ -1,6 +1,7 @@
 package GeneralMaxSatSolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,10 +13,11 @@ import javax.lang.model.element.AnnotationMirror;
 
 public class LatticeGenerator {
     QualifierHierarchy qualHierarchy;
-    Map<AnnotationMirror, Collection<AnnotationMirror>> subType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
-    Map<AnnotationMirror, Collection<AnnotationMirror>> superType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
-    Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = new HashMap<AnnotationMirror, Collection<AnnotationMirror>>();
-    Map<AnnotationMirror, Integer> modifierInt = new HashMap<AnnotationMirror, Integer>();
+    Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
+    Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
+    Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
+    Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
+    Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
     Set<? extends AnnotationMirror> allTypes;
     AnnotationMirror top;
     AnnotationMirror bottom;
@@ -29,11 +31,12 @@ public class LatticeGenerator {
         this.numModifiers = qualHierarchy.getTypeQualifiers().size();
         getSubSupertype();
         getNotComparable();
+        
     }
    
     private void getSubSupertype() {
+        int num = 1;
         for (AnnotationMirror i : allTypes) {
-            int num = 1;
             Set<AnnotationMirror> subtypeFori = new HashSet<AnnotationMirror>();
             Set<AnnotationMirror> supertypeFori = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
@@ -47,8 +50,12 @@ public class LatticeGenerator {
             subType.put(i, subtypeFori);
             superType.put(i, supertypeFori);
             modifierInt.put(i, num);
+            IntModifier.put(num, i);
             num++;
         }
+//        for (Integer j: IntModifier.keySet()){
+//            System.out.println("final key "+j+ "  " + "final value: " + IntModifier.get(j).toString());
+//        }
     }
 
     private void getNotComparable() {
