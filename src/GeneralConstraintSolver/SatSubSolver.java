@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,62 +20,109 @@ public class SatSubSolver {
     private List<ImpliesLogic> allImpliesLogic;
     private SlotManager slotManager;
     private LatticeGenerator lattice;
-    Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
-    
-    public SatSubSolver(List<ImpliesLogic> allImpliesLogic, SlotManager slotManager, LatticeGenerator lattice){
+    private Set<Integer> slotRepresentSet = new HashSet<Integer>();
+
+    public SatSubSolver(List<ImpliesLogic> allImpliesLogic,
+            SlotManager slotManager, LatticeGenerator lattice) {
         this.allImpliesLogic = allImpliesLogic;
         this.slotManager = slotManager;
         this.lattice = lattice;
         satSolve();
     }
-    
-    VecInt asVec(int... result) {
+
+    private VecInt asVec(int... result) {
         return new VecInt(result);
     }
 
-    VecInt[] asVecArray(int... vars) {
-        return new VecInt[] { new VecInt(vars) };
+    private boolean isLast(Integer var) {
+        return (Math.abs(var.intValue()) % lattice.numModifiers == 0);
     }
-        
-    public List<VecInt> convertImpliesToClauses(){
+
+    private int findSlotId(Integer var) {
+        return (Math.abs(var.intValue()) / lattice.numModifiers + 1);
+
+    }
+
+    public List<VecInt> convertImpliesToClauses() {
         List<VecInt> result = new ArrayList<VecInt>();
-        for (ImpliesLogic res :allImpliesLogic ){
-            if (res.singleVariable == true){
+        for (ImpliesLogic res : allImpliesLogic) {
+            if (res.singleVariable == true) {
                 result.add(asVec(res.variable));
-                //System.out.println("just: " + res.variable);
-            }
-            else{
-                int[] toBevecArray= new int[res.leftSide.size()+res.rightSide.size()];
+                slotRepresentSet.add(res.variable);
+                // System.out.println("just: " + res.variable);
+            } else {
+                int[] toBevecArray = new int[res.leftSide.size()
+                        + res.rightSide.size()];
                 toBevecArray[0] = -res.leftSide.iterator().next().intValue();
                 int i = 1;
-                for (Integer imp : res.rightSide){
-                    if (res.insideLogic == false){
+                for (Integer imp : res.rightSide) {
+                    slotRepresentSet.add(imp);
+                    if (res.insideLogic == false) {
                         toBevecArray[i] = imp.intValue();
                         i++;
                     }
                 }
                 result.add(asVec(toBevecArray));
-                //System.out.println("left: " + res.leftSide.toString()+ " ---> " + "right: " + res.rightSide.toString());
+                // System.out.println("left: " + res.leftSide.toString()+
+                // " ---> " + "right: " + res.rightSide.toString());
             }
-        }       
+        }
         return result;
     }
 
-    private void satSolve(){
+    private void becomeWellForm(List<VecInt> clauses) {
+        Set<Integer> slotId = new HashSet<Integer>();
+        for (Integer slotRep : slotRepresentSet) {
+            if (isLast(slotRep.intValue())) {
+                slotId.add(Math.abs(slotRep) / lattice.numModifiers);
+            } else {
+                slotId.add(findSlotId(slotRep));
+            }
+        }
+        System.out.println(slotId);
+        for (Integer id : slotId) {
+            int[] wellFormFirst = new int[lattice.numModifiers];
+            int j = 0;
+            for (Integer i : lattice.IntModifier.keySet()) {
+                wellFormFirst[j] = lattice.numModifiers * (id - 1)
+                        + i.intValue();
+                j++;
+            }
+            //clauses.add(asVec(wellFormFirst));
+            int[] wellFormFollow = new int[2];
+            Iterator<Integer> intRep1 = lattice.IntModifier.keySet().iterator();
+            Set<Integer> intRep2 = lattice.IntModifier.keySet();
+            while(intRep1.hasNext()) {
+                Integer int1= intRep1.next();
+                for (Integer int2: intRep2) {
+                    if (int2.intValue() != int1.intValue()) {
+                        wellFormFollow[0] = -(lattice.numModifiers * (id - 1) + int1
+                                .intValue());
+                        wellFormFollow[1] = -(lattice.numModifiers * (id - 1) + int2
+                                .intValue());
+                        clauses.add(asVec(wellFormFollow));
+                    }
+                }
+            }
+        }
+    }
+
+    private void satSolve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
-        List<VecInt> clauses = convertImpliesToClauses();        
+        List<VecInt> clauses = convertImpliesToClauses();
+        becomeWellForm(clauses);
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);
-        final int totalClauses = clauses.size();
+        final int totalClauses = clauses.size() + slotManager.nextId() * (1+(lattice.numModifiers*(lattice.numModifiers-1)/2));
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(
                 org.sat4j.pb.SolverFactory.newBoth());
-        
+
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
         solver.setTimeoutMs(1000000);
-        VecInt lastClause = null;       
+        VecInt lastClause = null;
         try {
             for (VecInt clause : clauses) {
-                //System.out.println(clause);
+                // System.out.println(clause);
                 lastClause = clause;
                 solver.addHardClause(clause);
             }
@@ -82,13 +130,16 @@ public class SatSubSolver {
                 int[] solution = solver.model();
                 DecodingTool decoder = new DecodingTool(solution, lattice);
                 result = decoder.result;
-                System.out.println("/*****************result from Sat Solver*******************/");
-                for (Integer j: result.keySet()){
-                    System.out.println("SlotID: "+j+ "  " + "Annotation: " + result.get(j).toString());
+                System.out
+                        .println("/*****************result from Sat Solver*******************/");
+                for (Integer j : result.keySet()) {
+                    System.out.println("SlotID: " + j + "  " + "Annotation: "
+                            + result.get(j).toString());
                 }
                 System.out.flush();
-                System.out.println("/**********************************************************/");
-                
+                System.out
+                        .println("/**********************************************************/");
+
             } else {
                 System.out.println("Not solvable!");
             }
