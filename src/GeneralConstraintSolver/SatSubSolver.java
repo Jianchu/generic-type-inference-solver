@@ -79,7 +79,6 @@ public class SatSubSolver {
                 slotId.add(findSlotId(slotRep));
             }
         }
-        System.out.println(slotId);
         for (Integer id : slotId) {
             int[] wellFormFirst = new int[lattice.numModifiers];
             int j = 0;
