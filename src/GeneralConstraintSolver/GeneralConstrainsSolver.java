@@ -42,7 +42,10 @@ public class GeneralConstrainsSolver implements InferenceSolver {
     
     private InferenceSolution solve() {
         List<ImpliesLogic> allImpliesLogic = serializer.convertAll(constraints);
-        SatSubSolver satSover = new SatSubSolver(allImpliesLogic,slotManager,lattice);
+        System.out.println("From Sat:");
+        SatSubSolver satSolver = new SatSubSolver(allImpliesLogic,slotManager,lattice);
+        System.out.println("From Logiql:");
+        LogiqlSubSolver logiqlSolver = new LogiqlSubSolver(allImpliesLogic, lattice);
 //        for (ImpliesLogic res :allImpliesLogic ){
 //            if (res.singleVariable == true){
 //                System.out.println("just: " + res.variable);

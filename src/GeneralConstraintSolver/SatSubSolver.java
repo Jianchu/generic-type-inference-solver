@@ -20,6 +20,7 @@ public class SatSubSolver {
     private SlotManager slotManager;
     private LatticeGenerator lattice;
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
+    
     public SatSubSolver(List<ImpliesLogic> allImpliesLogic, SlotManager slotManager, LatticeGenerator lattice){
         this.allImpliesLogic = allImpliesLogic;
         this.slotManager = slotManager;
