@@ -20,20 +20,11 @@ import com.sun.source.tree.Tree;
 @Target({ElementType.TYPE_USE, ElementType.METHOD})
 @SubtypeOf({})
 //@DefaultFor({DefaultLocation.RETURNS})
-@ImplicitFor(
-        trees={                
-//            Tree.Kind.INT_LITERAL,
-//            Tree.Kind.LONG_LITERAL,            
-//            Tree.Kind.FLOAT_LITERAL,    
-//            Tree.Kind.DOUBLE_LITERAL,   
-//            Tree.Kind.BOOLEAN_LITERAL,
-//            Tree.Kind.CHAR_LITERAL,
-//            Tree.Kind.STRING_LITERAL,
-//            Tree.Kind.NEW_CLASS,
-//            Tree.Kind.PRIMITIVE_TYPE,
-//            Tree.Kind.RETURN,
-            Tree.Kind.METHOD,
-        })
+//@ImplicitFor(
+//        trees={                
+//            Tree.Kind.METHOD,
+//        })
 public @interface DataFlow {
-    String typeName() default "";
+//    String typeName(); 
+    String[] typeName();//array
 }
