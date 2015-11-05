@@ -18,7 +18,7 @@ import com.sun.source.tree.Tree;
 @TypeQualifier
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.METHOD})
-@SubtypeOf({})
+@SubtypeOf({DataFlowTop.class})
 //@DefaultFor({DefaultLocation.RETURNS})
 //@ImplicitFor(
 //        trees={                

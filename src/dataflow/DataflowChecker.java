@@ -13,10 +13,11 @@ import checkers.inference.InferenceChecker;
 import checkers.inference.dataflow.InferenceAnalysis;
 import checkers.inference.dataflow.InferenceTransfer;
 import dataflow.quals.DataFlow;
+import dataflow.quals.DataFlowTop;
 
-@TypeQualifiers({ DataFlow.class})
+@TypeQualifiers({ DataFlow.class,DataFlowTop.class})
 public class DataflowChecker extends BaseInferrableChecker {
-    public AnnotationMirror DATAFLOW;
+    public AnnotationMirror DATAFLOW, DATAFLOWTOP;
     
     @Override
     public void initChecker() {
@@ -27,6 +28,7 @@ public class DataflowChecker extends BaseInferrableChecker {
     protected void setAnnotations() {
         final Elements elements = processingEnv.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
+        DATAFLOWTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
     }
     
     @Override
