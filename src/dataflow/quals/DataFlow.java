@@ -2,7 +2,9 @@ package dataflow.quals;
 
 import org.checkerframework.framework.qual.DefaultFor;
 import org.checkerframework.framework.qual.DefaultLocation;
+import org.checkerframework.framework.qual.DefaultQualifierInHierarchy;
 import org.checkerframework.framework.qual.ImplicitFor;
+import org.checkerframework.framework.qual.InvisibleQualifier;
 import org.checkerframework.framework.qual.SubtypeOf;
 import org.checkerframework.framework.qual.TypeQualifier;
 
@@ -16,7 +18,7 @@ import com.sun.source.tree.Tree;
 
 @Documented
 @TypeQualifier
-@Retention(RetentionPolicy.RUNTIME)
+//@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.METHOD})
 @SubtypeOf({DataFlowTop.class})
 //@DefaultFor({DefaultLocation.RETURNS})
@@ -24,7 +26,8 @@ import com.sun.source.tree.Tree;
 //        trees={                
 //            Tree.Kind.METHOD,
 //        })
+
 public @interface DataFlow {
 //    String typeName(); 
-    String[] typeName();//array
+    String[] typeNames() default {};//array
 }

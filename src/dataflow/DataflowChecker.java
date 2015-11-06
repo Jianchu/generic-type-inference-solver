@@ -15,7 +15,9 @@ import checkers.inference.dataflow.InferenceTransfer;
 import dataflow.quals.DataFlow;
 import dataflow.quals.DataFlowTop;
 
+//@TypeQualifiers({ DataFlow.class})
 @TypeQualifiers({ DataFlow.class,DataFlowTop.class})
+//@TypeQualifiers({DataFlowTop.class})
 public class DataflowChecker extends BaseInferrableChecker {
     public AnnotationMirror DATAFLOW, DATAFLOWTOP;
     
