@@ -109,12 +109,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 }
                 return super.isSubtype(rhs, lhs);
             }
-            //return false;
         }
         
-//        private String[] getDataflowValue(AnnotatedTypeMirror type) {
-//            return (String[]) AnnotationUtils.getElementValuesWithDefaults(type.getAnnotation(DataFlow.class)).get(dataflowValue).getValue();
-//        }
         
         private String[] getDataflowValue(AnnotationMirror type) {
             List<String> allTypesList = (List<String>) AnnotationUtils.getElementValuesWithDefaults(type).get(dataflowValue).getValue();
@@ -126,7 +122,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 i++;
                 //System.out.println(o.toString()); 
             }
-            //return (String[]) AnnotationUtils.getElementValuesWithDefaults(type).get(dataflowValue).getValue();
             return allTypesInArray;
         }
     }
@@ -144,12 +139,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         
         @Override
         public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {         
-            //System.out.println(atypeFactory);
-            //AnnotatedDeclaredType t = this.atypeFactory.getAnnotatedType(node);
             TypeMirror tm = InternalUtils.typeOf(node);
             String className = TypesUtils.getQualifiedName((DeclaredType)tm).toString();
-            //System.out.println(node);
-            //String className = node.getClassBody().getSimpleName().toString();
             AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(className));
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
@@ -195,15 +186,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 type.replaceAnnotation(dataFlowType);
             }            
             return super.visitLiteral(node, type);
-        }
-        
-//        @Override
-//        public Void visitNewArray(NewArrayTree node, AnnotatedTypeMirror type) {
-//            String arrayType = node.getType().getKind().toString();
-//            AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(Array.class.toString()+"["+arrayType+"]"));
-//            type.replaceAnnotation(dataFlowType);
-//            return super.visitNewArray(node, type);
-//        }                
+        }      
     }
 
 }

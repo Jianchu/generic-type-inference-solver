@@ -18,16 +18,9 @@ import com.sun.source.tree.Tree;
 
 @Documented
 @TypeQualifier
-//@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.METHOD,ElementType.TYPE_PARAMETER,ElementType.LOCAL_VARIABLE})
 @SubtypeOf({DataFlowTop.class})
-//@DefaultFor({DefaultLocation.RETURNS})
-//@ImplicitFor(
-//        trees={                
-//            Tree.Kind.METHOD,
-//        })
 
 public @interface DataFlow {
-//    String typeName(); 
-    String[] typeNames() default {};//array
+    String[] typeNames() default {};
 }
