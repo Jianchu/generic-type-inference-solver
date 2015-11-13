@@ -138,9 +138,13 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
          */
         
         @Override
-        public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {         
-            TypeMirror tm = InternalUtils.typeOf(node);
-            String className = TypesUtils.getQualifiedName((DeclaredType)tm).toString();
+        public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {    
+            //AnnotatedTypeMirror atm = super.visitNewClass(node, type);
+            
+            TypeMirror tm = type.getUnderlyingType();
+            
+            //String className = TypesUtils.getQualifiedName((DeclaredType)tm).toString();
+            String className= tm.toString();
             AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(className));
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
