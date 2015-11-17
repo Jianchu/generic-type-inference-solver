@@ -32,7 +32,7 @@ public class DatatypeSolver {
         return serializer.convertAll(constraints);
     }
 
-    public DataflowSolution solve() {
+    public DatatypeSolution solve() {
 
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
@@ -64,18 +64,21 @@ public class DatatypeSolver {
                 int[] solution = solver.model();
 
                 for (Integer var : solution) {
-                    boolean varIsTrue = !(var < 0);
+                    boolean varIsTrue = var > 0;
                     //Need postive var
                     var = Math.abs(var);
-
                     Integer potential = existentialToPotentialIds.get(var);
                     if (potential != null) {
                         idToExistence.put(potential, varIsTrue);
                     } else {
-                        result.put(var, varIsTrue);
+                        // logic is same as sparta.SourceSolution, but for easy to understand, 
+                        // I just set True for each top, which means this top(type) should present:
+                        // If the solution is false, that means top was infered.
+                        // for dataflow, that means that the annotation should have the type
+                        result.put(var, !varIsTrue);
                     }
                 }
-                return new DataflowSolution(result, idToExistence, datatype);
+                return new DatatypeSolution(result, idToExistence, datatype);
             }
 
         } catch (Throwable th) {
@@ -83,6 +86,6 @@ public class DatatypeSolver {
             throw new RuntimeException("Error MAX-SAT solving! " + lastClause, th);
         }
 
-        return DataflowSolution.noSolution(datatype);
+        return DatatypeSolution.noSolution(datatype);
     }
 }
