@@ -35,7 +35,7 @@ public abstract class CnfVecIntSerializer implements Serializer {
             @Override
             protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype, SubtypeConstraint constraint) {
 
-                if (isTop(subtype)) {
+                if (isPresented(subtype)) {
                     return asVecArray(-supertype.getId());
                 }
 
@@ -44,7 +44,7 @@ public abstract class CnfVecIntSerializer implements Serializer {
 
             @Override
             protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
-                if (!isTop(supertype)) {
+                if (!isPresented(supertype)) {
                     return asVecArray(subtype.getId());
                 }
 
@@ -69,7 +69,7 @@ public abstract class CnfVecIntSerializer implements Serializer {
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
 
-                if (isTop(slot1)) {
+                if (isPresented(slot1)) {
                     return asVecArray(-slot2.getId());
                 } else {
                     return asVecArray(slot2.getId());
@@ -102,7 +102,7 @@ public abstract class CnfVecIntSerializer implements Serializer {
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
 
-                if (isTop(slot1)) {
+                if (isPresented(slot1)) {
                     return asVecArray(slot2.getId());
                 } else {
                     return asVecArray(-slot2.getId());
@@ -260,7 +260,7 @@ public abstract class CnfVecIntSerializer implements Serializer {
         return results;
     }
 
-    protected abstract boolean isTop(ConstantSlot constantSlot);
+    protected abstract boolean isPresented(ConstantSlot constantSlot);
 
     VecInt asVec(int ... vars) {
         return new VecInt(vars);

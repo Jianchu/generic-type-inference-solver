@@ -32,7 +32,7 @@ public class DatatypeSolver {
         return serializer.convertAll(constraints);
     }
 
-    public PermissionSolution solve() {
+    public DataflowSolution solve() {
 
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
@@ -75,7 +75,7 @@ public class DatatypeSolver {
                         result.put(var, varIsTrue);
                     }
                 }
-                return new PermissionSolution(result, idToExistence, datatype);
+                return new DataflowSolution(result, idToExistence, datatype);
             }
 
         } catch (Throwable th) {
@@ -83,6 +83,6 @@ public class DatatypeSolver {
             throw new RuntimeException("Error MAX-SAT solving! " + lastClause, th);
         }
 
-        return PermissionSolution.noSolution(datatype);
+        return DataflowSolution.noSolution(datatype);
     }
 }
