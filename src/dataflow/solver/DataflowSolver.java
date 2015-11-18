@@ -53,7 +53,7 @@ public class DataflowSolver implements InferenceSolver{
             dataflowSolvers.add(solver);
         }
         
-        List<DataflowSolution> solutions = new ArrayList<>();
+        List<DatatypeSolution> solutions = new ArrayList<>();
         for (DatatypeSolver solver : dataflowSolvers) {
             solutions.add(solver.solve());
         }
@@ -85,7 +85,7 @@ public class DataflowSolver implements InferenceSolver{
         return new DataflowSerializer(datatype);
     }    
         
-    protected InferenceSolution getMergedSolution(ProcessingEnvironment processingEnvironment, List<DataflowSolution> solutions) {
-        return new SinkSolution(solutions, processingEnvironment);
+    protected InferenceSolution getMergedSolution(ProcessingEnvironment processingEnvironment, List<DatatypeSolution> solutions) {
+        return new DataflowSolution(solutions, processingEnvironment);
     }
 }
