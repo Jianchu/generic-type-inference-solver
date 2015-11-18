@@ -1,10 +1,15 @@
 package dataflow.util;
 
+import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.util.List;
+import java.util.Set;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
+
+import dataflow.quals.DataFlow;
 
 public class DataflowUtils {
    
@@ -19,5 +24,26 @@ public class DataflowUtils {
             i++;
         }
         return allTypesInArray;
+    }
+    
+    
+    public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes, ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder =
+            new AnnotationBuilder(processingEnv, DataFlow.class);
+        
+        return createDataflowAnnotation(datatypes,builder);
+
+    }
+    
+    private static AnnotationMirror createDataflowAnnotation(
+            final Set<String> datatypes, final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[datatypes.size()];
+        int i = 0;
+        for (String datatype : datatypes) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+        builder.setValue("typeNames", datatypesInArray);
+        return builder.build();        
     }
 }
