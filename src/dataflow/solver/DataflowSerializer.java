@@ -9,7 +9,7 @@ import javax.lang.model.element.AnnotationMirror;
 import checkers.inference.InferenceMain;
 import checkers.inference.SlotManager;
 import checkers.inference.model.ConstantSlot;
-import dataflow.CnfVecIntSerializer;
+import checkers.inference.model.serialization.CnfVecIntSerializer;
 import dataflow.quals.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
@@ -25,7 +25,7 @@ public class DataflowSerializer extends CnfVecIntSerializer{
     }
 
     @Override
-    protected boolean isPresented(ConstantSlot constantSlot) {
+    protected boolean isTop(ConstantSlot constantSlot) {
         AnnotationMirror anno = constantSlot.getValue();
         return annoIsPresented(anno);
     }

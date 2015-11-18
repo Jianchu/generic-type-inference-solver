@@ -30,7 +30,7 @@ import checkers.inference.model.Slot;
 import dataflow.quals.DataFlow;
 import dataflow.util.DataflowUtils;
 
-public class DataflowSolver implements InferenceSolver{
+public class DataflowSolver implements InferenceSolver {
     
     protected AnnotationMirror DATAFLOW;
     
@@ -59,7 +59,7 @@ public class DataflowSolver implements InferenceSolver{
         }
         
         return getMergedSolution(processingEnvironment, solutions);
-}
+    }
     
     
     
