@@ -1,4 +1,4 @@
-package AntExample;
+package DataflowExample;
 import dataflow.quals.DataFlow;
 
 public class DataflowExample {
