@@ -16,7 +16,7 @@ insert-annotations-to-source (from AFU) must be on your path.
 The tool do-like-javac will make the usage easier.                                                  
 https://github.com/SRI-CSL/pascali-public.git                                        
 
-I created a shortcut for this tool:
+I created a shortcut for this tool:    
 alias do-like-javac='python /the/path/to/do-like-javac/bin/do-like-javac.py'
 
 Building
