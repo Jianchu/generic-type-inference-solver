@@ -8,7 +8,7 @@ In order to use dataflow type system, you will need the following four tools ins
 http://types.cs.washington.edu/jsr308/
 http://types.cs.washington.edu/annotation-file-utilities/
 http://types.cs.washington.edu/checker-framework/
-https://github.com/wmdietl/checker-framework-inference
+https://github.com/wmdietl/checker-framework-inference/
 
 You'll need CHECKERFRAMEWORK, JSR308, JAVA_HOME, and AFU environment variables set up appropriately.
 insert-annotations-to-source (from AFU) must be on your path.
