@@ -1,0 +1,23 @@
+<project name="compile" default="compile" basedir=".">
+    <property name="build" location="build"/>
+    <property name="src" location="src"/>
+    <property environment="env" />
+    <target name="init">
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${src}" 
+               destdir="${build}" 
+               fork="yes" 
+               executable="${env.CHECKERFRAMEWORK}/checker/bin/javac">
+        	<classpath>
+				<pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar"/>	
+        	</classpath>
+        </javac>
+    </target>
+
+
+</project>  
+
+
