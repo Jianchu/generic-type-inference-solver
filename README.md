@@ -40,7 +40,7 @@ Here are some instructions that shows how to do these tasks with do-like-javac:
 
 1. cd into DataflowExample directory   
 
-   cd DataflowExample  
+   cd $JSR308/DataflowExample  
 2. invoke inference tool by do-like-javac. If the inference is successful, a jaif file will be generated under current path called default.jaif.    
 
    do-like-javac -t inference --checker dataflow.DataflowChecker --solver dataflow.solver.DataflowSolver -o logs -- ant compile     
