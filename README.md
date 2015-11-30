@@ -97,9 +97,11 @@ This step will type check the newly created source code, and generate
 control flow graph.
 
   ```
-  do-like-javac -t checker --checker dataflow.DataflowChecker
-    -Aflowdotdir=./dotfiles -o logs -- ant check-annotated-src
+  do-like-javac -t checker --checker "dataflow.DataflowChecker -Aflowdotdir=./dotfiles" -o logs -- ant check-annotated-src
   ```
+
+Note the parentheses around the `--checker` argument to ensure the
+whole string is used.
 
 If you compare the original source code with the source code generated
 by the third step, you can find the string field
