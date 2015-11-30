@@ -1,6 +1,7 @@
 package dataflow.solver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.framework.util.DefaultAnnotationFormatter;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.TreeUtils;
 
@@ -70,7 +71,6 @@ public class DataflowSolver implements InferenceSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-//                    System.out.println(anno.toString());
                     String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
                     for(String dataflowValue :dataflowValues){
                         types.add(dataflowValue);

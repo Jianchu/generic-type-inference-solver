@@ -9,8 +9,10 @@ import java.lang.annotation.Target;
 
 @Documented
 @TypeQualifier
-@Target({ElementType.TYPE_USE, ElementType.METHOD,ElementType.TYPE_PARAMETER,ElementType.LOCAL_VARIABLE})
+@Target({ElementType.TYPE_USE,ElementType.TYPE_PARAMETER})
+//@Target({ElementType.TYPE_USE})
 @SubtypeOf({DataFlowTop.class})
+
 public @interface DataFlow {
     String[] typeNames() default {};
 }
