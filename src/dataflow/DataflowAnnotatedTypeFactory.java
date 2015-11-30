@@ -2,7 +2,6 @@ package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
-import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
@@ -10,31 +9,23 @@ import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
-import org.checkerframework.javacutil.InternalUtils;
 import org.checkerframework.javacutil.TreeUtils;
-import org.checkerframework.javacutil.TypesUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.Attribute.Array;
 
 import dataflow.quals.DataFlow;
 import dataflow.quals.DataFlowTop;
+import dataflow.util.DataflowUtils;
 
 
 
@@ -61,6 +52,10 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         );
     }
     
+    protected TreeAnnotator getDataflowTreeAnnotator(){
+        return new DataflowTreeAnnotator();
+    }
+
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
         return new DataFlowQualifierHierarchy(factory, DATAFLOWBOTTOM);
@@ -132,20 +127,12 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         public DataflowTreeAnnotator() {
             super(DataflowAnnotatedTypeFactory.this);
         }
-        
-        /**
-         * 
-         */
-        
+
         @Override
-        public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {    
-            //AnnotatedTypeMirror atm = super.visitNewClass(node, type);
-            
-            TypeMirror tm = type.getUnderlyingType();
-            
-            //String className = TypesUtils.getQualifiedName((DeclaredType)tm).toString();
-            String className= tm.toString();
-            AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(className));
+        public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
+            AnnotationMirror dataFlowType = DataflowUtils
+                    .genereateDataflowAnnoFromNewClass(node, type,
+                    processingEnv);
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
                    
@@ -158,39 +145,12 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             type.replaceAnnotation(dataFlowType);
             return super.visitPrimitiveType(node, type);
         }
-        
+
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
-            if (node.getKind() == Tree.Kind.STRING_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(String.class.toString().split(" ")[1]));
-                type.replaceAnnotation(dataFlowType);
-            }
-            else if (node.getKind() == Tree.Kind.INT_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(int.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }
-            if (node.getKind() == Tree.Kind.LONG_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(long.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }
-            else if (node.getKind() == Tree.Kind.FLOAT_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(float.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }
-            else if (node.getKind() == Tree.Kind.DOUBLE_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(double.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }
-            else if (node.getKind() == Tree.Kind.BOOLEAN_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(boolean.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }
-            else if (node.getKind() == Tree.Kind.CHAR_LITERAL){
-                AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(convert(char.class.toString()));
-                type.replaceAnnotation(dataFlowType);
-            }            
+            AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(node,type,processingEnv);
+            type.replaceAnnotation(dataFlowType);
             return super.visitLiteral(node, type);
         }      
     }
-
 }
