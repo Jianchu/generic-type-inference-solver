@@ -103,13 +103,11 @@ control flow graph.
   ```
   do-like-javac -t checker --checker "dataflow.DataflowChecker -Aflowdotdir=./dotfiles" -o logs -- ant check-annotated-src
   ```
-
-Note the quotes around the `--checker` argument to ensure the
+  Note the quotes around the `--checker` argument to ensure the
 whole string is used.
 
 
-5. Visualize the dot files by tool `graphviz`.    
-This step will generate a pdf file that contains the control flow graph.
+5. Visualize the dot files by tool `graphviz`. This step will generate a pdf file that contains the control flow graph.
 
   ```
   dot -Tpdf dotfiles/_init_Dataflow.dot -o CFG.pdf
