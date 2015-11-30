@@ -9,6 +9,9 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
+import checkers.inference.InferenceChecker;
+import GUTI.GUTIChecker;
+
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 /**
@@ -471,11 +474,11 @@ public class LogiqlConstraintGenerator {
      */
     private void getEncodingForAdaptationConstraint(
          StringBuilder encodingForAdaptationConstraint) {
-         //InferenceChecker IC = new GUTIChecker();
-         //GUTIChecker GC = (GUTIChecker) IC;
-         //if (IC instanceof AdaptationInference ){
-         //encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
-         //}
+//         InferenceChecker IC = new InferenceChecker();
+//         if (IC instanceof AdaptationInference ){
+//             GUTIChecker GC = (GUTIChecker) IC;
+//         encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
+//         }
     }
 
     /**
