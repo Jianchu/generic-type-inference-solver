@@ -63,7 +63,7 @@ Dataflow Checker and Dataflow Solver like this:
 Running Example
 ---------------
 
-After the second step of Building, a `DataflowExample` directory will be
+After the second step of Building, a `dataflowexample` directory will be
 placed under `$JSR308`.  This is a sample project that is annotated with
 @Dataflow annotations, and you can play around with it: type check,
 type infer, insert the inferred annotations to source code, visualize the control flow graph, etc.
@@ -71,10 +71,10 @@ type infer, insert the inferred annotations to source code, visualize the contro
 Here are some instructions that shows how to do these tasks with
 `do-like-javac`:
 
-1. Change into the DataflowExample directory:
+1. Change into the dataflowexample directory:
 
   ```
-  cd $JSR308/DataflowExample
+  cd $JSR308/dataflowexample
   ```
 
 2. Invoke the inference tool using `do-like-javac`.
@@ -114,5 +114,5 @@ whole string is used.
 
 If you compare the original source code with the source code generated
 by the third step, you can find the string field
-`insertAnnotationToThis` is annotated with
-`@DataFlow(typeNames={"java.lang.String"})` in the new source code.
+`thisIsString` and `thisShouldbeString` are annotated with
+`@DataFlow(typeNames={"java.lang.String"})` in the new source code, although the declared type of `thisShouldbeString` is `Object`.
