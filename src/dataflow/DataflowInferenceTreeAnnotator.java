@@ -51,8 +51,6 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     @Override
     public Void visitNewClass(final NewClassTree newClassTree,
             final AnnotatedTypeMirror atm) {
-        System.out.println("visitNewClass is called!");
-        System.out.println("ATM: " + atm.toString());
         AnnotationMirror anno = DataflowUtils
                 .genereateDataflowAnnoFromNewClass(newClassTree, atm,
                 this.realTypeFactory.getProcessingEnv());
@@ -67,7 +65,6 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         // .getDataflowTreeAnnotator();
         // realTreeAnnotator.visitNewClass(newClassTree, atm);
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
-        System.out.println(anno.toString());
         return null;
     }
 
