@@ -1,6 +1,6 @@
 package DataflowExample;
 
 public class DataflowExample {
-	String annotatedString = "I am a String!";
-	String insertAnnotationToThis = annotatedString;
+	String thisIsString = "I am a String!";
+	Object thisShouldbeString = thisIsString;
 }
