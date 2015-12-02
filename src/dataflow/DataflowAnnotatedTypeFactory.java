@@ -1,7 +1,6 @@
 package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
-import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
@@ -21,10 +20,10 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
+import checkers.inference.InferrableAnnotatedTypeFactory;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
-import checkers.inference.InferrableAnnotatedTypeFactory;
 
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewClassTree;
@@ -65,13 +64,12 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     }
 
     @Override
-    public TreeAnnotator getRealInferenceTreeAnnotator(
+    public TreeAnnotator getInferenceTreeAnnotator(
             InferenceAnnotatedTypeFactory atypeFactory,
             InferrableChecker realChecker,
-            AnnotatedTypeFactory realAnnotatedTypeFactory,
             VariableAnnotator variableAnnotator, SlotManager slotManager) {
         return new DataflowInferenceTreeAnnotator(atypeFactory, realChecker,
-                realAnnotatedTypeFactory, variableAnnotator, slotManager);
+                this, variableAnnotator, slotManager);
     }
 
     @Override
