@@ -1,9 +1,7 @@
 package dataflow.solver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.framework.util.DefaultAnnotationFormatter;
 import org.checkerframework.javacutil.AnnotationUtils;
-import org.checkerframework.javacutil.TreeUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,18 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 
-import sparta.checkers.iflow.util.PFPermission;
-import sparta.checkers.sat.IFlowSerializer;
-import sparta.checkers.sat.PermissionSolution;
-import sparta.checkers.sat.PermissionSolver;
-import sparta.checkers.sat.SinkSolution;
-import sparta.checkers.sat.SourceSerializer;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
@@ -32,38 +28,68 @@ import dataflow.quals.DataFlow;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSolver implements InferenceSolver {
-    
+
     protected AnnotationMirror DATAFLOW;
-    
+
     public InferenceSolution solve(Map<String, String> configuration,
-            Collection<Slot> slots,
-            Collection<Constraint> constraints,
+            Collection<Slot> slots, Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
-        
+
         Elements elements = processingEnvironment.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
-        
+
         Collection<String> datatypesUsed = getDatatypessUsed(slots);
         List<DatatypeSolver> dataflowSolvers = new ArrayList<>();
-        
-        //Configure datatype solvers
+
+        // Configure datatype solvers
         for (String datatype : datatypesUsed) {
             DatatypeSolver solver = new DatatypeSolver(datatype);
             solver.configure(constraints, getSerializer(datatype));
             dataflowSolvers.add(solver);
         }
-        
+
+        // List<DatatypeSolution> solutions = new ArrayList<>();
+        // for (DatatypeSolver solver : dataflowSolvers) {
+        // solutions.add(solver.solve());
+        // }
+
         List<DatatypeSolution> solutions = new ArrayList<>();
-        for (DatatypeSolver solver : dataflowSolvers) {
-            solutions.add(solver.solve());
+        try {
+            solutions = solveInparallel(dataflowSolvers);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        
+
         return getMergedSolution(processingEnvironment, solutions);
     }
-    
-    
-    
+
+    private List<DatatypeSolution> solveInparallel(
+            List<DatatypeSolver> dataflowSolvers) throws InterruptedException,
+            ExecutionException {
+        ExecutorService service = Executors.newFixedThreadPool(dataflowSolvers
+                .size());
+
+        List<Future<DatatypeSolution>> futures = new ArrayList<Future<DatatypeSolution>>();
+
+        for (final DatatypeSolver solver : dataflowSolvers) {
+            Callable<DatatypeSolution> callable = new Callable<DatatypeSolution>() {
+                @Override
+                public DatatypeSolution call() throws Exception {
+                    return solver.solve();
+                }
+            };
+            futures.add(service.submit(callable));
+        }
+        service.shutdown();
+
+        List<DatatypeSolution> solutions = new ArrayList<>();
+        for (Future<DatatypeSolution> future : futures) {
+            solutions.add(future.get());
+        }
+        return solutions;
+    }
+
     private Collection<String> getDatatypessUsed(Collection<Slot> solts) {
         Set<String> types = new TreeSet<>();
         for (Slot slot : solts) {
@@ -71,8 +97,9 @@ public class DataflowSolver implements InferenceSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-                    String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
-                    for(String dataflowValue :dataflowValues){
+                    String[] dataflowValues = DataflowUtils
+                            .getDataflowValue(anno);
+                    for (String dataflowValue : dataflowValues) {
                         types.add(dataflowValue);
                     }
                 }
@@ -80,12 +107,14 @@ public class DataflowSolver implements InferenceSolver {
         }
         return types;
     }
-    
+
     protected DataflowSerializer getSerializer(String datatype) {
         return new DataflowSerializer(datatype);
-    }    
-        
-    protected InferenceSolution getMergedSolution(ProcessingEnvironment processingEnvironment, List<DatatypeSolution> solutions) {
+    }
+
+    protected InferenceSolution getMergedSolution(
+            ProcessingEnvironment processingEnvironment,
+            List<DatatypeSolution> solutions) {
         return new DataflowSolution(solutions, processingEnvironment);
     }
 }
