@@ -1,0 +1,38 @@
+<project name="compilel" default="compile" basedir=".">
+    <property name="libsbin" location="libs/bin"/>
+    <property name="libsrc" location="libs/src"/>
+    <property name="projectbin" location="project/bin"/>
+    <property name="projectsrc" location="project/src"/>
+
+
+    <target name="init-libs">
+        <mkdir dir="${libsbin}"/>
+    </target>
+
+    <target name="init-project">
+        <mkdir dir="${projectbin}"/>
+    </target> 
+
+    <target name="compile-libs" depends="init-libs">
+        <javac srcdir="${libsrc}" 
+               destdir="${libsbin}" 
+               fork="yes">
+        </javac>     
+    </target>
+
+    <target name="compile-project" depends="init-project">
+        <javac srcdir="${projectsrc}" 
+               destdir="${projectbin}" 
+               fork="yes">
+            <classpath>
+                <pathelement location="${libsbin}"/>    
+            </classpath>
+        </javac>   
+    </target>
+
+    <target name="clean">
+        <delete dir="${libsbin}"/>
+        <delete dir="${projectbin}"/>
+    </target>
+
+</project>  
