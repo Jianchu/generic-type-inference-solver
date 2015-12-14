@@ -3,6 +3,7 @@ import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.framework.util.AnnotationBuilder;
@@ -68,8 +69,9 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             InferenceAnnotatedTypeFactory atypeFactory,
             InferrableChecker realChecker,
             VariableAnnotator variableAnnotator, SlotManager slotManager) {
-        return new DataflowInferenceTreeAnnotator(atypeFactory, realChecker,
-                this, variableAnnotator, slotManager);
+        return new ListTreeAnnotator(new ImplicitsTreeAnnotator(this),
+                new DataflowInferenceTreeAnnotator(atypeFactory, realChecker,
+                        this, variableAnnotator, slotManager));
     }
 
     @Override
