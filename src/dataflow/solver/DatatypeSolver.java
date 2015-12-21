@@ -33,7 +33,6 @@ public class DatatypeSolver {
     }
 
     public DatatypeSolution solve() {
-
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
 
@@ -62,8 +61,9 @@ public class DatatypeSolver {
                 //**** Remove exatential vars from solution
                 final Map<Integer, Integer> existentialToPotentialIds = serializer.getExistentialToPotentialVar();
                 int[] solution = solver.model();
-
                 for (Integer var : solution) {
+                    // System.out.println("This slot's value: " +
+                    // var.intValue());
                     boolean varIsTrue = var > 0;
                     //Need postive var
                     var = Math.abs(var);
@@ -78,6 +78,7 @@ public class DatatypeSolver {
                         result.put(var, !varIsTrue);
                     }
                 }
+                // System.out.println("*******************************");
                 return new DatatypeSolution(result, idToExistence, datatype);
             }
 

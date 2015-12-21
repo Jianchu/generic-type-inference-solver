@@ -42,6 +42,11 @@ public class DataflowUtils {
     private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder =
             new AnnotationBuilder(processingEnv, DataFlow.class);
+        // System.out.println("ddddddddddddddddddddddddddddddddddddddddddddd"
+        // + Arrays.toString(dataType));
+        // if (Arrays.toString(dataType) != null) {
+        // builder.setValue("typeNames", dataType);
+        // }
         builder.setValue("typeNames", dataType);
         return builder.build();
     }
@@ -76,7 +81,8 @@ public class DataflowUtils {
     public static AnnotationMirror generateDataflowAnnoFromLiteral(
             LiteralTree node, AnnotatedTypeMirror type,
             ProcessingEnvironment processingEnv) {
-        String[] datatypeInArray = null;
+        String datatypeInArray[] = { "" };
+        // String datatypeInArray[] = null;
         switch(node.getKind()){
             case STRING_LITERAL:
             datatypeInArray = convert(String.class.toString().split(" ")[1]);
@@ -98,9 +104,14 @@ public class DataflowUtils {
               break;
             case CHAR_LITERAL:
               datatypeInArray = convert(char.class.toString());
-              break;                
+            break;
+        case NULL_LITERAL:
+            break;
+        default:
+            break;
         }
-        AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(datatypeInArray,processingEnv);
+        AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(
+                    datatypeInArray, processingEnv);
         return dataFlowType;
     }
 }

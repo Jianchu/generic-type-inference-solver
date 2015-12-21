@@ -1,40 +1,38 @@
-<project name="compile" default="compile" basedir=".">
-    <property name="build" location="build"/>
-    <property name="src" location="src"/>
-    <property name="annotated" location="annotated/DataflowExample"/>
-    <property name="annotated-build" location="annotated/build"/>
-    <property name="dotfiles" location="dotfiles"/>
-    <property environment="env" />
-    <target name="init">
-        <mkdir dir="${build}"/>
+<project name="compilel" default="compile" basedir=".">
+    <property name="libsbin" location="libs/bin"/>
+    <property name="libsrc" location="libs/src"/>
+    <property name="projectbin" location="project/bin"/>
+    <property name="projectsrc" location="project/src"/>
+
+
+    <target name="init-libs">
+        <mkdir dir="${libsbin}"/>
     </target>
 
-    <target name="annotated-init">
-        <mkdir dir="${annotated-build}"/>
-        <mkdir dir="${dotfiles}"/>
+    <target name="init-project">
+        <mkdir dir="${projectbin}"/>
+    </target> 
+
+    <target name="compile-libs" depends="init-libs">
+        <javac srcdir="${libsrc}" 
+               destdir="${libsbin}" 
+               fork="yes">
+        </javac>     
     </target>
 
-
-    <target name="compile" depends="init">
-        <javac srcdir="${src}" 
-               destdir="${build}" 
-               fork="yes" 
-               executable="${env.CHECKERFRAMEWORK}/checker/bin/javac">
+    <target name="compile-project" depends="init-project">
+        <javac srcdir="${projectsrc}" 
+               destdir="${projectbin}" 
+               fork="yes">
             <classpath>
-                <pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar"/>    
+                <pathelement location="${libsbin}"/>    
             </classpath>
-        </javac>
+        </javac>   
     </target>
 
-    <target name="check-annotated-src" depends="annotated-init">
-        <javac srcdir="${annotated}" 
-               destdir="${annotated-build}" 
-               fork="yes" 
-               executable="${env.CHECKERFRAMEWORK}/checker/bin/javac">
-            <classpath>
-                <pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar"/>    
-            </classpath>
-        </javac>
+    <target name="clean">
+        <delete dir="${libsbin}"/>
+        <delete dir="${projectbin}"/>
     </target>
 
 </project>  

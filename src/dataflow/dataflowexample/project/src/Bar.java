@@ -1,11 +1,12 @@
-package DataflowExample;
+package project;
 
-import java.util.List;
-import java.util.ArrayList;
+import libs.Foo;
 import java.util.Date;
 
-public class DataflowExample {
-    int thisIsInt = 3;
+public class Bar {
+
+	private Foo fieldOfBar;
+	int thisIsInt = 3;
 
     char thisIsChar = 'c';
 
@@ -13,6 +14,10 @@ public class DataflowExample {
     Object thisShouldbeString = thisIsString;
 
     Date date = new Date();
+
+	public Bar(){
+		this.fieldOfBar = new Foo(10);
+	}
 
     public Object testingUpperBound(int intpara) {
 
