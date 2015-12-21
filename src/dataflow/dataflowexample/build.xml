@@ -5,6 +5,7 @@
     <property name="projectsrc" location="project/src"/>
     <property name="inserteddir" location="annotated/project"/>
     <property name="annotated-build" location="annotated/build"/>
+    <property name="dotfiles" location="dotfiles"/>
     <property environment="env" />
 
     <target name="init-libs">
@@ -34,12 +35,14 @@
 
     <target name="check-annotated-src" depends="init-project">
         <mkdir dir="${annotated-build}"/>
+        <mkdir dir="${dotfiles}"/>
         <javac srcdir="${inserteddir}" 
                destdir="${annotated-build}" 
                fork="yes" 
                executable="${env.CHECKERFRAMEWORK}/checker/bin/javac">
             <classpath>
-                <pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar:${libsbin}"/>    
+                <pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar"/>
+                <pathelement location="${libsbin}"/>    
             </classpath>
         </javac>
     </target>
@@ -48,6 +51,7 @@
         <delete dir="${libsbin}"/>
         <delete dir="${projectbin}"/>
         <delete dir="${annotated-build}"/>
+        <delete dir="${dotfiles}"/>        
     </target>
 
 </project>  
