@@ -3,8 +3,8 @@
     <property name="libsrc" location="libs/src"/>
     <property name="projectbin" location="project/bin"/>
     <property name="projectsrc" location="project/src"/>
-    <property name="inserteddir" location="output/project"/>
-    <property name="annotated-build" location="output/build"/>
+    <property name="inserteddir" location="annotated/project"/>
+    <property name="annotated-build" location="annotated/build"/>
     <property environment="env" />
 
     <target name="init-libs">
@@ -33,6 +33,7 @@
     </target>
 
     <target name="check-annotated-src" depends="init-project">
+        <mkdir dir="${annotated-build}"/>
         <javac srcdir="${inserteddir}" 
                destdir="${annotated-build}" 
                fork="yes" 
@@ -46,6 +47,7 @@
     <target name="clean">
         <delete dir="${libsbin}"/>
         <delete dir="${projectbin}"/>
+        <delete dir="${annotated-build}"/>
     </target>
 
 </project>  
