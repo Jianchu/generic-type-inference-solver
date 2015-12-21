@@ -78,23 +78,17 @@ Here are some instructions that shows how to do these tasks with
   ```
 
 2. Invoke the inference tool using `do-like-javac`.
-If the inference is successful, a `default.jaif` file will be
-generated in the current directory.
+The ROUNDTRIP mode will generate and solve the constraints 
+and then inserts the results back into the original source code. 
+If the whole process runs successfully, the inserted output will be placed in `annotated` directory.
 
   ```
   do-like-javac -t inference --checker dataflow.DataflowChecker
-    --solver dataflow.solver.DataflowSolver -o logs -- ant compile
+    --solver dataflow.solver.DataflowSolver -o logs 
+    -m ROUNDTRIP -afud annotated -- ant compile-project
   ```
 
-3. Insert the infered annotations into the source code. A
-directory called `annotated` will be created in the current directory. You can
-find a source code with infered annotations in it.
-
-  ```
-  insert-annotations-to-source default.jaif src/DataflowExample.java
-  ```
-
-4. Invoke the checker tool with `do-like-javac`.
+3. Invoke the checker tool with `do-like-javac`.
 This step will type check the newly created source code, and generate
 `.dot` files (in the `dotfiles` directory) that visualize the
 control flow graph.
@@ -106,7 +100,7 @@ control flow graph.
 whole string is used.
 
 
-5. Visualize the dot files by tool `graphviz`. This step will generate a pdf file that contains the control flow graph.
+4. Visualize the dot files by tool `graphviz`. This step will generate a pdf file that contains the control flow graph.
 
   ```
   dot -Tpdf dotfiles/_init_Dataflow.dot -o CFG.pdf
