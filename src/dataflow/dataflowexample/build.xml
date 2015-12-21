@@ -3,7 +3,9 @@
     <property name="libsrc" location="libs/src"/>
     <property name="projectbin" location="project/bin"/>
     <property name="projectsrc" location="project/src"/>
-
+    <property name="inserteddir" location="output/project"/>
+    <property name="annotated-build" location="output/build"/>
+    <property environment="env" />
 
     <target name="init-libs">
         <mkdir dir="${libsbin}"/>
@@ -28,6 +30,17 @@
                 <pathelement location="${libsbin}"/>    
             </classpath>
         </javac>   
+    </target>
+
+    <target name="check-annotated-src" depends="annotated-init">
+        <javac srcdir="${inserteddir}" 
+               destdir="${annotated-build}" 
+               fork="yes" 
+               executable="${env.CHECKERFRAMEWORK}/checker/bin/javac">
+            <classpath>
+                <pathelement location="${env.JSR308}/checker-framework-inference/dist/checker-framework-inference.jar:${libsbin}"/>    
+            </classpath>
+        </javac>
     </target>
 
     <target name="clean">
