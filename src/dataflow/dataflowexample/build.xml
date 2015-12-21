@@ -32,7 +32,7 @@
         </javac>   
     </target>
 
-    <target name="check-annotated-src" depends="annotated-init">
+    <target name="check-annotated-src" depends="init-project">
         <javac srcdir="${inserteddir}" 
                destdir="${annotated-build}" 
                fork="yes" 
