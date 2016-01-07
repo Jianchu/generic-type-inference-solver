@@ -1,4 +1,4 @@
-package LogicSolver;
+package logicsolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
+import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
@@ -24,7 +25,7 @@ import checkers.inference.model.Slot;
 public class LogicSolver implements InferenceSolver {
 
     @Override
-    public Map<Integer, AnnotationMirror> solve(
+    public InferenceSolution solve(
             Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
@@ -76,6 +77,6 @@ public class LogicSolver implements InferenceSolver {
             System.out.println("Slot ID: " + i + "  Annotation: "
                     + result.get(i).toString());
         }
-        return result;
+        return (InferenceSolution) result;
     }
 }

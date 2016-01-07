@@ -1,4 +1,8 @@
-package checkers.inference.solver.generalconstrainssolver.logiqlsubsolver;
+package generalconstrainssolver.logiqlsubsolver;
+
+import generalconstrainssolver.DecodingTool;
+import generalconstrainssolver.ImpliesLogic;
+import generalconstrainssolver.LatticeGenerator;
 
 import java.io.File;
 import java.util.HashMap;
@@ -9,9 +13,7 @@ import javax.lang.model.element.AnnotationMirror;
 
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
-import checkers.inference.solver.generalconstrainssolver.DecodingTool;
-import checkers.inference.solver.generalconstrainssolver.ImpliesLogic;
-import checkers.inference.solver.generalconstrainssolver.LatticeGenerator;
+
 
 public class LogiqlSubSolver {
     private List<ImpliesLogic> allImpliesLogic;

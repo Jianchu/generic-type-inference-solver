@@ -1,4 +1,4 @@
-package LogicSolver;
+package logicsolver;
 
 import java.io.File;
 import java.io.PrintWriter;

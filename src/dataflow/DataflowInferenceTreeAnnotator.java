@@ -43,7 +43,8 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
             final AnnotatedTypeMirror atm) {
         AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(
                 literalTree, atm, this.realTypeFactory.getProcessingEnv());
-        variableAnnotator.createConstant(anno, literalTree);
+        ConstantSlot cs =variableAnnotator.createConstant(anno, literalTree);
+        atm.replaceAnnotation(cs.getValue());
         variableAnnotator.visit(atm, literalTree);
         return null;
     }
@@ -51,11 +52,12 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     @Override
     public Void visitNewClass(final NewClassTree newClassTree,
             final AnnotatedTypeMirror atm) {
+        System.out.println("New class Tree: " + newClassTree.toString());
         AnnotationMirror anno = DataflowUtils
                 .genereateDataflowAnnoFromNewClass(newClassTree, atm,
                         this.realTypeFactory.getProcessingEnv());
         ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
-        atm.addAnnotation(cs.getValue());
+        atm.replaceAnnotation(cs.getValue());
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
         return null;
     }

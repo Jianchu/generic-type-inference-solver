@@ -1,18 +1,15 @@
-package LogicSolver;
+package logicsolver;
+
+import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
-
-import checkers.inference.InferenceChecker;
-import GUTI.GUTIChecker;
-
-import org.checkerframework.framework.type.QualifierHierarchy;
 
 /**
  * LogiqlConstraintGenerator take QualifierHierarchy of current type system as

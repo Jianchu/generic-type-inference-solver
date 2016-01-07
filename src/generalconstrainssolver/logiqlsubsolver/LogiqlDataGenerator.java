@@ -1,4 +1,6 @@
-package checkers.inference.solver.generalconstrainssolver.logiqlsubsolver;
+package generalconstrainssolver.logiqlsubsolver;
+
+import generalconstrainssolver.ImpliesLogic;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -6,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import checkers.inference.solver.generalconstrainssolver.ImpliesLogic;
 
 public class LogiqlDataGenerator {
     private String path = "";

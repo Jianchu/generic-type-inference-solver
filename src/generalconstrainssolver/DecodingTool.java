@@ -1,4 +1,4 @@
-package checkers.inference.solver.generalconstrainssolver;
+package generalconstrainssolver;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

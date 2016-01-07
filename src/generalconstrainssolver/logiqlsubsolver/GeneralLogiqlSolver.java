@@ -1,11 +1,13 @@
-package checkers.inference.solver.generalconstrainssolver.logiqlsubsolver;
+package generalconstrainssolver.logiqlsubsolver;
+
+import generalconstrainssolver.GeneralConstrainsSolver;
+import generalconstrainssolver.ImpliesLogic;
 
 import java.util.List;
 
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
-import checkers.inference.solver.generalconstrainssolver.GeneralConstrainsSolver;
-import checkers.inference.solver.generalconstrainssolver.ImpliesLogic;
+
 
 public class GeneralLogiqlSolver extends GeneralConstrainsSolver{
     @Override

@@ -1,4 +1,4 @@
-package checkers.inference.solver.generalconstrainssolver.logiqlsubsolver;
+package generalconstrainssolver.logiqlsubsolver;
 
 import java.io.File;
 import java.io.PrintWriter;

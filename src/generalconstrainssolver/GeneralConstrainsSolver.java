@@ -1,4 +1,4 @@
-package checkers.inference.solver.generalconstrainssolver;
+package generalconstrainssolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 

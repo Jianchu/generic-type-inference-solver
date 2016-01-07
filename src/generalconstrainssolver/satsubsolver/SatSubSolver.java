@@ -1,4 +1,8 @@
-package checkers.inference.solver.generalconstrainssolver.satsubsolver;
+package generalconstrainssolver.satsubsolver;
+
+import generalconstrainssolver.DecodingTool;
+import generalconstrainssolver.ImpliesLogic;
+import generalconstrainssolver.LatticeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,9 +20,7 @@ import org.sat4j.maxsat.WeightedMaxSatDecorator;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
-import checkers.inference.solver.generalconstrainssolver.DecodingTool;
-import checkers.inference.solver.generalconstrainssolver.ImpliesLogic;
-import checkers.inference.solver.generalconstrainssolver.LatticeGenerator;
+
 
 public class SatSubSolver {
     private List<ImpliesLogic> allImpliesLogic;
