@@ -1,17 +1,23 @@
-package generalconstrainssolver;
+package generalconstraintsolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
+import dataflow.util.DataflowUtils;
+
 public class LatticeGenerator {
+    
+    public ProcessingEnvironment processingEnv;
     public QualifierHierarchy qualHierarchy;
     public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
     public Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
@@ -36,6 +42,50 @@ public class LatticeGenerator {
 //        }
         //System.out.println(allTypes.toString());
         
+    }
+    
+    public LatticeGenerator(AnnotationMirror dataflowAnnotation,ProcessingEnvironment processingEnv){
+        this.processingEnv = processingEnv;
+        this.top = dataflowAnnotation;
+        this.bottom = DataflowUtils.createDataflowAnnotation(new HashSet<String>(Arrays.asList("")), processingEnv);
+        this.numModifiers = 2;
+        addAlltypesFor2();
+        getSubSupertypeFor2();
+        //TODO:
+        
+        
+    }
+    
+    private void addAlltypesFor2() {
+        Set<AnnotationMirror> all2Types = new HashSet<AnnotationMirror>();
+        all2Types.add(this.top);
+        all2Types.add(this.bottom);
+        this.allTypes = all2Types;
+    }
+
+    private void getSubSupertypeFor2(){
+        int num = 1;
+        for (AnnotationMirror i :allTypes){
+            Set<AnnotationMirror> subtypeSet = new HashSet<AnnotationMirror>();
+            Set<AnnotationMirror> supertypeSet = new HashSet<AnnotationMirror>();
+            if (AnnotationUtils.areSame(i, this.top)){
+                subtypeSet.add(this.top);
+                subtypeSet.add(this.bottom);
+                supertypeSet.add(this.top);
+            }
+            
+            else if (AnnotationUtils.areSame(i, this.bottom)){
+                subtypeSet.add(this.bottom);
+                supertypeSet.add(this.bottom);
+                supertypeSet.add(this.top);
+            }
+            this.subType.put(i, subtypeSet);
+            this.superType.put(i, supertypeSet);
+            this.modifierInt.put(i, num);
+            this.IntModifier.put(num, i);
+            num++;
+            
+        }        
     }
    
     private void getSubSupertype() {
