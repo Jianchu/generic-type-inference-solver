@@ -1,8 +1,8 @@
-package generalconstrainssolver.satsubsolver;
+package generalconstraintsolver.satsubsolver;
 
-import generalconstrainssolver.DecodingTool;
-import generalconstrainssolver.ImpliesLogic;
-import generalconstrainssolver.LatticeGenerator;
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;

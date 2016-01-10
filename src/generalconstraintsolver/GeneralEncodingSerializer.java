@@ -1,4 +1,4 @@
-package generalconstrainssolver;
+package generalconstraintsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
@@ -97,7 +97,7 @@ public class GeneralEncodingSerializer  implements Serializer{
                     return asSingleImp(lattice.modifierInt.get(lattice.top)
                             + lattice.numModifiers * (supertype.getId() - 1));
                 }
-                System.out.println(subtype.toString());
+                //System.out.println(subtype.toString());
                 ImpliesLogic[] result = hasNotToBeInSub(lattice.subType.get(subtype.getValue()),supertype, subtype);
                 if (result.length > 0){
                     return result;

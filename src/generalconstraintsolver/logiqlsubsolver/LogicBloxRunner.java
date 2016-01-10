@@ -1,4 +1,4 @@
-package generalconstrainssolver.logiqlsubsolver;
+package generalconstraintsolver.logiqlsubsolver;
 
 import java.io.BufferedReader;
 import java.io.File;

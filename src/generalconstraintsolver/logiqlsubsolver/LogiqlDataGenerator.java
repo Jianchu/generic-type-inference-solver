@@ -1,6 +1,6 @@
-package generalconstrainssolver.logiqlsubsolver;
+package generalconstraintsolver.logiqlsubsolver;
 
-import generalconstrainssolver.ImpliesLogic;
+import generalconstraintsolver.ImpliesLogic;
 
 import java.io.File;
 import java.io.PrintWriter;

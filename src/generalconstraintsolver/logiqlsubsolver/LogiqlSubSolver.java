@@ -1,8 +1,8 @@
-package generalconstrainssolver.logiqlsubsolver;
+package generalconstraintsolver.logiqlsubsolver;
 
-import generalconstrainssolver.DecodingTool;
-import generalconstrainssolver.ImpliesLogic;
-import generalconstrainssolver.LatticeGenerator;
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 
 import java.io.File;
 import java.util.HashMap;

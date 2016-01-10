@@ -1,4 +1,4 @@
-package generalconstrainssolver;
+package generalconstraintsolver;
 
 
 import java.util.HashSet;

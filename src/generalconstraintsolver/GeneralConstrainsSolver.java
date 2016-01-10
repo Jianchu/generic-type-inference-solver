@@ -1,4 +1,4 @@
-package generalconstrainssolver;
+package generalconstraintsolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
@@ -16,20 +16,22 @@ import checkers.inference.model.Slot;
 
 public abstract class GeneralConstrainsSolver implements InferenceSolver {
     protected Collection<Constraint> constraints;
-    protected GeneralEncodingSerializer serializer;
+    //protected GeneralEncodingSerializer serializer;
     protected SlotManager slotManager;
-    protected LatticeGenerator lattice;
-    
-    
+    //protected LatticeGenerator lattice;
+    protected QualifierHierarchy qualHierarchy;
+    protected ProcessingEnvironment processingEnvironment;
+    protected Collection<Slot> slots;
     @Override
     public InferenceSolution solve(Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
+        this.processingEnvironment = processingEnvironment;
+        this.slots = slots;
+        this.qualHierarchy = qualHierarchy;
         this.constraints = constraints;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
-        this.lattice = new LatticeGenerator(qualHierarchy);
-        this.serializer = new GeneralEncodingSerializer(slotManager, lattice);
         return solve();
     }
     
