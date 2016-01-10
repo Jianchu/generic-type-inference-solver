@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="/framework"/>
+	<classpathentry kind="src" path="/checker-framework-inference"/>
+	<classpathentry kind="lib" path="/checker-framework-inference/dist/org.ow2.sat4j.core-2.3.4.jar"/>
+	<classpathentry kind="lib" path="/checker-framework-inference/dist/org.ow2.sat4j.maxsat-2.3.4.jar"/>
+	<classpathentry kind="lib" path="/checker-framework-inference/dist/org.ow2.sat4j.pb-2.3.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
