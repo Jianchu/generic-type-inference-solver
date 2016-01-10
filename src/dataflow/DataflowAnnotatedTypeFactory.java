@@ -125,8 +125,9 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         }
         
         
+        @SuppressWarnings("unchecked")
         private String[] getDataflowValue(AnnotationMirror type) {
-            List<String> allTypesList = (List<String>) AnnotationUtils.getElementValuesWithDefaults(type).get(dataflowValue).getValue();
+            List<String> allTypesList = ((List<String>) AnnotationUtils.getElementValuesWithDefaults(type).get(dataflowValue).getValue());
             //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
             String[] allTypesInArray = new String[allTypesList.size()];
             int i = 0;
