@@ -39,14 +39,15 @@ public class DatatypeSolver {
         newdir.mkdir();
         String base = file.toString();
         String path = base + "/CNFfiles";
-        String writePath = path + "/CNFResultFor" + datatype + ".txt";
+        String writePath = path + "/CNFResultFor-" + datatype + ".txt";
         sb.append("CNF for type " + datatype + ":" + "\n");
+        
         for (VecInt clause : clauses) {
             sb.append("(");
             sb.append(clause.toString().replace(",", " \u22C1  "));
             sb.append(") \u22C0\n");
         }
-        System.out.println(writePath);
+        
         try {
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
