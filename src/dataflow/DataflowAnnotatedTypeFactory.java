@@ -152,8 +152,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                     .genereateDataflowAnnoFromNewClass(node, type,
                     processingEnv);
             type.replaceAnnotation(dataFlowType);
-            return super.visitNewClass(node, type);
-                   
+            return super.visitNewClass(node, type);                   
         }
         
         @Override
@@ -166,9 +165,10 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
-            AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(node,type,processingEnv);
+            AnnotationMirror dataFlowType = DataflowUtils
+                    .generateDataflowAnnoFromLiteral(node, type, processingEnv);
             type.replaceAnnotation(dataFlowType);
             return super.visitLiteral(node, type);
-        }      
+        }
     }
 }
