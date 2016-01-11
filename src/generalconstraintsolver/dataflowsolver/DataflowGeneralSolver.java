@@ -1,11 +1,9 @@
-package generalconstraintsolver.dataflowsolver.dataflowsatsolver;
+package generalconstraintsolver.dataflowsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import generalconstraintsolver.GeneralConstrainsSolver;
-import generalconstraintsolver.GeneralEncodingSerializer;
 import generalconstraintsolver.LatticeGenerator;
-import generalconstraintsolver.dataflowsolver.DatatypeSolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +21,7 @@ import checkers.inference.model.Slot;
 import dataflow.quals.DataFlow;
 import dataflow.util.DataflowUtils;
 
-public class DataflowSatSolver extends GeneralConstrainsSolver{
+public class DataflowGeneralSolver extends GeneralConstrainsSolver{
     
     protected AnnotationMirror DATAFLOW;
        
@@ -33,19 +31,32 @@ public class DataflowSatSolver extends GeneralConstrainsSolver{
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
         
         Collection<String> datatypesUsed = getDatatypessUsed(slots);
-        List<DatatypeSolver> dataflowSolvers = new ArrayList<>();
-        
+        List<DataflowImpliesLogic> dataflowLogics = new ArrayList<>();
+
         for (String datatype : datatypesUsed) {
             Set<String> datatypeSet = new HashSet<String>();
             datatypeSet.add(datatype);
             AnnotationMirror dataflowAnnotation= DataflowUtils.createDataflowAnnotation(datatypeSet, processingEnvironment);
             LatticeGenerator lattice = new LatticeGenerator(dataflowAnnotation,processingEnvironment);
-            GeneralEncodingSerializer serializer = new GeneralEncodingSerializer(slotManager, lattice);
-            
-            for (AnnotationMirror i : lattice.subType.keySet()) {
-                System.out.println("key: " + i.toString() + "value: "
-                        + lattice.modifierInt.get(i));
-            }
+            DataflowGeneralSerializer serializer = new DataflowGeneralSerializer(
+                    slotManager, lattice);
+            DataflowImpliesLogic logic = new DataflowImpliesLogic(lattice);
+            logic.configure(constraints, serializer);
+            dataflowLogics.add(logic);
+
+            // for (ImpliesLogic i : logic.getLogics()) {
+            // System.out.println("left: " + i.leftSide + "right: "
+            // + i.rightSide + "variable: " + i.variable);
+            // }
+            //
+            // // DatatypeSatSolver solver = new DatatypeSatSolver();
+            //
+            // for (AnnotationMirror i : lattice.subType.keySet()) {
+            // System.out.println("key: " + i.toString() + "value: "
+            // + lattice.modifierInt.get(i));
+            // System.out.println("top: " + lattice.top.toString()
+            // + "bottom: " + lattice.bottom.toString());
+            // }
             
         }
         
