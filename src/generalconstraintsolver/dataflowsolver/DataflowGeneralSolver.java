@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.util.Elements;
 
@@ -19,9 +20,11 @@ import checkers.inference.InferenceSolution;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Slot;
 import dataflow.quals.DataFlow;
+import dataflow.solver.DataflowSolution;
+import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
 
-public class DataflowGeneralSolver extends GeneralConstrainsSolver{
+public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
     
     protected AnnotationMirror DATAFLOW;
        
@@ -33,6 +36,7 @@ public class DataflowGeneralSolver extends GeneralConstrainsSolver{
         Collection<String> datatypesUsed = getDatatypessUsed(slots);
         List<DataflowImpliesLogic> dataflowLogics = new ArrayList<>();
 
+
         for (String datatype : datatypesUsed) {
             Set<String> datatypeSet = new HashSet<String>();
             datatypeSet.add(datatype);
@@ -43,6 +47,10 @@ public class DataflowGeneralSolver extends GeneralConstrainsSolver{
             DataflowImpliesLogic logic = new DataflowImpliesLogic(lattice);
             logic.configure(constraints, serializer);
             dataflowLogics.add(logic);
+            // List<DatatypeSolution> solutions = new ArrayList<>();
+            // for (DatatypeSolver solver : dataflowSolvers) {
+            // solutions.add(solver.solve());
+            // }
 
             // for (ImpliesLogic i : logic.getLogics()) {
             // System.out.println("left: " + i.leftSide + "right: "
@@ -59,8 +67,8 @@ public class DataflowGeneralSolver extends GeneralConstrainsSolver{
             // }
             
         }
-        
-        return null;
+        List<DatatypeSolution> Datatypesolutions = solveImpliesLogic(dataflowLogics);
+        return getMergedSolution(processingEnvironment, Datatypesolutions);
         
     }
     
@@ -82,4 +90,13 @@ public class DataflowGeneralSolver extends GeneralConstrainsSolver{
         return types;
     }
     
+    public abstract List<DatatypeSolution> solveImpliesLogic(
+            List<DataflowImpliesLogic> dataflowLogics);
+    
+    protected InferenceSolution getMergedSolution(
+            ProcessingEnvironment processingEnvironment,
+            List<DatatypeSolution> solutions) {
+        return new DataflowSolution(solutions, processingEnvironment);
+    }
+
 }

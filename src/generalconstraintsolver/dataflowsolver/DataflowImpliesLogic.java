@@ -33,4 +33,12 @@ public class DataflowImpliesLogic {
     public List<ImpliesLogic> getLogics() {
         return this.logics;
     }
+
+    public LatticeGenerator getLattice() {
+        return this.lattice;
+    }
+
+    public DataflowGeneralSerializer getSerializer() {
+        return this.serializer;
+    }
 }

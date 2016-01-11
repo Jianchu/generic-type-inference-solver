@@ -23,10 +23,10 @@ import checkers.inference.SlotManager;
 
 
 public class SatSubSolver {
-    private List<ImpliesLogic> allImpliesLogic;
-    private SlotManager slotManager;
-    private LatticeGenerator lattice;
-    private Set<Integer> slotRepresentSet = new HashSet<Integer>();
+    public List<ImpliesLogic> allImpliesLogic;
+    public SlotManager slotManager;
+    public LatticeGenerator lattice;
+    public Set<Integer> slotRepresentSet = new HashSet<Integer>();
 
     public SatSubSolver(List<ImpliesLogic> allImpliesLogic,
             SlotManager slotManager, LatticeGenerator lattice) {
@@ -35,15 +35,15 @@ public class SatSubSolver {
         this.lattice = lattice;
     }
 
-    private VecInt asVec(int... result) {
+    public VecInt asVec(int... result) {
         return new VecInt(result);
     }
 
-    private boolean isLast(Integer var) {
+    public boolean isLast(Integer var) {
         return (Math.abs(var.intValue()) % lattice.numModifiers == 0);
     }
 
-    private int findSlotId(Integer var) {
+    public int findSlotId(Integer var) {
         return (Math.abs(var.intValue()) / lattice.numModifiers + 1);
 
     }
@@ -75,7 +75,7 @@ public class SatSubSolver {
         return result;
     }
 
-    private void becomeWellForm(List<VecInt> clauses) {
+    public void becomeWellForm(List<VecInt> clauses) {
         Set<Integer> slotId = new HashSet<Integer>();
         for (Integer slotRep : slotRepresentSet) {
             if (isLast(slotRep.intValue())) {

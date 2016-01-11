@@ -30,9 +30,9 @@ import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
 public class GeneralEncodingSerializer  implements Serializer{
-    private final SlotManager slotManager;
-    private final LatticeGenerator lattice;
-    private final Map<Integer, Integer> existentialToPotentialVar = new HashMap<>();
+    public final SlotManager slotManager;
+    public final LatticeGenerator lattice;
+    public final Map<Integer, Integer> existentialToPotentialVar = new HashMap<>();
     
     public GeneralEncodingSerializer(SlotManager slotManager,
             LatticeGenerator lattice) {
@@ -173,7 +173,7 @@ public class GeneralEncodingSerializer  implements Serializer{
     }
 
     @Override
-    public Object serialize(EqualityConstraint constraint) {
+    public ImpliesLogic[] serialize(EqualityConstraint constraint) {
         return new VariableCombos<EqualityConstraint>() {
 
             @Override
@@ -301,22 +301,23 @@ public class GeneralEncodingSerializer  implements Serializer{
         return null;
     }
     
-    boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
+    public boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
         //System.out.println(AnnotationUtils.areSameIgnoringValues(m1, m2) +"  "+ m1.toString() + "  " + m2.toString());
         return AnnotationUtils.areSameIgnoringValues(m1, m2);
     }
     
-    ImpliesLogic[] asSingleImp(int variable) {
+    public ImpliesLogic[] asSingleImp(int variable) {
             return new ImpliesLogic[] {new ImpliesLogic(variable,true)};
     }
     
-    ImpliesLogic asDoubleImp(int leftVariable, int RightVariable) {
+    public ImpliesLogic asDoubleImp(int leftVariable, int RightVariable) {
         ImpliesLogic imply =  new ImpliesLogic(leftVariable,RightVariable);
 
         return imply;
     }
     
-    ImpliesLogic asMutipleImp(int[] leftVariable, int[] RightVariable, String insideLogic) {
+    public ImpliesLogic asMutipleImp(int[] leftVariable, int[] RightVariable,
+            String insideLogic) {
         return new ImpliesLogic(leftVariable,RightVariable, insideLogic);
     }
 
@@ -325,7 +326,7 @@ public class GeneralEncodingSerializer  implements Serializer{
 //    }
     
     
-    class VariableCombos<T extends Constraint> {
+    public class VariableCombos<T extends Constraint> {
 
         protected ImpliesLogic[] variable_variable(VariableSlot slot1,
                 VariableSlot slot2, T constraint) {
