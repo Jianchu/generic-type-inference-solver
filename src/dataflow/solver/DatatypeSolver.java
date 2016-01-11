@@ -43,7 +43,7 @@ public class DatatypeSolver {
         sb.append("CNF for type " + datatype + ":" + "\n");
         for (VecInt clause : clauses) {
             sb.append("(");
-            sb.append(clause.toString().replace(",", " \u22C1 "));
+            sb.append(clause.toString().replace(",", " \u22C1  "));
             sb.append(") \u22C0\n");
         }
         System.out.println(writePath);
