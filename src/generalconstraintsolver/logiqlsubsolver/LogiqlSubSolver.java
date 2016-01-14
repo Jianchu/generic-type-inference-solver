@@ -32,7 +32,8 @@ public class LogiqlSubSolver {
         final String currentPath = new File("").getAbsolutePath();
         File file = new File(currentPath);
         String base = file.getParent().toString();
-        String path = base + "/src/checkers/inference/solver/LogicData";
+        String path = base
+                + "/src/generalconstraintsolver/logiqlsubsolver/logicdata";
         LogiqlPredicateGenerator LogiqlPredicate = new LogiqlPredicateGenerator(lattice.numModifiers,path);
         LogiqlDataGenerator LogiqlData = new LogiqlDataGenerator(allImpliesLogic, path);
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(path);
