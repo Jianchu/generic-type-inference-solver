@@ -51,6 +51,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     @Override
     public Void visitNewClass(final NewClassTree newClassTree,
             final AnnotatedTypeMirror atm) {
+        //System.out.println("New class Tree: " + newClassTree.toString());
         AnnotationMirror anno = DataflowUtils
                 .genereateDataflowAnnoFromNewClass(newClassTree, atm,
                         this.realTypeFactory.getProcessingEnv());

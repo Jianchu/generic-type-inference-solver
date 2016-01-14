@@ -1,5 +1,7 @@
 package dataflow.solver;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,34 @@ public class DatatypeSolver {
         this.serializer = serializer;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.clauses = convertToCNF(constraints);
+        writeCNF();
+    }
+
+    private void writeCNF() {
+        StringBuilder sb = new StringBuilder();
+        final String currentPath = new File("").getAbsolutePath();
+        File file = new File(currentPath);
+        File newdir = new File("CNFfiles");
+        newdir.mkdir();
+        String base = file.toString();
+        String path = base + "/CNFfiles";
+        String writePath = path + "/CNFResultFor-" + datatype + ".txt";
+        sb.append("CNF for type " + datatype + ":" + "\n");
+        
+        for (VecInt clause : clauses) {
+            sb.append("(");
+            sb.append(clause.toString().replace(",", " \u22C1  "));
+            sb.append(") \u22C0\n");
+        }
+        
+        try {
+            File f = new File(writePath);
+            PrintWriter pw = new PrintWriter(f);
+            pw.write(sb.toString());
+            pw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List<VecInt> convertToCNF(Collection<Constraint> constraints) {
