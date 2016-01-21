@@ -14,7 +14,7 @@ import javax.lang.model.type.TypeMirror;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewClassTree;
 
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
 public class DataflowUtils {
    

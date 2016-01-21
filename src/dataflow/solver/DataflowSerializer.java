@@ -23,7 +23,7 @@ import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 import checkers.inference.model.serialization.CnfVecIntSerializer;
-import dataflow.quals.DataFlowTop;
+import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
 

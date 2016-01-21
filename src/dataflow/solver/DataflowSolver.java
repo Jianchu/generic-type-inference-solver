@@ -24,7 +24,7 @@ import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSolver implements InferenceSolver {
