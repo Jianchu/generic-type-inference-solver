@@ -1,0 +1,15 @@
+/bin/
+*.jar
+*.war
+*.ear
+*.class
+.classpath
+.project
+.metadata
+*.logic
+*.jaif
+scripts/CNFfiles/
+src/generalconstraintsolver/dataflowsolver/logicdata/
+src/generalconstraintsolver/logiqlsubsolver/logicdata/
+scripts/annotated/
+scripts/*.java
