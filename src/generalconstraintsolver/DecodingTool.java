@@ -17,7 +17,7 @@ import javax.lang.model.element.AnnotationMirror;
 public class DecodingTool {
     public int[] satSolution;
     public String path = "";
-    private LatticeGenerator lattice;
+    public LatticeGenerator lattice;
     public Map<Integer, AnnotationMirror> result = new HashMap<>();
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
     
@@ -38,6 +38,11 @@ public class DecodingTool {
         }
     }
     
+    public DecodingTool(String path, LatticeGenerator lattice) {
+        this.path = path;
+        this.lattice = lattice;
+    }
+
     private boolean isLast(int var) {
         return (Math.abs(var) % lattice.numModifiers == 0);
     }
@@ -65,7 +70,7 @@ public class DecodingTool {
         }
     }
     
-    private void mapSlot_ModifierRep(Integer var){
+    protected void mapSlot_ModifierRep(Integer var) {
         if (isLast(var)) {
             mapSlot_Set(Math.abs(var) / lattice.numModifiers, lattice.numModifiers, var / Math.abs(var));
         } else {
@@ -73,7 +78,7 @@ public class DecodingTool {
         }
     }
     
-    private void decodeSolverResult(Map<Integer, AnnotationMirror> result){
+    protected void decodeSolverResult(Map<Integer, AnnotationMirror> result) {
         for (Integer slotId : typeForSlot.keySet()){
             Collection<Integer> ModifiersForthisSlot = typeForSlot.get(slotId);
             result.put(slotId, lattice.top);
@@ -85,7 +90,7 @@ public class DecodingTool {
         }
     }
     
-    private void setDefaultResult(Set<Integer> slotRepresentSet){
+    private void setDefaultResult(Set<Integer> slotRepresentSet) {
         for (Integer var : slotRepresentSet) {
             mapSlot_ModifierRep(var);
         }
@@ -100,7 +105,7 @@ public class DecodingTool {
         decodeSolverResult(result);
     }
     
-    private void decodeLogicBloxResult() throws FileNotFoundException{
+    public void decodeLogicBloxResult() throws FileNotFoundException {
         String readPath = path + "/logicbloxOutput.txt";
         InputStream in = new FileInputStream(readPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));

@@ -99,10 +99,16 @@ public class LogiqlPredicateGenerator {
     private void writeFile(String output) {
         try {
             String writePath = path + "/LogiqlEncoding.logic";
+            String writeDeletePath = path + "/deleteData.logic";
+            String deleteContent = "-variable(v) <- variable@prev(v).";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
             pw.write(output);
             pw.close();
+            File df = new File(writeDeletePath);
+            PrintWriter dpw = new PrintWriter(df);
+            dpw.write(deleteContent);
+            dpw.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

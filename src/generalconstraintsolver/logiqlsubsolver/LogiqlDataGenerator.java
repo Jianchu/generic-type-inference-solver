@@ -16,10 +16,10 @@ public class LogiqlDataGenerator {
     public LogiqlDataGenerator(List<ImpliesLogic> allImpliesLogic, String path){
         this.allImpliesLogic = allImpliesLogic;
         this.path = path;
-        generateData();
+        // generateData();
     }
     
-    private void generateData(){
+    public void generateData() {
         StringBuilder logiqlData = new StringBuilder();
         for (ImpliesLogic res : allImpliesLogic) {
             if (res.singleVariable == true) {
@@ -58,7 +58,7 @@ public class LogiqlDataGenerator {
         writeFile(logiqlData.toString());
     }
     
-    private void writeFile(String output) {
+    protected void writeFile(String output) {
         try {
             String writePath = path + "/data.logic";
             File f = new File(writePath);

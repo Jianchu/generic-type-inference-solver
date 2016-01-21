@@ -8,16 +8,11 @@ import java.io.PrintWriter;
 
 public class LogicBloxRunner {
 
-    private String inReply = "";
+    protected String inReply = "";
     private final String path;
 
     public LogicBloxRunner(String path) {
         this.path = path;
-        try {
-            runLogicBlox();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
     
     /**
@@ -27,7 +22,7 @@ public class LogicBloxRunner {
      * @throws InterruptedException
      */
 
-    private void runLogicBlox() throws IOException {
+    public void runLogicBlox() throws IOException {
         String[] command = new String[7];
         command[0] = "lb create pltest";
         command[1] = "lb addblock pltest -f" + path + "/LogiqlEncoding.logic";
@@ -53,7 +48,7 @@ public class LogicBloxRunner {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void getOutPut_Error(String command, final int i)
+    protected void getOutPut_Error(String command, final int i)
             throws IOException, InterruptedException {
         final Process p = Runtime.getRuntime().exec(command);
         Thread getOutPut = new Thread() {
@@ -99,7 +94,7 @@ public class LogicBloxRunner {
     /**
      * write the result from LogicBlox to logicbloxOutput.txt.
      */
-    private void writeFile(String output) {
+    protected void writeFile(String output) {
         try {
             String writePath = path + "/logicbloxOutput.txt";
             File f = new File(writePath);

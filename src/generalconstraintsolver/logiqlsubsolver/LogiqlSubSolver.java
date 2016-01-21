@@ -5,6 +5,7 @@ import generalconstraintsolver.ImpliesLogic;
 import generalconstraintsolver.LatticeGenerator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,14 @@ public class LogiqlSubSolver {
                 + "/src/generalconstraintsolver/logiqlsubsolver/logicdata";
         LogiqlPredicateGenerator LogiqlPredicate = new LogiqlPredicateGenerator(lattice.numModifiers,path);
         LogiqlDataGenerator LogiqlData = new LogiqlDataGenerator(allImpliesLogic, path);
+        LogiqlData.generateData();
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(path);
+        try {
+            runLogicBlox.runLogicBlox();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         DecodingTool decoder = new DecodingTool(path, lattice,LogiqlData.slotRepresentSet);
         result = decoder.result;
         return new DefaultInferenceSolution(result, idToExistence);

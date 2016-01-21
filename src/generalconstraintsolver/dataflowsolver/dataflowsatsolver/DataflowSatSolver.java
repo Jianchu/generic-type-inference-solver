@@ -22,7 +22,6 @@ public class DataflowSatSolver extends DataflowGeneralSolver {
     public List<DatatypeSolution> solveImpliesLogic(
             List<DataflowImpliesLogic> dataflowLogics) {
 
-        List<int[]> solutions = new ArrayList<int[]>();
         List<DatatypeSolution> Datatypesolutions = new ArrayList<>();
 
         for (DataflowImpliesLogic logic : dataflowLogics) {
