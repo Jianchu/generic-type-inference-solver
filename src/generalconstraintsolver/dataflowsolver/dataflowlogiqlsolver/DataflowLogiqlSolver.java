@@ -28,7 +28,13 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
         String base = file.getParent().toString();
         String path = base
                 + "/src/generalconstraintsolver/dataflowsolver/logicdata";
+        String dataPath = path + "/data";
+        String logibloxoutputPath = path + "/logibloxoutput";
+        createDir(path);
+        createDir(dataPath);
+        createDir(logibloxoutputPath);
         // generate logiql tables
+
         LogiqlPredicateGenerator LogiqlPredicate = new LogiqlPredicateGenerator(
                 2, path);
         for (DataflowImpliesLogic logic : dataflowLogics) {
@@ -42,6 +48,11 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
         }
         runLogicBlox(path);
         return decodeLogiqlResult(path);
+    }
+
+    private void createDir(String path) {
+        File dirPath = new File(path);
+        dirPath.mkdir();
     }
 
     private List<DatatypeSolution> decodeLogiqlResult(String path) {
