@@ -2,7 +2,6 @@ package dataflow;
 
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.framework.flow.CFTransfer;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -12,10 +11,9 @@ import checkers.inference.BaseInferrableChecker;
 import checkers.inference.InferenceChecker;
 import checkers.inference.dataflow.InferenceAnalysis;
 import checkers.inference.dataflow.InferenceTransfer;
-import dataflow.quals.DataFlow;
-import dataflow.quals.DataFlowTop;
+import dataflow.qual.DataFlow;
+import dataflow.qual.DataFlowTop;
 
-@TypeQualifiers({ DataFlow.class,DataFlowTop.class})
 public class DataflowChecker extends BaseInferrableChecker {
     public AnnotationMirror DATAFLOW, DATAFLOWTOP;
     

@@ -30,8 +30,8 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 
-import dataflow.quals.DataFlow;
-import dataflow.quals.DataFlowTop;
+import dataflow.qual.DataFlow;
+import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
 
@@ -40,7 +40,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         implements InferrableAnnotatedTypeFactory {
     protected final AnnotationMirror DATAFLOW, DATAFLOWBOTTOM, DATAFLOWTOP;
 //  private ProcessingEnvironment processingEnv = checker.getProcessingEnvironment();
-    private ExecutableElement dataflowValue = TreeUtils.getMethod("dataflow.quals.DataFlow", "typeNames", 0, processingEnv);
+    private ExecutableElement dataflowValue = TreeUtils.getMethod(
+            "dataflow.qual.DataFlow", "typeNames", 0, processingEnv);
     
     //cannot use DataFlow.class.toString(), the string would be "interface dataflow.quals.DataFlow"
     //private ExecutableElement dataflowValue = TreeUtils.getMethod(DataFlow.class.toString(), "typeNames", 0, processingEnv);
