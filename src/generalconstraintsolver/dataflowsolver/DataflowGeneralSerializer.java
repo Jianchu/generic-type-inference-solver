@@ -30,7 +30,7 @@ import checkers.inference.model.RefinementVariableSlot;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
-import dataflow.quals.DataFlowTop;
+import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
 

@@ -19,7 +19,7 @@ import javax.lang.model.util.Elements;
 import checkers.inference.InferenceSolution;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Slot;
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 import dataflow.solver.DataflowSolution;
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
@@ -47,25 +47,6 @@ public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
             DataflowImpliesLogic logic = new DataflowImpliesLogic(lattice);
             logic.configure(constraints, serializer);
             dataflowLogics.add(logic);
-            // List<DatatypeSolution> solutions = new ArrayList<>();
-            // for (DatatypeSolver solver : dataflowSolvers) {
-            // solutions.add(solver.solve());
-            // }
-
-            // for (ImpliesLogic i : logic.getLogics()) {
-            // System.out.println("left: " + i.leftSide + "right: "
-            // + i.rightSide + "variable: " + i.variable);
-            // }
-            //
-            // // DatatypeSatSolver solver = new DatatypeSatSolver();
-            //
-            // for (AnnotationMirror i : lattice.subType.keySet()) {
-            // System.out.println("key: " + i.toString() + "value: "
-            // + lattice.modifierInt.get(i));
-            // System.out.println("top: " + lattice.top.toString()
-            // + "bottom: " + lattice.bottom.toString());
-            // }
-            
         }
         List<DatatypeSolution> Datatypesolutions = solveImpliesLogic(dataflowLogics);
         return getMergedSolution(processingEnvironment, Datatypesolutions);
