@@ -38,7 +38,7 @@ Building
 
   ```
   cd $JSR308
-  git clone https://github.com/Jianchu/LogiqlSolver.git
+  git clone https://github.com/Jianchu/generic-type-inference-solver.git
   ```
 
 2. In the `$JSR308` directory, run
@@ -54,7 +54,7 @@ up, recompile `checker-framework-inference`, and put the
 Dataflow Checker and Dataflow Solver like this:
 
   ```
-  $JSR308/checker-framework-inference/scripts/inference.py
+  $JSR308/checker-framework-inference/scripts/inference
     --checker dataflow.DataflowChecker
     --solver dataflow.solver.DataflowSolver --mode INFER [List of files]
   ```
