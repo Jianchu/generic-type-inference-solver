@@ -52,7 +52,7 @@ Building
 to run different constraint solvers:
 
   ```
-  $JSR308/generic-type-inference-solver/scripts/runGeneralLogiqlSolver.sh [List of files]
+  bash $JSR308/generic-type-inference-solver/scripts/runGeneralLogiqlSolver.sh [List of files]
   ```
 
   There are five solvers in total:
