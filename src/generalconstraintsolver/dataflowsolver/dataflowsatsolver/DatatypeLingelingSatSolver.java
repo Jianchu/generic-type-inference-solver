@@ -5,10 +5,8 @@ import generalconstraintsolver.satsubsolver.SatSubSolver;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -78,20 +76,6 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         }
     }
 
-    private void getSolverOutput(String datatype) throws FileNotFoundException {
-        String readPath = input + "/" + datatype;
-        InputStream in = new FileInputStream(readPath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-                }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void solveSAT(String datatype) throws FileNotFoundException {
         String readPath = input + "/" + datatype;
         String command = lingeling + " " + readPath;
@@ -116,11 +100,9 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         String path = base
                 + "/src/generalconstraintsolver/dataflowsolver/lingelingdata";
         input = path + "/input";
-        output = path + "/output";
         lingeling = new File(base).getParent() + "/lingeling/lingeling";
         createDir(path);
         createDir(input);
-        createDir(output);
     }
 
     private void createDir(String path) {
