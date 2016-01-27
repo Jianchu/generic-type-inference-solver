@@ -29,7 +29,8 @@ public class DataflowSatSolver extends DataflowGeneralSolver {
             Map<Integer, Boolean> result = new HashMap<>();
             final Map<Integer, Integer> existentialToPotentialIds = logic
                     .getSerializer().getExistentialToPotentialVar();
-            DatatypeSatSolver solver = new DatatypeSatSolver(logic, slotManager);
+            DatatypeLingelingSatSolver solver = new DatatypeLingelingSatSolver(
+                    logic, slotManager);
             DecodingTool decoder = new DecodingTool(solver.dataflowsatSolve(),
                     logic.getLattice());
             for (Integer i : decoder.result.keySet()) {
