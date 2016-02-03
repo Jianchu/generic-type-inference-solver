@@ -1,10 +1,10 @@
 package dataflow.qual;
 
-import org.checkerframework.framework.qual.DefaultLocation;
 import org.checkerframework.framework.qual.DefaultQualifierInHierarchy;
 import org.checkerframework.framework.qual.InvisibleQualifier;
 import org.checkerframework.framework.qual.SubtypeOf;
 import org.checkerframework.framework.qual.TargetLocations;
+import org.checkerframework.framework.qual.TypeUseLocation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @InvisibleQualifier
 @SubtypeOf({})
 @Target({ ElementType.TYPE_USE })
-@TargetLocations({ DefaultLocation.EXPLICIT_UPPER_BOUNDS })
+@TargetLocations({ TypeUseLocation.EXPLICIT_UPPER_BOUND })
 public @interface DataFlowTop {}
