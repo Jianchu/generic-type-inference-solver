@@ -38,10 +38,11 @@ import dataflow.util.DataflowUtils;
 public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
 
     private Set<Integer> touchedSlots = new HashSet<Integer>();
-
+    protected LatticeGenerator lattice;
     public DataflowGeneralSerializer(SlotManager slotManager,
             LatticeGenerator lattice) {
         super(slotManager, lattice);
+        this.lattice = lattice;
         // TODO Auto-generated constructor stub
     }
 
@@ -295,6 +296,38 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
 
+    @Override
+    public ImpliesLogic[] serialize(EqualityConstraint constraint) {
+        return new VariableCombos<EqualityConstraint>() {
+
+            @Override
+            protected ImpliesLogic[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
+                if (isTop(slot1)) {
+                    return asSingleImp(lattice.modifierInt.get(lattice.top)+ lattice.numModifiers * (slot2.getId()-1));
+                }
+                //result[0] = asSingleImp(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
+                return emptyClauses;
+            }
+
+            @Override
+            protected ImpliesLogic[] variable_constant(VariableSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
+                return constant_variable(slot2, slot1, constraint);
+            }
+
+            @Override
+            protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {                                
+                // a <=> b which is the same as (!a v b) & (!b v a)
+                ImpliesLogic[] result = new ImpliesLogic[lattice.numModifiers];
+                int i = 0;
+                for (AnnotationMirror modifiers: lattice.allTypes){
+                    result[i] = asDoubleImp((lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1));             
+                    i++;
+                }
+                return result;
+            }
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
+    }
+    
     @Override
     public Object serialize(ExistentialConstraint constraint) {
         // TODO Auto-generated method stub
