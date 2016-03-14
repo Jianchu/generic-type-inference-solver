@@ -12,10 +12,17 @@
 \usepackage{graphicx}
 
 \begin{document}
-\section{LogiQL encoding}
+
+\section{Encoding}
+In order to solve the constraint system, we encode the constraints as Max-SAT problem and LogiQL language. 
+
+\subsection{Max-SAT encoding}
+
+
+\subsection{LogiQL encoding}
 LogiQL is a declarative logic programming language ran by LogicBlox database system. Given a set of constraints from a particular type system, we can encode those constraints into LogiQL form, and solve them by LogicBlox.
-\subsection{Basic Encoding} 
-Basic encoding consists some predicates that don't depend on type systems.
+\subsubsection{Basic Encoding} 
+Basic encoding consists some predicates that won't depend on type systems.
 \begin{lstlisting}
 variable(v),hasvariableName(v:i)->int(i).
 /*Variable is an entity type, and hasvariableName is a refmode predicate for it. A variable name is represented as a integer. */ 
@@ -24,29 +31,30 @@ This predicate stores all the variables(slotID-typeQualifier), which will be use
 
 \begin{lstlisting}
 isAnnotated[v] = i -> variable(v), boolean(i).
-/* */ 
+/*isAnnotated is a functional predicate mapping variable entities to boolean values. Boolean value equals to true means the corresponding slot is annotated to corresponding annotation*/ 
 \end{lstlisting}
 This predicate represents whether the constraint variable v.slotID is annotated by v.typeQualifier.
 
 \begin{lstlisting}
 hasToBeTrue[v] = h -> variable(v), boolean(h).
 \end{lstlisting}
-This predicate is for the situation that a variable must be true, which is corresponding to a slot equals to a constant slot, or the equality constraint between a constant slot and a variable slot.
+This predicate is for the situation that a variable must be true, which is corresponding to equality constraint between a constant slot and a variable slot, a variable slot is supertype of the top type, or a variable slot is subtype of the bottom type.
+
 \begin{lstlisting}
 set_1_variable[v] = s -> variable(v), boolean(s).
 set_1_variable[v] = true <- hasToBeTrue[v] = true.
 \end{lstlisting}
-set\_x\_variable means a group of variable, x is the number of variables in this set, it would be true if one of variables in this set is true. The following set only contains one variable.following set only contains one variable.
+set\_x\_variable means a group of variable, x is the number of variables in this set, the whole predicate would be true if one of variables in this set is true.
 
 \begin{lstlisting}
-implies[v1,v2] = e -> variable(v1), variable(v2), boolean(e).
+implies1[v1,v2] = e -> variable(v1), variable(v2), boolean(e).
 \end{lstlisting}
-A table represents implies logic: "v1 --> v2"
+In the functional predicate impliesx, x means how many variables in the right hand side of implies logic. For example, implies1[1,3] = true, means "1 $->$ 3".
 
 \begin{lstlisting}
 rightSide[v] = r -> variable(v), boolean(r).
 \end{lstlisting}
-rightSide table indicates whether the variable in right side is operated by logic "not"
+rightSide predicate indicates whether the right side of logic implies operated by logic negation.
 
 
  \par 
