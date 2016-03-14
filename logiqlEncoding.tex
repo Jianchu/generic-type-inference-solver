@@ -54,9 +54,17 @@ In the functional predicate impliesx, x means how many variables in the right ha
 \begin{lstlisting}
 rightSide[v] = r -> variable(v), boolean(r).
 \end{lstlisting}
-rightSide predicate indicates whether the right side of logic implies operated by logic negation.
+rightSide predicate indicates whether the right side of logic implies operated by logic negation. For example, implies1[1, 2] = true, rightSide[2] = false means 1 $->$ $\neg$3
 
-
+\begin{lstlisting}
+set_1_variable[v2] = true <- implies[v1,v2] = true, set_1_variable[v1] = true, rightSide[v2] = true.
+set_1_variable[v2] = false <- implies[v1,v2] = true, set_1_variable[v1] = true, rightSide[v2] = false.
+\end{lstlisting}
+These two rules indicate that the implies relationship between two variables, the value of v2 in set\_1\_variable depends on the value of v1 in set\_1\_variable, and the value of v2 in predicate rightSide. These two rules are basic encoding because every type systems has at least one type.
+\begin{lstlisting}
+isAnnotated[v] = true <- set_1_variable[v] = true.
+isAnnotated[v] = false <- set_1_variable[v] = false.
+\end{lstlisting}
  \par 
 
 \end{document}
