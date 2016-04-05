@@ -1,0 +1,14 @@
+language: java
+
+# This is essential lest the script is ignored and Travis just runs gradle.
+install: true
+
+script: ./.travis-build.sh
+
+sudo: false
+
+jdk:
+  - oraclejdk8
+#  - oraclejdk7
+  - openjdk7
+
