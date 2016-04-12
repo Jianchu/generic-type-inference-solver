@@ -1,5 +1,5 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
-public class TestChar{
-	@dataflow.quals.DataFlow(typeNames={"char"}) char charTesting = 'L';
+public class TestChar {
+    @DataFlow(typeNames={"char"}) char charTesting = 'L';
 }

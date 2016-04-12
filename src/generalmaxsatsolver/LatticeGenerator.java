@@ -31,9 +31,8 @@ public class LatticeGenerator {
         this.numModifiers = qualHierarchy.getTypeQualifiers().size();
         getSubSupertype();
         getNotComparable();
-        
     }
-   
+
     private void getSubSupertype() {
         int num = 1;
         for (AnnotationMirror i : allTypes) {

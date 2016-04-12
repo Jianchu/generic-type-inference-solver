@@ -20,14 +20,14 @@ public class DecodingTool {
     public LatticeGenerator lattice;
     public Map<Integer, AnnotationMirror> result = new HashMap<>();
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
-    
-    public DecodingTool(int[] satSolution, LatticeGenerator lattice){
+
+    public DecodingTool(int[] satSolution, LatticeGenerator lattice) {
         this.satSolution = satSolution;
         this.lattice = lattice;
         decodeSatResult();
     }
-    
-    public DecodingTool(String path, LatticeGenerator lattice, Set<Integer> slotRepresentSet){
+
+    public DecodingTool(String path, LatticeGenerator lattice, Set<Integer> slotRepresentSet) {
         this.path = path;
         this.lattice = lattice;
         try {
@@ -37,19 +37,20 @@ public class DecodingTool {
             e.printStackTrace();
         }
     }
-    
+
     public DecodingTool(String path, LatticeGenerator lattice) {
         this.path = path;
         this.lattice = lattice;
     }
 
     private boolean isLast(int var) {
+        // JLTODO: Why this strange comparison?? What is the semantics of
+        // isLast? Why not Math.abs(var) == lattice.numModifiers?
         return (Math.abs(var) % lattice.numModifiers == 0);
     }
 
     private int findSlotId(int var) {
         return (Math.abs(var) / lattice.numModifiers + 1);
-
     }
 
     private int findModifierNumber(int var) {
@@ -69,7 +70,7 @@ public class DecodingTool {
             typeForSlot.put(slotId, possiableModifier);
         }
     }
-    
+
     protected void mapSlot_ModifierRep(Integer var) {
         if (isLast(var)) {
             mapSlot_Set(Math.abs(var) / lattice.numModifiers, lattice.numModifiers, var / Math.abs(var));
@@ -77,19 +78,19 @@ public class DecodingTool {
             mapSlot_Set(findSlotId(var), findModifierNumber(var), var / Math.abs(var));
         }
     }
-    
+
     protected void decodeSolverResult(Map<Integer, AnnotationMirror> result) {
-        for (Integer slotId : typeForSlot.keySet()){
+        for (Integer slotId : typeForSlot.keySet()) {
             Collection<Integer> ModifiersForthisSlot = typeForSlot.get(slotId);
             result.put(slotId, lattice.top);
-            for (Integer modifier: ModifiersForthisSlot){
-                if (modifier.intValue() >0){
+            for (Integer modifier : ModifiersForthisSlot) {
+                if (modifier.intValue() > 0) {
                     result.put(slotId,lattice.IntModifier.get(modifier));
                 }
             }
         }
     }
-    
+
     private void setDefaultResult(Set<Integer> slotRepresentSet) {
         for (Integer var : slotRepresentSet) {
             mapSlot_ModifierRep(var);
@@ -97,14 +98,14 @@ public class DecodingTool {
         decodeSolverResult(result);
         typeForSlot.clear();
     }
-    
-    private void decodeSatResult(){
+
+    private void decodeSatResult() {
         for (Integer var : satSolution) {
             mapSlot_ModifierRep(var);
         }
         decodeSolverResult(result);
     }
-    
+
     public void decodeLogicBloxResult() throws FileNotFoundException {
         String readPath = path + "/logicbloxOutput.txt";
         InputStream in = new FileInputStream(readPath);
@@ -113,10 +114,10 @@ public class DecodingTool {
         try {
             while ((line = reader.readLine()) != null) {
                 String[] s = line.split(" ");
-                if (s[1].equals("true")){
+                if (s[1].equals("true")) {
                     int var = Integer.parseInt(s[0]);
-                    mapSlot_ModifierRep(var);                
-                }                
+                    mapSlot_ModifierRep(var);
+                }
             }
             decodeSolverResult(result);
         } catch (IOException e) {

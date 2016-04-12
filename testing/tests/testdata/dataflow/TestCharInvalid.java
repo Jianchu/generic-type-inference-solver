@@ -1,4 +1,6 @@
-public class TestCharInvalid{
-	//:: error: (assignment.type.incompatible)
-	@dataflow.quals.DataFlow(typeNames={"int"}) char charTesting_invalid = 'L';
+import dataflow.qual.DataFlow;
+
+public class TestCharInvalid {
+    //:: error: (assignment.type.incompatible)
+    @DataFlow(typeNames={"int"}) char charTesting_invalid = 'L';
 } 

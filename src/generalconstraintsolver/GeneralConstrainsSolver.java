@@ -14,6 +14,7 @@ import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
 
+// JLTODO: rename class to GeneralConstraintSolver
 public abstract class GeneralConstrainsSolver implements InferenceSolver {
     protected Collection<Constraint> constraints;
     //protected GeneralEncodingSerializer serializer;
@@ -22,6 +23,7 @@ public abstract class GeneralConstrainsSolver implements InferenceSolver {
     protected QualifierHierarchy qualHierarchy;
     protected ProcessingEnvironment processingEnvironment;
     protected Collection<Slot> slots;
+
     @Override
     public InferenceSolution solve(Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
@@ -34,16 +36,17 @@ public abstract class GeneralConstrainsSolver implements InferenceSolver {
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         return solve();
     }
-    
-    protected abstract InferenceSolution solve(); 
+
+    protected abstract InferenceSolution solve();
+
 //    {
 //        List<ImpliesLogic> allImpliesLogic = serializer.convertAll(constraints);
 //        System.out.println("From Sat:");
 //        SatSubSolver satSolver = new SatSubSolver(allImpliesLogic,slotManager,lattice);
 //        System.out.println("From Logiql:");
 //        LogiqlSubSolver logiqlSolver = new LogiqlSubSolver(allImpliesLogic, lattice);
-////        for (ImpliesLogic res :allImpliesLogic ){
-////            if (res.singleVariable == true){
+////        for (ImpliesLogic res :allImpliesLogic ) {
+////            if (res.singleVariable == true) {
 ////                System.out.println("just: " + res.variable);
 ////            }
 ////            else{

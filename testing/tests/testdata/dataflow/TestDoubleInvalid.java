@@ -1,6 +1,6 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
-public class TestDoubleInvalid{
-	//:: error: (assignment.type.incompatible)
-	@dataflow.quals.DataFlow(typeNames={"int"}) double floatTesting_invalid = 3.14;
+public class TestDoubleInvalid {
+    //:: error: (assignment.type.incompatible)
+    @DataFlow(typeNames={"int"}) double floatTesting_invalid = 3.14;
 }

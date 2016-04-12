@@ -1,5 +1,5 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
 public class TestInt {
-	@dataflow.quals.DataFlow(typeNames={"int"}) int intTesting = 3;
+    @DataFlow(typeNames={"int"}) int intTesting = 3;
 }

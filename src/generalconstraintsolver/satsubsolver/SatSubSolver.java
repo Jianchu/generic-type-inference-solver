@@ -1,9 +1,5 @@
 package generalconstraintsolver.satsubsolver;
 
-import generalconstraintsolver.DecodingTool;
-import generalconstraintsolver.ImpliesLogic;
-import generalconstraintsolver.LatticeGenerator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +16,9 @@ import org.sat4j.maxsat.WeightedMaxSatDecorator;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
-
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 
 public class SatSubSolver {
     public List<ImpliesLogic> allImpliesLogic;
@@ -96,14 +94,12 @@ public class SatSubSolver {
             int[] wellFormFollow = new int[2];
             Iterator<Integer> intRep1 = lattice.IntModifier.keySet().iterator();
             Set<Integer> intRep2 = lattice.IntModifier.keySet();
-            while(intRep1.hasNext()) {
+            while (intRep1.hasNext()) {
                 Integer int1= intRep1.next();
                 for (Integer int2: intRep2) {
                     if (int2.intValue() != int1.intValue()) {
-                        wellFormFollow[0] = -(lattice.numModifiers * (id - 1) + int1
-                                .intValue());
-                        wellFormFollow[1] = -(lattice.numModifiers * (id - 1) + int2
-                                .intValue());
+                        wellFormFollow[0] = -(lattice.numModifiers * (id - 1) + int1.intValue());
+                        wellFormFollow[1] = -(lattice.numModifiers * (id - 1) + int2.intValue());
                         clauses.add(asVec(wellFormFollow));
                     }
                 }
@@ -112,23 +108,23 @@ public class SatSubSolver {
     }
 
     public InferenceSolution satSolve() {
-        Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         List<VecInt> clauses = convertImpliesToClauses();
         becomeWellForm(clauses);
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);
-        final int totalClauses = clauses.size() + slotManager.nextId() * (1+(lattice.numModifiers*(lattice.numModifiers-1)/2));
+        final int totalClauses = clauses.size()
+                + slotManager.nextId() * (1 + (lattice.numModifiers * (lattice.numModifiers - 1) / 2));
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(
                 org.sat4j.pb.SolverFactory.newBoth());
 
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
         solver.setTimeoutMs(1000000);
-        VecInt lastClause = null;
+        // VecInt lastClause = null;
         try {
             for (VecInt clause : clauses) {
                 // System.out.println(clause);
-                lastClause = clause;
+                // lastClause = clause;
                 solver.addHardClause(clause);
             }
             if (solver.isSatisfiable()) {
@@ -142,7 +138,7 @@ public class SatSubSolver {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        return new DefaultInferenceSolution(result, idToExistence);
+        return new DefaultInferenceSolution(result);
     }
-    
+
 }

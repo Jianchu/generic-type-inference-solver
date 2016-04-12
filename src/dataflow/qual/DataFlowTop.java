@@ -14,4 +14,5 @@ import java.lang.annotation.Target;
 @SubtypeOf({})
 @Target({ ElementType.TYPE_USE })
 @TargetLocations({ TypeUseLocation.EXPLICIT_UPPER_BOUND })
-public @interface DataFlowTop {}
+public @interface DataFlowTop {
+}

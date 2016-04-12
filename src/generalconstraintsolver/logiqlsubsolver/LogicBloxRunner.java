@@ -14,14 +14,13 @@ public class LogicBloxRunner {
     public LogicBloxRunner(String path) {
         this.path = path;
     }
-    
+
     /**
      * runLogicBlox run each command of logicblox.
-     * 
+     *
      * @throws IOException
      * @throws InterruptedException
      */
-
     public void runLogicBlox() throws IOException {
         String[] command = new String[7];
         command[0] = "lb create pltest";
@@ -39,10 +38,9 @@ public class LogicBloxRunner {
         writeFile(inReply);
     }
 
-    
     /**
      * run command and get the output and error from logicblox.
-     * 
+     *
      * @param command is the command in string.
      * @param i
      * @throws IOException
@@ -52,6 +50,7 @@ public class LogicBloxRunner {
             throws IOException, InterruptedException {
         final Process p = Runtime.getRuntime().exec(command);
         Thread getOutPut = new Thread() {
+            @Override
             public void run() {
                 String s = "";
                 BufferedReader stdInput = new BufferedReader(
@@ -71,6 +70,7 @@ public class LogicBloxRunner {
         getOutPut.start();
 
         Thread getError = new Thread() {
+            @Override
             public void run() {
                 String s = "";
                 String errReply = "";

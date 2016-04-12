@@ -1,8 +1,5 @@
 package generalconstraintsolver.dataflowsolver.dataflowsatsolver;
 
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
-import generalconstraintsolver.satsubsolver.SatSubSolver;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,25 +7,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
 import checkers.inference.SlotManager;
 import dataflow.util.DataflowUtils;
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+import generalconstraintsolver.satsubsolver.SatSubSolver;
 
 public class DatatypeLingelingSatSolver extends SatSubSolver {
     private DataflowImpliesLogic logic;
     private StringBuilder sb = new StringBuilder();
-    private String input, output, lingeling;
+    private String input, lingeling;
     private Set<Integer> variableSet = new HashSet<Integer>();
-    List<Integer> resultList = new ArrayList<Integer>();
+    private List<Integer> resultList = new ArrayList<Integer>();
+
     public DatatypeLingelingSatSolver(DataflowImpliesLogic logic,
             SlotManager slotManager) {
         super(logic.getLogics(), slotManager, logic.getLattice());
@@ -41,8 +37,6 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         String base = file.getParent().toString();
         createLingelingDir(base);
 
-        Map<Integer, Boolean> idToExistence = new HashMap<>();
-        Map<Integer, AnnotationMirror> result = new HashMap<>();
         List<VecInt> clauses = convertImpliesToClauses();
         becomeWellForm(clauses);
         buildInputString(clauses);
@@ -69,7 +63,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
                 }
                 sb.append("0\n");
             }
-            wirteCNFinput(datatype);
+            writeCNFinput(datatype);
             solveSAT(datatype);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -87,7 +81,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         }
     }
 
-    private void wirteCNFinput(String datatype) throws FileNotFoundException {
+    private void writeCNFinput(String datatype) throws FileNotFoundException {
         String writePath = input + "/" + datatype;
         File f = new File(writePath);
         PrintWriter pw = new PrintWriter(f);
@@ -123,6 +117,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         resultList = new ArrayList<Integer>();
         final Process p = Runtime.getRuntime().exec(command);
         Thread getOutPut = new Thread() {
+            @Override
             public void run() {
                 String s = "";
                 BufferedReader stdInput = new BufferedReader(
@@ -134,14 +129,10 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
                             for (String retval : s.split(" ")) {
                                 if (!retval.equals("") && !retval.equals(" ")
                                         && !retval.equals("\n")) {
-                                    if (variableSet.contains(Math.abs(Integer
-                                            .parseInt(retval)))) {
-                                        resultList
-                                                .add(Integer.parseInt(retval));
+                                    if (variableSet.contains(Math.abs(Integer.parseInt(retval)))) {
+                                        resultList.add(Integer.parseInt(retval));
                                     }
-
                                 }
-
                             }
                         }
                     }
@@ -153,6 +144,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         getOutPut.start();
 
         Thread getError = new Thread() {
+            @Override
             public void run() {
                 String s = "";
                 String errReply = "";

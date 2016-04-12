@@ -4,11 +4,9 @@ import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 
@@ -29,31 +27,34 @@ import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
-public class GeneralEncodingSerializer  implements Serializer{
-    public final SlotManager slotManager;
-    public final LatticeGenerator lattice;
-    public final Map<Integer, Integer> existentialToPotentialVar = new HashMap<>();
-    
+public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], ImpliesLogic[]> {
+    protected final SlotManager slotManager;
+    protected final LatticeGenerator lattice;
+    // protected final Map<Integer, Integer> existentialToPotentialVar = new
+    // HashMap<>();
+
     public GeneralEncodingSerializer(SlotManager slotManager,
             LatticeGenerator lattice) {
         this.slotManager = slotManager;
         this.lattice = lattice;
     }
-    
+
+    /* JLTODO: This map is always empty. What is it's purpose???
+     * I commented out all uses.
     public Map<Integer, Integer> getExistentialToPotentialVar() {
         return existentialToPotentialVar;
-    }
-    
+    }*/
+
     public List<ImpliesLogic> convertAll(Iterable<Constraint> constraints) {
         return convertAll(constraints, new LinkedList<ImpliesLogic>());
     }
 
     public List<ImpliesLogic> convertAll(Iterable<Constraint> constraints,
             List<ImpliesLogic> results) {
-        
+
         for (Constraint constraint : constraints) {
-            for (ImpliesLogic res: ((ImpliesLogic[]) constraint.serialize(this))){
-                if (res.size() != 0){
+            for (ImpliesLogic res : constraint.serialize(this)) {
+                if (res.size() != 0) {
 //                    if (res.singleVariable == true){
 //                        System.out.println("just: " + res.variable);
 //                    }
@@ -66,15 +67,18 @@ public class GeneralEncodingSerializer  implements Serializer{
         }
         return results;
     }
-    
-    private ImpliesLogic[] hasNotToBeInSub(Collection<AnnotationMirror> collection, VariableSlot currentSlot,ConstantSlot currentConslot){
+
+    private ImpliesLogic[] hasNotToBeInSub(Collection<AnnotationMirror> collection, VariableSlot currentSlot,
+            ConstantSlot currentConslot) {
         List<Integer> Listresult = new ArrayList<Integer>();
-        for (AnnotationMirror subOrSup: collection){
-            if (!areSameType(subOrSup,currentConslot.getValue())){
+        for (AnnotationMirror subOrSup : collection) {
+            if (!areSameType(subOrSup, currentConslot.getValue())) {
+                // JLTODO: can you put this computation into a helper? It
+                // appears multiple times in this file.
                 Listresult.add(-(lattice.modifierInt.get(subOrSup) + lattice.numModifiers * (currentSlot.getId() - 1)));
-            }              
+            }
         }
-        
+
         ImpliesLogic[] result = new ImpliesLogic[Listresult.size()];
         if (Listresult.size() > 0) {
             Iterator<Integer> iterator = Listresult.iterator();
@@ -85,23 +89,23 @@ public class GeneralEncodingSerializer  implements Serializer{
         }
         return emptyClauses;
     }
-    
+
     @Override
     public ImpliesLogic[] serialize(SubtypeConstraint constraint) {
         return new VariableCombos<SubtypeConstraint>() {
 
             @Override
             protected ImpliesLogic[] constant_variable(ConstantSlot subtype,
-                    VariableSlot supertype, SubtypeConstraint constraint) {   
+                    VariableSlot supertype, SubtypeConstraint constraint) {
                 if (areSameType(subtype.getValue(),lattice.top)) {
                     return asSingleImp(lattice.modifierInt.get(lattice.top)
                             + lattice.numModifiers * (supertype.getId() - 1));
                 }
                 //System.out.println(subtype.toString());
-                ImpliesLogic[] result = hasNotToBeInSub(lattice.subType.get(subtype.getValue()),supertype, subtype);
-                if (result.length > 0){
+                ImpliesLogic[] result = hasNotToBeInSub(lattice.subType.get(subtype.getValue()), supertype, subtype);
+                if (result.length > 0) {
                     return result;
-                }                
+                }
                 return emptyClauses;
             }
 
@@ -111,7 +115,7 @@ public class GeneralEncodingSerializer  implements Serializer{
                 if (areSameType(supertype.getValue(),lattice.bottom)) {
                     return asSingleImp(lattice.modifierInt.get(lattice.bottom)
                             + lattice.numModifiers * (subtype.getId() - 1));
-                }                 
+                }
                 ImpliesLogic[] result = hasNotToBeInSub(lattice.superType.get(supertype.getValue()),subtype, supertype);
                 if (result.length > 0) {
                     return result;
@@ -119,11 +123,10 @@ public class GeneralEncodingSerializer  implements Serializer{
                 return emptyClauses;
             }
 
-        
             @Override
             protected ImpliesLogic[] variable_variable(VariableSlot subtype,
                     VariableSlot supertype, SubtypeConstraint constraint) {
-                
+
                 ImpliesLogic supertypeOfTop = asDoubleImp(
                         (lattice.modifierInt.get(lattice.top) + lattice.numModifiers
                                 * (subtype.getId() - 1)),
@@ -135,7 +138,7 @@ public class GeneralEncodingSerializer  implements Serializer{
                                 * (supertype.getId() - 1)),
                         lattice.modifierInt.get(lattice.bottom)
                                 + lattice.numModifiers * (subtype.getId() - 1));
-                
+
                 List<ImpliesLogic> list = new ArrayList<ImpliesLogic>();
                 for (AnnotationMirror modifier : lattice.allTypes) {
                     // if we know subtype
@@ -143,7 +146,7 @@ public class GeneralEncodingSerializer  implements Serializer{
                         int[] rightSide = new int[lattice.superType.get(modifier).size()];
                         int[] leftSide = new int[1];
                         int i = 0;
-                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));                       
+                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));
                         for (AnnotationMirror sup : lattice.superType.get(modifier)) {
                             rightSide[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (supertype.getId() - 1);
                             i++;
@@ -151,12 +154,12 @@ public class GeneralEncodingSerializer  implements Serializer{
                         list.add(asMutipleImp(leftSide,rightSide,"right-false"));
                     }
                     // if we know supertype
-                    if (!areSameType(modifier,lattice.bottom)){
+                    if (!areSameType(modifier, lattice.bottom)) {
                         int[] rightSide = new int[lattice.subType.get(modifier).size()];
                         int[] leftSide = new int[1];
                         int j = 0;
                         leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers * (supertype.getId()-1));
-                        for (AnnotationMirror sub : lattice.subType.get(modifier)){
+                        for (AnnotationMirror sub : lattice.subType.get(modifier)) {
                             rightSide[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (subtype.getId()-1);
                             j++;
                         }
@@ -169,6 +172,8 @@ public class GeneralEncodingSerializer  implements Serializer{
                 return result;
             }
 
+            // JLTODO: this is quite a large anonymous inner class. Extract it
+            // to the top level and document.
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
 
@@ -179,7 +184,8 @@ public class GeneralEncodingSerializer  implements Serializer{
             @Override
             protected ImpliesLogic[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 //result[0] = asSingleImp(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
-                return asSingleImp(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
+                return asSingleImp(
+                        lattice.modifierInt.get(slot1.getValue()) + lattice.numModifiers * (slot2.getId() - 1));
             }
 
             @Override
@@ -188,12 +194,14 @@ public class GeneralEncodingSerializer  implements Serializer{
             }
 
             @Override
-            protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {                                
+            protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 // a <=> b which is the same as (!a v b) & (!b v a)
                 ImpliesLogic[] result = new ImpliesLogic[lattice.numModifiers];
                 int i = 0;
-                for (AnnotationMirror modifiers: lattice.allTypes){
-                    result[i] = asDoubleImp((lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1));             
+                for (AnnotationMirror modifiers : lattice.allTypes) {
+                    result[i] = asDoubleImp(
+                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1),
+                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1));
                     i++;
                 }
                 return result;
@@ -202,18 +210,19 @@ public class GeneralEncodingSerializer  implements Serializer{
     }
 
     @Override
-    public Object serialize(ExistentialConstraint constraint) {
+    public ImpliesLogic[] serialize(ExistentialConstraint constraint) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(InequalityConstraint constraint) {
+    public ImpliesLogic[] serialize(InequalityConstraint constraint) {
         return new VariableCombos<InequalityConstraint>() {
 
             @Override
             protected ImpliesLogic[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
-                return asSingleImp(-(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1)));
+                return asSingleImp(
+                        -(lattice.modifierInt.get(slot1.getValue()) + lattice.numModifiers * (slot2.getId() - 1)));
 
             }
 
@@ -227,58 +236,63 @@ public class GeneralEncodingSerializer  implements Serializer{
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 ImpliesLogic[] result = new ImpliesLogic[lattice.numModifiers];
                 int i = 0;
-                for (AnnotationMirror modifiers: lattice.allTypes){
-                    result[i] = asDoubleImp(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1), -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1)));               
+                for (AnnotationMirror modifiers : lattice.allTypes) {
+                    result[i] = asDoubleImp(
+                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1),
+                            -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1)));
                     i++;
                 }
-                return result;  
+                return result;
             }
 
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
     @Override
-    public Object serialize(VariableSlot slot) {
+    public ImpliesLogic[] serialize(VariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ConstantSlot slot) {
+    public ImpliesLogic[] serialize(ConstantSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ExistentialVariableSlot slot) {
+    public ImpliesLogic[] serialize(ExistentialVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(RefinementVariableSlot slot) {
+    public ImpliesLogic[] serialize(RefinementVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(CombVariableSlot slot) {
+    public ImpliesLogic[] serialize(CombVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ComparableConstraint comparableConstraint) {
+    public ImpliesLogic[] serialize(ComparableConstraint comparableConstraint) {
         ComparableConstraint constraint = comparableConstraint;
         return new VariableCombos<ComparableConstraint>() {
             @Override
             protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, ComparableConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 List<ImpliesLogic> list = new ArrayList<ImpliesLogic>();
-                for (AnnotationMirror modifiers: lattice.allTypes){
-                    if (!lattice.notComparableType.get(modifiers).isEmpty()){
-                        for (AnnotationMirror notComparable : lattice.notComparableType.get(modifiers)){
-                            list.add(asDoubleImp(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() -1 ),-(lattice.modifierInt.get(notComparable) + lattice.numModifiers * (slot2.getId()-1))));
+                for (AnnotationMirror modifiers : lattice.allTypes) {
+                    if (!lattice.notComparableType.get(modifiers).isEmpty()) {
+                        for (AnnotationMirror notComparable : lattice.notComparableType.get(modifiers)) {
+                            list.add(asDoubleImp(
+                                    lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1),
+                                    -(lattice.modifierInt.get(notComparable)
+                                            + lattice.numModifiers * (slot2.getId() - 1))));
                         }
                     }
                 }
@@ -286,36 +300,34 @@ public class GeneralEncodingSerializer  implements Serializer{
                 return result;
             }
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
-        // TODO Auto-generated method stub
     }
 
     @Override
-    public Object serialize(CombineConstraint combineConstraint) {
+    public ImpliesLogic[] serialize(CombineConstraint combineConstraint) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(PreferenceConstraint preferenceConstraint) {
+    public ImpliesLogic[] serialize(PreferenceConstraint preferenceConstraint) {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     public boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
         //System.out.println(AnnotationUtils.areSameIgnoringValues(m1, m2) +"  "+ m1.toString() + "  " + m2.toString());
         return AnnotationUtils.areSameIgnoringValues(m1, m2);
     }
-    
+
     public ImpliesLogic[] asSingleImp(int variable) {
             return new ImpliesLogic[] {new ImpliesLogic(variable,true)};
     }
-    
+
     public ImpliesLogic asDoubleImp(int leftVariable, int RightVariable) {
         ImpliesLogic imply =  new ImpliesLogic(leftVariable,RightVariable);
-
         return imply;
     }
-    
+
     public ImpliesLogic asMutipleImp(int[] leftVariable, int[] RightVariable,
             String insideLogic) {
         return new ImpliesLogic(leftVariable,RightVariable, insideLogic);
@@ -324,8 +336,7 @@ public class GeneralEncodingSerializer  implements Serializer{
 //    VecInt[] asVecArray(int... vars) {
 //        return new VecInt[] { new VecInt(vars) };
 //    }
-    
-    
+
     public class VariableCombos<T extends Constraint> {
 
         protected ImpliesLogic[] variable_variable(VariableSlot slot1,
@@ -353,7 +364,7 @@ public class GeneralEncodingSerializer  implements Serializer{
         }
 
         public ImpliesLogic[] accept(Slot slot1, Slot slot2, T constraint) {
-            
+
             final ImpliesLogic[] result;
             if (slot1 instanceof ConstantSlot) {
                 if (slot2 instanceof ConstantSlot) {
@@ -374,5 +385,6 @@ public class GeneralEncodingSerializer  implements Serializer{
             return result;
         }
     }
+
     public static final ImpliesLogic[] emptyClauses = new ImpliesLogic[0];
 }

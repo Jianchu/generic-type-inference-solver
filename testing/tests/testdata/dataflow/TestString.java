@@ -1,5 +1,5 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
-public class TestString{
-	@dataflow.quals.DataFlow(typeNames={"java.lang.String"}) String stingTesting = "I am a String!";
+public class TestString {
+    @DataFlow(typeNames={"java.lang.String"}) String stingTesting = "I am a String!";
 }

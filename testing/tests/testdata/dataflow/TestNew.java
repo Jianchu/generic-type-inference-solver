@@ -1,6 +1,6 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 import java.util.ArrayList;
 
-public class TestNew{
-	@dataflow.quals.DataFlow(typeNames={"java.util.ArrayList"}) ArrayList newTesing = new ArrayList();
+public class TestNew {
+    @DataFlow(typeNames={"java.util.ArrayList"}) ArrayList newTesing = new ArrayList();
 }

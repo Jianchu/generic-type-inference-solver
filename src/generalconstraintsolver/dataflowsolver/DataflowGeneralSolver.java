@@ -2,9 +2,6 @@ package generalconstraintsolver.dataflowsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
-import generalconstraintsolver.GeneralConstrainsSolver;
-import generalconstraintsolver.LatticeGenerator;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,19 +20,20 @@ import dataflow.qual.DataFlow;
 import dataflow.solver.DataflowSolution;
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
+import generalconstraintsolver.GeneralConstrainsSolver;
+import generalconstraintsolver.LatticeGenerator;
 
 public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
-    
+
     protected AnnotationMirror DATAFLOW;
-       
+
     @Override
-    protected InferenceSolution solve(){
+    protected InferenceSolution solve() {
         Elements elements = processingEnvironment.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
-        
-        Collection<String> datatypesUsed = getDatatypessUsed(slots);
-        List<DataflowImpliesLogic> dataflowLogics = new ArrayList<>();
 
+        Collection<String> datatypesUsed = getDatatypesUsed(slots);
+        List<DataflowImpliesLogic> dataflowLogics = new ArrayList<>();
 
         for (String datatype : datatypesUsed) {
             Set<String> datatypeSet = new HashSet<String>();
@@ -44,17 +42,14 @@ public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
             LatticeGenerator lattice = new LatticeGenerator(dataflowAnnotation,processingEnvironment);
             DataflowGeneralSerializer serializer = new DataflowGeneralSerializer(
                     slotManager, lattice);
-            DataflowImpliesLogic logic = new DataflowImpliesLogic(lattice);
-            logic.configure(constraints, serializer);
+            DataflowImpliesLogic logic = new DataflowImpliesLogic(lattice, constraints, serializer);
             dataflowLogics.add(logic);
         }
-        List<DatatypeSolution> Datatypesolutions = solveImpliesLogic(dataflowLogics);
-        return getMergedSolution(processingEnvironment, Datatypesolutions);
-        
+        List<DatatypeSolution> datatypeSolutions = solveImpliesLogic(dataflowLogics);
+        return getMergedSolution(processingEnvironment, datatypeSolutions);
     }
-    
-    
-    private Collection<String> getDatatypessUsed(Collection<Slot> solts) {
+
+    private Collection<String> getDatatypesUsed(Collection<Slot> solts) {
         Set<String> types = new TreeSet<>();
         for (Slot slot : solts) {
             if (slot instanceof ConstantSlot) {
@@ -62,7 +57,7 @@ public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
                     String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
-                    for(String dataflowValue :dataflowValues){
+                    for (String dataflowValue : dataflowValues) {
                         types.add(dataflowValue);
                     }
                 }
@@ -70,10 +65,10 @@ public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
         }
         return types;
     }
-    
+
     public abstract List<DatatypeSolution> solveImpliesLogic(
             List<DataflowImpliesLogic> dataflowLogics);
-    
+
     protected InferenceSolution getMergedSolution(
             ProcessingEnvironment processingEnvironment,
             List<DatatypeSolution> solutions) {

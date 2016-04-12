@@ -1,5 +1,5 @@
-import dataflow.quals.DataFlow;
+import dataflow.qual.DataFlow;
 
-public class TestDouble{
-	@dataflow.quals.DataFlow(typeNames={"double"}) double DoubleTesting = 3.14;
+public class TestDouble {
+    @DataFlow(typeNames={"double"}) double DoubleTesting = 3.14;
 }
