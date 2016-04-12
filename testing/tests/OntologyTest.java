@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.runners.Parameterized.Parameters;
 
 import checkers.inference.test.CFInferenceTest;
-import ontology.solver.OntologyGeneralSolver;
+import ontology.solver.OntologySatSolver;
 
 public class OntologyTest extends CFInferenceTest {
 
@@ -21,7 +21,7 @@ public class OntologyTest extends CFInferenceTest {
 
     @Override
     public Pair<String, List<String>> getSolverNameAndOptions() {
-        return Pair.<String, List<String>> of(OntologyGeneralSolver.class.getCanonicalName(), new ArrayList<String>());
+        return Pair.<String, List<String>> of(OntologySatSolver.class.getCanonicalName(), new ArrayList<String>());
     }
 
     @Parameters
