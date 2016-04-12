@@ -29,4 +29,4 @@ fi
 
 
 cd $ROOT
-bash generic-type-inference-solver/dataflowSetup.sh
+bash generic-type-inference-solver/integrationSetup.sh
