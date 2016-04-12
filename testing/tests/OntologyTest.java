@@ -10,24 +10,24 @@ import java.util.List;
 import org.junit.runners.Parameterized.Parameters;
 
 import checkers.inference.test.CFInferenceTest;
-import dataflow.solver.DataflowSolver;
+import ontology.solver.OntologyGeneralSolver;
 
-public class DataflowTest extends CFInferenceTest {
+public class OntologyTest extends CFInferenceTest {
 
-    public DataflowTest(File testFile) {
-        super(testFile,  dataflow.DataflowChecker.class, "dataflow",
+    public OntologyTest(File testFile) {
+        super(testFile,  ontology.OntologyChecker.class, "ontology",
               "-Anomsgtext", "-d", "tests/build/outputdir");
     }
 
     @Override
     public Pair<String, List<String>> getSolverNameAndOptions() {
-        return Pair.<String, List<String>>of(DataflowSolver.class.getCanonicalName(), new ArrayList<String>());
+        return Pair.<String, List<String>> of(OntologyGeneralSolver.class.getCanonicalName(), new ArrayList<String>());
     }
 
     @Parameters
     public static List<File> getTestFiles(){
-        List<File> testfiles = new ArrayList<>();//InferenceTestUtilities.findAllSystemTests();
-        testfiles.addAll(TestUtilities.findRelativeNestedJavaFiles("testdata", "dataflow"));
+        List<File> testfiles = new ArrayList<>(); //InferenceTestUtilities.findAllSystemTests();
+        testfiles.addAll(TestUtilities.findRelativeNestedJavaFiles("testdata", "ontology"));
         return testfiles;
     }
 }
