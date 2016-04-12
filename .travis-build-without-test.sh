@@ -6,6 +6,14 @@ set -e
 
 export SHELLOPTS
 
+export JAVA_HOME=/usr/lib/jvm/default-java/
+
+export JSR308=$ROOT
+export AFU=$ROOT/annotation-tools/annotation-file-utilities
+export CHECKERFRAMEWORK=$ROOT/checker-framework
+
+export PATH=$AFU/scripts:$JAVA_HOME/bin:$PATH
+
 ## Build Checker Framework
 if [ -d $ROOT/checker-framework-inference ] ; then
     # Older versions of git don't support the -C command-line option
@@ -17,5 +25,6 @@ fi
 # This also builds annotation-tools and jsr308-langtools
 (cd $ROOT/checker-framework-inference/ && ./.travis-build-without-test.sh)
 
-# TODO: how do we correctly build?
-scripts/compile.sh
+
+cd $ROOT
+bash generic-type-inference-solver/dataflowSetup.sh

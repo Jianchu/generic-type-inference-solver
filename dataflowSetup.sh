@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# Links will already exist if run before.
+# Therefore, don't fail if any of teh commands fails.
+# TODO: what is cleaner way to do this?
+set +e
+
 export MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ant -buildfile $MYDIR/testing/dataflowexample/build.xml compile-libs
