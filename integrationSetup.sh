@@ -17,8 +17,8 @@ ln -s $MYDIR/src/generalconstraintsolver $MYDIR/../checker-framework-inference/s
 ln -s $MYDIR/testing/tests/DataflowTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
 ln -s $MYDIR/testing/tests/OntologyTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
 
-ln -s $MYDIR/../checker-framework-inference/src/dataflow/tests/testdata/dataflow $MYDIR/../checker-framework-inference/testdata
-ln -s $MYDIR/../checker-framework-inference/src/dataflow/tests/testdata/ontology $MYDIR/../checker-framework-inference/testdata
+ln -s $MYDIR/testing/dataflow $MYDIR/../checker-framework-inference/testdata
+ln -s $MYDIR/testing/ontology $MYDIR/../checker-framework-inference/testdata
 
 ln -s $MYDIR/testing/dataflowexample $MYDIR/..
 

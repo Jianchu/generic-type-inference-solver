@@ -1,7 +1,12 @@
 package ontology.solver;
 
+import java.util.Collection;
+import java.util.List;
+
 import checkers.inference.InferenceSolution;
+import checkers.inference.model.Constraint;
 import generalconstraintsolver.GeneralConstrainsSolver;
+import generalconstraintsolver.ImpliesLogic;
 import generalconstraintsolver.LatticeGenerator;
 
 public abstract class OntologyGeneralSolver extends GeneralConstrainsSolver {
@@ -9,10 +14,16 @@ public abstract class OntologyGeneralSolver extends GeneralConstrainsSolver {
     protected InferenceSolution solve() {
         LatticeGenerator lattice = new LatticeGenerator(qualHierarchy);
         OntologyGeneralSerializer serializer = new OntologyGeneralSerializer(slotManager, lattice);
-        OntologyImpliesLogic logic = new OntologyImpliesLogic(lattice, constraints, serializer);
-        OntologySolution solution = solveImpliesLogic(logic);
+        List<ImpliesLogic> logic = convertToImpliesLogic(constraints, serializer);
+        OntologySolution solution = solveImpliesLogic(lattice, logic);
         return solution;
     }
 
-    protected abstract OntologySolution solveImpliesLogic(OntologyImpliesLogic logic);
+    private List<ImpliesLogic> convertToImpliesLogic(Collection<Constraint> constraints,
+            OntologyGeneralSerializer serializer) {
+        return serializer.convertAll(constraints);
+    }
+
+    protected abstract OntologySolution solveImpliesLogic(LatticeGenerator lattice,
+            List<ImpliesLogic> logic);
 }

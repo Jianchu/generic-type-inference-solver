@@ -6,13 +6,16 @@ import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
 import checkers.inference.SlotManager;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 import generalconstraintsolver.satsubsolver.SatSubSolver;
 
 public class OntologySatSubSolver extends SatSubSolver {
     private int[] solution;
 
-    public OntologySatSubSolver(OntologyImpliesLogic logic, SlotManager slotManager) {
-        super(logic.getLogics(), slotManager, logic.getLattice());
+    public OntologySatSubSolver(LatticeGenerator lattice, List<ImpliesLogic> logic,
+            SlotManager slotManager) {
+        super(logic, slotManager, lattice);
     }
 
     public int[] solve() {
