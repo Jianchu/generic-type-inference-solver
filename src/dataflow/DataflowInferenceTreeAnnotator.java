@@ -5,24 +5,23 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror;
 
 import javax.lang.model.element.AnnotationMirror;
 
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.NewClassTree;
+
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
 import checkers.inference.model.ConstantSlot;
-
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.NewClassTree;
-
 import dataflow.util.DataflowUtils;
 
 public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
-    private final SlotManager slotManager;
+    // private final SlotManager slotManager;
     private final VariableAnnotator variableAnnotator;
     private final AnnotatedTypeFactory realTypeFactory;
-    private final InferrableChecker realChecker;
+    // private final InferrableChecker realChecker;
 
     public DataflowInferenceTreeAnnotator(
             InferenceAnnotatedTypeFactory atypeFactory,
@@ -32,10 +31,10 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         super(atypeFactory, realChecker, realAnnotatedTypeFactory,
                 variableAnnotator, slotManager);
 
-        this.slotManager = slotManager;
+        // this.slotManager = slotManager;
         this.variableAnnotator = variableAnnotator;
         this.realTypeFactory = realAnnotatedTypeFactory;
-        this.realChecker = realChecker;
+        // this.realChecker = realChecker;
     }
 
     @Override

@@ -1,28 +1,23 @@
 package generalconstraintsolver.dataflowsolver;
 
-import generalconstraintsolver.ImpliesLogic;
-import generalconstraintsolver.LatticeGenerator;
-
 import java.util.Collection;
 import java.util.List;
 
 import checkers.inference.model.Constraint;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 
 public class DataflowImpliesLogic {
 
-    private DataflowGeneralSerializer serializer;
-    LatticeGenerator lattice;
-    private List<ImpliesLogic> logics;
+    private final DataflowGeneralSerializer serializer;
+    private final LatticeGenerator lattice;
+    private final List<ImpliesLogic> logics;
 
-    public DataflowImpliesLogic(LatticeGenerator lattice) {
-        this.lattice = lattice;
-    }
-
-    public void configure(Collection<Constraint> constraints,
+    public DataflowImpliesLogic(LatticeGenerator lattice, Collection<Constraint> constraints,
             DataflowGeneralSerializer serializer) {
+        this.lattice = lattice;
         this.serializer = serializer;
         this.logics = convertToImpliesLogic(constraints);
-
     }
 
     private List<ImpliesLogic> convertToImpliesLogic(

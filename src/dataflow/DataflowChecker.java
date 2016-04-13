@@ -16,21 +16,21 @@ import dataflow.qual.DataFlowTop;
 
 public class DataflowChecker extends BaseInferrableChecker {
     public AnnotationMirror DATAFLOW, DATAFLOWTOP;
-    
+
     @Override
     public void initChecker() {
         super.initChecker();
         setAnnotations();
     }
-    
+
     protected void setAnnotations() {
         final Elements elements = processingEnv.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
         DATAFLOWTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
     }
-    
+
     @Override
-    public DataflowVisitor createVisitor(InferenceChecker ichecker, BaseAnnotatedTypeFactory factory, boolean infer)  {
+    public DataflowVisitor createVisitor(InferenceChecker ichecker, BaseAnnotatedTypeFactory factory, boolean infer) {
         return new DataflowVisitor(this, ichecker, factory, infer);
     }
 

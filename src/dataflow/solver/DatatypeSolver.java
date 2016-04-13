@@ -15,16 +15,13 @@ import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
 
 public class DatatypeSolver {
-    private SlotManager slotManager;
-    private String datatype;
-    private DataflowSerializer serializer;
-    List<VecInt> clauses;
+    private final SlotManager slotManager;
+    private final String datatype;
+    private final DataflowSerializer serializer;
+    private final List<VecInt> clauses;
 
-    public DatatypeSolver(String datatype) {
+    public DatatypeSolver(String datatype, Collection<Constraint> constraints, DataflowSerializer serializer) {
         this.datatype = datatype;
-    }
-
-    public void configure(Collection<Constraint> constraints, DataflowSerializer serializer) {
         this.serializer = serializer;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.clauses = convertToCNF(constraints);
@@ -41,13 +38,13 @@ public class DatatypeSolver {
         String path = base + "/CNFfiles";
         String writePath = path + "/CNFResultFor-" + datatype + ".txt";
         sb.append("CNF for type " + datatype + ":" + "\n");
-        
+
         for (VecInt clause : clauses) {
             sb.append("(");
             sb.append(clause.toString().replace(",", " \u22C1  "));
             sb.append(") \u22C0\n");
         }
-        
+
         try {
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
@@ -66,13 +63,14 @@ public class DatatypeSolver {
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
 
-
         final int totalVars = slotManager.nextId();
         final int totalClauses = clauses.size();
 
         try {
             //**** Prep Solver ****
             //org.sat4j.pb.SolverFactory.newBoth() Runs both of sat4j solves and uses the result of the first to finish
+            // JLTODO: why is this a weighted max-sat solver? Isn't this only
+            // creating sat constraints?
             final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
 
             solver.newVar(totalVars);
@@ -101,15 +99,18 @@ public class DatatypeSolver {
                     if (potential != null) {
                         idToExistence.put(potential, varIsTrue);
                     } else {
-                        // logic is same as sparta.SourceSolution, but for easy to understand, 
-                        // I just set True for each top, which means this top(type) should present:
-                        // If the solution is false, that means top was infered.
-                        // for dataflow, that means that the annotation should have the type
+                        // Logic is same as sparta.SourceSolution, but for easy
+                        // to understand, I just set True for each top, which
+                        // means this top(type) should present:
+                        // If the solution is false, that means top was
+                        // inferred.
+                        // For dataflow, that means that the annotation should
+                        // have the type.
                         result.put(var, !varIsTrue);
                     }
                 }
                 // System.out.println("*******************************");
-                return new DatatypeSolution(result, idToExistence, datatype);
+                return new DatatypeSolution(result, datatype);
             }
 
         } catch (Throwable th) {

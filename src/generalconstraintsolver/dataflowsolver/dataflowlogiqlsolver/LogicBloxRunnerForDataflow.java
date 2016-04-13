@@ -1,15 +1,15 @@
 package generalconstraintsolver.dataflowsolver.dataflowlogiqlsolver;
 
-import generalconstraintsolver.logiqlsubsolver.LogicBloxRunner;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import generalconstraintsolver.logiqlsubsolver.LogicBloxRunner;
+
 public class LogicBloxRunnerForDataflow extends LogicBloxRunner {
-    private String path;
-    String[] command;
-    String currentFile;
+    private final String path;
+    private final String[] command;
+    private String currentFile;
 
     public LogicBloxRunnerForDataflow(String path) {
         super(path);

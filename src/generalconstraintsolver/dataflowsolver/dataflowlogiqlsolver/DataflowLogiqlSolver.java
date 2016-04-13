@@ -1,10 +1,5 @@
 package generalconstraintsolver.dataflowsolver.dataflowlogiqlsolver;
 
-import generalconstraintsolver.dataflowsolver.DataflowGeneralSerializer;
-import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
-import generalconstraintsolver.logiqlsubsolver.LogiqlPredicateGenerator;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,10 +10,14 @@ import java.util.Map;
 
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
+import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+import generalconstraintsolver.logiqlsubsolver.LogiqlPredicateGenerator;
 
 public class DataflowLogiqlSolver extends DataflowGeneralSolver {
-    private DataflowGeneralSerializer serializer;
+    // private DataflowGeneralSerializer serializer;
     private Map<String, DataflowImpliesLogic> fileName_logic = new HashMap<String, DataflowImpliesLogic>();
+
     @Override
     public List<DatatypeSolution> solveImpliesLogic(
             List<DataflowImpliesLogic> dataflowLogics) {
@@ -35,8 +34,8 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
         createDir(logibloxoutputPath);
         // generate logiql tables
 
-        LogiqlPredicateGenerator LogiqlPredicate = new LogiqlPredicateGenerator(
-                2, path);
+        // LogiqlPredicateGenerator LogiqlPredicate =
+        new LogiqlPredicateGenerator(2, path);
         for (DataflowImpliesLogic logic : dataflowLogics) {
             // generate logiql data
             LogiqlDataflowDataGenerator LogiqlData = new LogiqlDataflowDataGenerator(
@@ -59,11 +58,13 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
         final File folder = new File(path + "/logibloxoutput");
         List<DatatypeSolution> Datatypesolutions = new ArrayList<>();
         for (final File fileEntry : folder.listFiles()) {
-            Map<Integer, Boolean> idToExistence = new HashMap<>();
+            // Map<Integer, Boolean> idToExistence = new HashMap<>();
             Map<Integer, Boolean> result = new HashMap<>();
+            /*
             final Map<Integer, Integer> existentialToPotentialIds = fileName_logic
                     .get(fileEntry.getName().toString()).getSerializer()
                     .getExistentialToPotentialVar();
+             */
             if (fileEntry.isFile()) {
                 DataflowDecodingTool decoder = new DataflowDecodingTool(
                         fileEntry.getAbsolutePath(),
@@ -78,15 +79,14 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
                             .getDataflowValue(decoder.result.get(i));
                     if (datatype[0].equals(fileEntry.getName().toString())) {
                         result.put(i.intValue(), true);
-                        Integer potential = existentialToPotentialIds.get(i
-                                .intValue());
+                        /*
+                        Integer potential = existentialToPotentialIds.get(i.intValue());
                         if (potential != null) {
                             idToExistence.put(potential, false);
-                        }
+                        }*/
                     }
                 }
-                Datatypesolutions.add(new DatatypeSolution(result,
-                        idToExistence, fileEntry.getName().toString()));
+                Datatypesolutions.add(new DatatypeSolution(result, fileEntry.getName().toString()));
             }
         }
         return Datatypesolutions;

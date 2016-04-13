@@ -77,6 +77,8 @@ public class LogicSolver implements InferenceSolver {
             System.out.println("Slot ID: " + i + "  Annotation: "
                     + result.get(i).toString());
         }
+        // JLTODO: This cast will fail!! result is a Map, not an
+        // InferenceSolution.
         return (InferenceSolution) result;
     }
 }

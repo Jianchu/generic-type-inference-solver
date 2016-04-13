@@ -28,7 +28,6 @@ public class DataflowTest extends CFInferenceTest {
     @Parameters
     public static List<File> getTestFiles(){
         List<File> testfiles = new ArrayList<>();//InferenceTestUtilities.findAllSystemTests();
-        TestUtilities.filterOutJdk8Sources(testfiles);
         testfiles.addAll(TestUtilities.findRelativeNestedJavaFiles("testdata", "dataflow"));
         return testfiles;
     }

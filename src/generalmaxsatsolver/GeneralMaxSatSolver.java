@@ -68,13 +68,13 @@ public class GeneralMaxSatSolver implements InferenceSolver {
             typeForSlot.put(slotId, possiableModifier);
         }
     }
-    
-    private void decodeSolverResult(Map<Integer, AnnotationMirror> result){
-        for (Integer slotId : typeForSlot.keySet()){
+
+    private void decodeSolverResult(Map<Integer, AnnotationMirror> result) {
+        for (Integer slotId : typeForSlot.keySet()) {
             Collection<Integer> ModifiersForthisSlot = typeForSlot.get(slotId);
             result.put(slotId, lattice.top);
-            for (Integer modifier: ModifiersForthisSlot){
-                if (modifier.intValue() >0){
+            for (Integer modifier : ModifiersForthisSlot) {
+                if (modifier.intValue() > 0) {
                     result.put(slotId,lattice.IntModifier.get(modifier));
                 }
             }
@@ -91,12 +91,12 @@ public class GeneralMaxSatSolver implements InferenceSolver {
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
         solver.setTimeoutMs(1000000);
-        VecInt lastClause = null;
+        // VecInt lastClause = null;
 
         try {
             for (VecInt clause : clauses) {
 //                System.out.println(clause);
-                lastClause = clause;
+                // lastClause = clause;
                 solver.addSoftClause(clause);
             }
             if (solver.isSatisfiable()) {
@@ -116,8 +116,8 @@ public class GeneralMaxSatSolver implements InferenceSolver {
 //                }
                 decodeSolverResult(result);
                 System.out.println("/***********************result*****************************/");
-                for (Integer j: result.keySet()){
-                    System.out.println("SlotID: "+j+ "  " + "Annotation: " + result.get(j).toString());
+                for (Integer j : result.keySet()) {
+                    System.out.println("SlotID: " + j + "  " + "Annotation: " + result.get(j).toString());
                 }
                 System.out.flush();
                 System.out.println("/**********************************************************/");
@@ -125,7 +125,7 @@ public class GeneralMaxSatSolver implements InferenceSolver {
 //                    System.out.println("final key "+j+ "  " + "final value: " + result.get(j).toString());
 //                    System.out.println(j.toString() + " " + lattice.modifierInt.get(j));
 //                }
-                
+
             } else {
                 System.out.println("Not solvable!");
             }

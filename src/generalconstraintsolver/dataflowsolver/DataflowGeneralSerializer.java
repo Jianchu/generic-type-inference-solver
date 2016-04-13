@@ -2,10 +2,6 @@ package generalconstraintsolver.dataflowsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
-import generalconstraintsolver.GeneralEncodingSerializer;
-import generalconstraintsolver.ImpliesLogic;
-import generalconstraintsolver.LatticeGenerator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,18 +28,18 @@ import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
+import generalconstraintsolver.GeneralEncodingSerializer;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
 
-
-
+// JLTODO: put more of the computations into helper functions to reduce duplication
 public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
 
     private Set<Integer> touchedSlots = new HashSet<Integer>();
-    protected LatticeGenerator lattice;
+
     public DataflowGeneralSerializer(SlotManager slotManager,
             LatticeGenerator lattice) {
         super(slotManager, lattice);
-        this.lattice = lattice;
-        // TODO Auto-generated constructor stub
     }
 
     protected boolean isTop(ConstantSlot constantSlot) {
@@ -66,8 +62,7 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
         List<Constraint> constraintsNoBaseCase = new ArrayList<Constraint>();
         for (Constraint constraint : constraints) {
             if (checkConstraintType(constraint)) {
-                for (ImpliesLogic res : ((ImpliesLogic[]) constraint
-                        .serialize(this))) {
+                for (ImpliesLogic res : constraint.serialize(this)) {
                     if (res.size() != 0) {
                         results.add(res);
                     }
@@ -134,8 +129,7 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
             while (i.hasNext()) {
                 Constraint constraint = i.next();
                 if (checkTouched(constraint)) {
-                    for (ImpliesLogic res : ((ImpliesLogic[]) constraint
-                            .serialize(this))) {
+                    for (ImpliesLogic res : constraint.serialize(this)) {
                         if (res.size() != 0) {
                             results.add(res);
                         }
@@ -303,7 +297,8 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
             @Override
             protected ImpliesLogic[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 if (isTop(slot1)) {
-                    return asSingleImp(lattice.modifierInt.get(lattice.top)+ lattice.numModifiers * (slot2.getId()-1));
+                    return asSingleImp(
+                            lattice.modifierInt.get(lattice.top) + lattice.numModifiers * (slot2.getId() - 1));
                 }
                 //result[0] = asSingleImp(lattice.modifierInt.get(slot1.getValue())+ lattice.numModifiers * (slot2.getId()-1));
                 return emptyClauses;
@@ -315,69 +310,71 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
             }
 
             @Override
-            protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {                                
+            protected ImpliesLogic[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 // a <=> b which is the same as (!a v b) & (!b v a)
                 ImpliesLogic[] result = new ImpliesLogic[lattice.numModifiers];
                 int i = 0;
-                for (AnnotationMirror modifiers: lattice.allTypes){
-                    result[i] = asDoubleImp((lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1)), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1));             
+                for (AnnotationMirror modifiers : lattice.allTypes) {
+                    result[i] = asDoubleImp(
+                            (lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1)),
+                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1));
                     i++;
                 }
                 return result;
             }
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
-    
+
     @Override
-    public Object serialize(ExistentialConstraint constraint) {
+    public ImpliesLogic[] serialize(ExistentialConstraint constraint) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(VariableSlot slot) {
+    public ImpliesLogic[] serialize(VariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ConstantSlot slot) {
+    public ImpliesLogic[] serialize(ConstantSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ExistentialVariableSlot slot) {
+    public ImpliesLogic[] serialize(ExistentialVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(RefinementVariableSlot slot) {
+    public ImpliesLogic[] serialize(RefinementVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(CombVariableSlot slot) {
+    public ImpliesLogic[] serialize(CombVariableSlot slot) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(ComparableConstraint comparableConstraint) {
+    public ImpliesLogic[] serialize(ComparableConstraint comparableConstraint) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(CombineConstraint combineConstraint) {
+    public ImpliesLogic[] serialize(CombineConstraint combineConstraint) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Object serialize(PreferenceConstraint preferenceConstraint) {
+    public ImpliesLogic[] serialize(PreferenceConstraint preferenceConstraint) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -20,17 +20,16 @@ import checkers.inference.model.VariableSlot;
  * @author Jianchu Li
  *
  */
-
 public class LogiqlDataGenerator {
-    Collection<Slot> slots;
-    Collection<Constraint> constraints;
-    String path;
-    boolean flag;
-    int constantSlot;
+    // private final Collection<Slot> slots;
+    private final Collection<Constraint> constraints;
+    private final String path;
+    private boolean flag;
+    private int constantSlot;
 
     public LogiqlDataGenerator(Collection<Slot> slots,
             Collection<Constraint> constraints, String path) {
-        this.slots = slots;
+        // this.slots = slots;
         this.constraints = constraints;
         this.path = path;
         flag = false;
@@ -66,7 +65,7 @@ public class LogiqlDataGenerator {
     /**
      * writeOutputString generate the logiql encoding for current input program,
      * and write it to String nameOfConstraint.
-     * 
+     *
      * @param nameOfConstraint
      * @param vStr
      * @param slot
@@ -82,7 +81,7 @@ public class LogiqlDataGenerator {
                     + "+variable(_" + vStr[2] + "),+hasvariableName[_"
                     + vStr[2] + "]=" + vStr[2] + "," + "+" + nameOfConstraint
                     + "(" + "_" + vStr[0] + "," + "_" + vStr[1] + ",_"+vStr[2]+").\n");
-        } 
+        }
         else if (flag == true && constantSlot == 0) {
             output.append("+modifier(" + vStr[0] + "),+hasmodifierName["
                     + vStr[0] + "]=" + "\"" + vStr[0] + "\"," + "+variable(_"
@@ -135,7 +134,7 @@ public class LogiqlDataGenerator {
     /**
      * change the name of modifier from type system to the name that can match
      * the encoding from LogiqlConstraintGenerator.
-     * 
+     *
      * @param simpleName
      * @return
      */

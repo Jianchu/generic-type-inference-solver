@@ -4,23 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatatypeSolution {
-    Map<Integer, Boolean> result;
-    Map<Integer, Boolean> idToExistence;
-    String datatype;
+    private final Map<Integer, Boolean> result;
+    private final String datatype;
 
-    public DatatypeSolution(Map<Integer, Boolean> result, Map<Integer, Boolean> idToExistence, String datatype) {
+    public DatatypeSolution(Map<Integer, Boolean> result, String datatype) {
         this.result = result;
-        this.idToExistence = idToExistence;
         this.datatype = datatype;
     }
-    
+
     private DatatypeSolution(String datatype) {
-        this(new HashMap<Integer, Boolean>(), new HashMap<Integer, Boolean>(), datatype);
-    }
-    
-    
-    public Map<Integer, Boolean> getIdToExistence() {
-        return idToExistence;
+        this(new HashMap<Integer, Boolean>(), datatype);
     }
 
     public Map<Integer, Boolean> getResult() {
@@ -30,7 +23,7 @@ public class DatatypeSolution {
     public String getDatatype() {
         return datatype;
     }
-    
+
     public static DatatypeSolution noSolution(String datatype) {
         return new DatatypeSolution(datatype);
     }

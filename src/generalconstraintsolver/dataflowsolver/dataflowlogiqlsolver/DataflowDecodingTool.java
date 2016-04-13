@@ -1,14 +1,14 @@
 package generalconstraintsolver.dataflowsolver.dataflowlogiqlsolver;
 
-import generalconstraintsolver.DecodingTool;
-import generalconstraintsolver.LatticeGenerator;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.LatticeGenerator;
 
 public class DataflowDecodingTool extends DecodingTool {
 
@@ -35,7 +35,5 @@ public class DataflowDecodingTool extends DecodingTool {
             e.printStackTrace();
         }
     }
-
-
 
 }

@@ -77,11 +77,11 @@ public class LogiqlDebugSolverCalTime implements InferenceSolver {
         }
         t_variable = System.currentTimeMillis();
         for (Constraint constraint : constraints) {
-            if (constraint.getClass().getSimpleName()
-                    .contains("ComparableConstraint"))
+            if (constraint.getClass().getSimpleName().contains("ComparableConstraint")) {
                 continue;
-                List<Slot> slots1 = constraint.getSlots();
-            if(slots1.get(0)!= slots1.get(1)){
+            }
+            List<Slot> slots1 = constraint.getSlots();
+            if (slots1.get(0)!= slots1.get(1)) {
             String[] vStr = new String[2];
             vStr = SlotsToStr(slots1);
             for (int i = 0; i < 2; i++) {
@@ -91,8 +91,8 @@ public class LogiqlDebugSolverCalTime implements InferenceSolver {
                     vStr[i] = OSUNTRUSTED;
                 }
             }
-            
-            if(vStr[0]!=vStr[1]){
+
+            if (vStr[0]!=vStr[1]) {
             output = output + "+Variable(_" + vStr[0] + "),+hasVariableName[_"+vStr[0] + "]="+ vStr[0] +","  + "+Variable(_" + vStr[1] + "),+hasVariableName[_"+vStr[1] + "]="+ vStr[1]+",+"+constraint.getClass().getSimpleName() + "["
                     + "_"+vStr[0] + "," + "_"+vStr[1] + "]=true.\n";
             output = output.replaceAll("=ostrusted", "=-1");

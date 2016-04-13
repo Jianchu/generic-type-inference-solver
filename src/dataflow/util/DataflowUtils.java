@@ -17,14 +17,13 @@ import com.sun.source.tree.NewClassTree;
 import dataflow.qual.DataFlow;
 
 public class DataflowUtils {
-   
-    
+
     public static String[] getDataflowValue(AnnotationMirror type) {
         List<String> allTypesList = AnnotationUtils.getElementValueArray(type,"typeNames", String.class, true);
         //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
         String[] allTypesInArray = new String[allTypesList.size()];
         int i = 0;
-        for (Object o :allTypesList){
+        for (Object o : allTypesList) {
             allTypesInArray[i] = o.toString();
             i++;
         }
@@ -34,11 +33,10 @@ public class DataflowUtils {
     public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes, ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder =
             new AnnotationBuilder(processingEnv, DataFlow.class);
-        
-        return createDataflowAnnotation(datatypes,builder);
 
+        return createDataflowAnnotation(datatypes,builder);
     }
-    
+
     private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder =
             new AnnotationBuilder(processingEnv, DataFlow.class);
@@ -50,11 +48,11 @@ public class DataflowUtils {
         builder.setValue("typeNames", dataType);
         return builder.build();
     }
-    
-    private static String[] convert (String... typeName){
+
+    private static String[] convert(String... typeName) {
         return typeName;
     }
-    
+
     private static AnnotationMirror createDataflowAnnotation(
             final Set<String> datatypes, final AnnotationBuilder builder) {
         String[] datatypesInArray = new String[datatypes.size()];
@@ -64,7 +62,7 @@ public class DataflowUtils {
             i++;
         }
         builder.setValue("typeNames", datatypesInArray);
-        return builder.build();        
+        return builder.build();
     }
 
     public static AnnotationMirror genereateDataflowAnnoFromNewClass(
@@ -72,10 +70,9 @@ public class DataflowUtils {
             ProcessingEnvironment processingEnv) {
         TypeMirror tm = type.getUnderlyingType();
         String className = tm.toString();
-        AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(
+        AnnotationMirror dataFlowType = createDataflowAnnotation(
                 convert(className), processingEnv);
         return dataFlowType;
-
     }
 
     // TODO :doc
@@ -84,34 +81,38 @@ public class DataflowUtils {
             ProcessingEnvironment processingEnv) {
         String datatypeInArray[] = { "" };
         // String datatypeInArray[] = null;
-        switch(node.getKind()){
-            case STRING_LITERAL:
+        switch (node.getKind()) {
+        case STRING_LITERAL:
             datatypeInArray = convert(String.class.toString().split(" ")[1]);
-              break;
-            case INT_LITERAL:
-              datatypeInArray = convert(int.class.toString());
-              break;
-            case LONG_LITERAL:
-              datatypeInArray = convert(long.class.toString());
-              break;
-            case FLOAT_LITERAL:
-              datatypeInArray = convert(float.class.toString());
-              break;
-            case DOUBLE_LITERAL:
-              datatypeInArray = convert(double.class.toString());
-              break;
-            case BOOLEAN_LITERAL:
-              datatypeInArray = convert(boolean.class.toString());
-              break;
-            case CHAR_LITERAL:
-              datatypeInArray = convert(char.class.toString());
+            break;
+        case INT_LITERAL:
+            datatypeInArray = convert(int.class.toString());
+            break;
+        case LONG_LITERAL:
+            datatypeInArray = convert(long.class.toString());
+            break;
+        case FLOAT_LITERAL:
+            datatypeInArray = convert(float.class.toString());
+            break;
+        case DOUBLE_LITERAL:
+            datatypeInArray = convert(double.class.toString());
+            break;
+        case BOOLEAN_LITERAL:
+            datatypeInArray = convert(boolean.class.toString());
+            break;
+        case CHAR_LITERAL:
+            datatypeInArray = convert(char.class.toString());
             break;
         case NULL_LITERAL:
+            // JLTODO: this results in "" for null, which is not very useful.
+            // We had discussed two modes: not including null, or making it
+            // explicit.
             break;
         default:
+            // JLTODO: Raise an error?!
             break;
         }
-        AnnotationMirror dataFlowType = (AnnotationMirror) createDataflowAnnotation(
+        AnnotationMirror dataFlowType = createDataflowAnnotation(
                     datatypeInArray, processingEnv);
         return dataFlowType;
     }

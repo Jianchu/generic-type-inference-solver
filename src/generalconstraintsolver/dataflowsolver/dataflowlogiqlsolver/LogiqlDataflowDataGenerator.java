@@ -1,23 +1,22 @@
 package generalconstraintsolver.dataflowsolver.dataflowlogiqlsolver;
 
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
-import generalconstraintsolver.logiqlsubsolver.LogiqlDataGenerator;
-
 import java.io.File;
 import java.io.PrintWriter;
 
 import dataflow.util.DataflowUtils;
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+import generalconstraintsolver.logiqlsubsolver.LogiqlDataGenerator;
 
 public class LogiqlDataflowDataGenerator extends LogiqlDataGenerator {
 
-    private String path;
-    private DataflowImpliesLogic logic;
+    private final String path;
+    private final DataflowImpliesLogic logic;
+
     public LogiqlDataflowDataGenerator(DataflowImpliesLogic logic,
             String path) {
         super(logic.getLogics(), path);
         this.path = path;
         this.logic = logic;
-        // TODO Auto-generated constructor stub
     }
 
     @Override

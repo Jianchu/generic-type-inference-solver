@@ -20,16 +20,15 @@ import checkers.inference.model.Slot;
  * DecodingTool decodes the result from LogicBlox, change the form to human
  * readable form and put the result to HashMap result and return it to
  * LogicSolver.
- * 
+ *
  * @author Jianchu Li
  *
  */
-
 public class DecodingTool {
-    Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
-    Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
-    Collection<Slot> slots;
-    QualifierHierarchy qualHierarchy;
+    private final Map<Integer, AnnotationMirror> result = new HashMap<Integer, AnnotationMirror>();
+    private final Map<String, AnnotationMirror> qualifierName = new HashMap<String, AnnotationMirror>();
+    private final Collection<Slot> slots;
+    private final QualifierHierarchy qualHierarchy;
     private final String path;
 
     public DecodingTool(Collection<Slot> slots,
@@ -43,7 +42,7 @@ public class DecodingTool {
         setDefault();
         mapSimpleOriginalName();
         try {
-            DecodeLogicBloxOutput();
+            decodeLogicBloxOutput();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -60,10 +59,10 @@ public class DecodingTool {
     /**
      * DecodeLogicBloxOutput decodes the LogicBloxOutput, and put it in HashMap
      * result.
-     * 
+     *
      * @throws FileNotFoundException
      */
-    private void DecodeLogicBloxOutput() throws FileNotFoundException {
+    private void decodeLogicBloxOutput() throws FileNotFoundException {
         String readPath = path + "/logicbloxOutput.txt";
         InputStream in = new FileInputStream(readPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
