@@ -6,9 +6,7 @@ set -e
 
 export SHELLOPTS
 
-if [ -z ${JAVA_HOME} ]; then
-export JAVA_HOME=/usr/lib/jvm/default-java/
-fi
+export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(dirname $(readlink -f $(/usr/bin/which java)))))}
 
 export JSR308=$ROOT
 export AFU=$ROOT/annotation-tools/annotation-file-utilities
