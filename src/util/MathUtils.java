@@ -1,8 +1,8 @@
 package util;
 
-import maxsatbackend.LatticeGenerator;
-
 import javax.lang.model.element.AnnotationMirror;
+
+import constraintsolver.LatticeGenerator;
 
 public class MathUtils {
 

@@ -26,6 +26,7 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
+import constraintsolver.LatticeGenerator;
 
 /**
  * @author jianchu
@@ -139,39 +140,30 @@ public class MaxSatBackEnd extends BackEnd {
 
     @Override
     public InferenceSolution solve() {
-        Map<Integer, AnnotationMirror> result = new HashMap<>();
         List<VecInt> clauses = this.convertAll();
+        generateWellForm(clauses);
 
+        Map<Integer, AnnotationMirror> result = new HashMap<>();
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);
         final int totalClauses = clauses.size();
-        final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(
-                org.sat4j.pb.SolverFactory.newBoth());
+        final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
         solver.setTimeoutMs(1000000);
-        // VecInt lastClause = null;
-
         try {
             for (VecInt clause : clauses) {
-//                System.out.println(clause);
-                // lastClause = clause;
-                solver.addSoftClause(clause);
+                // System.out.println(clause);
+                solver.addHardClause(clause);
             }
             if (solver.isSatisfiable()) {
-//                System.out.println("solved!");
                 int[] solution = solver.model();
                 for (Integer var : solution) {
-//                    System.out.println(var);
                     if (isLast(var)) {
                         mapSlot_Set(Math.abs(var) / lattice.numModifiers, lattice.numModifiers, var / Math.abs(var));
                     } else {
                         mapSlot_Set(findSlotId(var), findModifierNumber(var), var / Math.abs(var));
                     }
                 }
-//                for (Integer i : typeForSlot.keySet()) {
-//                    System.out.println("key: " + i + "      " + "value: "
-//                            + typeForSlot.get(i));
-//                }
                 decodeSolverResult(result);
                 System.out.println("/***********************result*****************************/");
                 for (Integer j : result.keySet()) {
@@ -179,11 +171,6 @@ public class MaxSatBackEnd extends BackEnd {
                 }
                 System.out.flush();
                 System.out.println("/**********************************************************/");
-//                for (AnnotationMirror j: lattice.modifierInt.keySet()){
-//                    System.out.println("final key "+j+ "  " + "final value: " + result.get(j).toString());
-//                    System.out.println(j.toString() + " " + lattice.modifierInt.get(j));
-//                }
-
             } else {
                 System.out.println("Not solvable!");
             }
@@ -193,5 +180,4 @@ public class MaxSatBackEnd extends BackEnd {
         }
         return null;
     }
-
 }

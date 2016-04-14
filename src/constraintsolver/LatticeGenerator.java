@@ -1,4 +1,4 @@
-package maxsatbackend;
+package constraintsolver;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;
@@ -14,13 +14,13 @@ import javax.lang.model.element.AnnotationMirror;
 public class LatticeGenerator {
     QualifierHierarchy qualHierarchy;
     public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
-    Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
-    Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
     public Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
     public Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
     public Set<? extends AnnotationMirror> allTypes;
-    AnnotationMirror top;
-    AnnotationMirror bottom;
+    public AnnotationMirror top;
+    public AnnotationMirror bottom;
     public int numModifiers;
 
     public LatticeGenerator(QualifierHierarchy qualHierarchy) {

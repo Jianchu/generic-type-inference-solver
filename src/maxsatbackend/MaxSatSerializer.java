@@ -11,6 +11,7 @@ import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
+import constraintsolver.LatticeGenerator;
 import checkers.inference.SlotManager;
 import checkers.inference.model.CombVariableSlot;
 import checkers.inference.model.CombineConstraint;
