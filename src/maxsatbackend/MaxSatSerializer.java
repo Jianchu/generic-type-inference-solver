@@ -156,15 +156,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                VecInt[] result = new VecInt[Lattice.numModifiers];
-                int i =0;
-                for (AnnotationMirror modifiers : Lattice.allTypes) {
-                    if (areSameType(slot1.getValue(), modifiers)) {
-                        result[i] = VectorUtils.asVec(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue()));
-                    }
-                    i++;
-                }
-                return result;
+                return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue()));
             }
 
             @Override
@@ -177,13 +169,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 // a <=> b which is the same as (!a v b) & (!b v a)
                 VecInt[] result = new VecInt[Lattice.numModifiers * 2];
                 int i = 0;
-                for (AnnotationMirror modifiers : Lattice.allTypes) {
+                for (AnnotationMirror type : Lattice.allTypes) {
                     result[i] = VectorUtils.asVec(
-                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1)),
-                            Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1));
+                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
+                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type));
                     result[i + 1] = VectorUtils.asVec(
-                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1)),
-                            Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1));
+                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
+                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type));
                     i = i + 2;
                 }
                 return result;
