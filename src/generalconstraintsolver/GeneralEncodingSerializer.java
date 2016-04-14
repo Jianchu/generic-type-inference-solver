@@ -122,7 +122,9 @@ public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], Imp
                 }
                 Collection<AnnotationMirror> subOfConstant = lattice.superType.get(supertype.getValue());
                 Collection<AnnotationMirror> unCompOfConstant = lattice.notComparableType.get(supertype.getValue());
-                subOfConstant.addAll(unCompOfConstant);
+                if (unCompOfConstant != null) {
+                    subOfConstant.addAll(unCompOfConstant);
+                }
                 ImpliesLogic[] result = hasNotToBeInSub(subOfConstant,subtype, supertype);
                 if (result.length > 0) {
                     return result;
