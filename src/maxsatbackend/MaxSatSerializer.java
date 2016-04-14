@@ -11,8 +11,6 @@ import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
-import constraintsolver.LatticeGenerator;
-import checkers.inference.SlotManager;
 import checkers.inference.model.CombVariableSlot;
 import checkers.inference.model.CombineConstraint;
 import checkers.inference.model.ComparableConstraint;
@@ -28,16 +26,13 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
+import constraintsolver.Lattice;
 
 
 public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
-    // private final SlotManager slotManager;
-    private final LatticeGenerator lattice;
 
-    public MaxSatSerializer(SlotManager slotManager,
-            LatticeGenerator lattice) {
-        // this.slotManager = slotManager;
-        this.lattice = lattice;
+    public MaxSatSerializer() {
+
     }
 
     public List<VecInt> convertAll(Iterable<Constraint> constraints) {
@@ -66,15 +61,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                     VariableSlot supertype, SubtypeConstraint constraint) {
                 int numForsupertype = 0;
                 List<Integer> list = new ArrayList<Integer>();
-                if (areSameType(subtype.getValue(),lattice.top)) {
-                    return asVecArray(lattice.modifierInt.get(lattice.top)
-                            + lattice.numModifiers * (supertype.getId() - 1));
+                if (areSameType(subtype.getValue(), Lattice.top)) {
+                    return asVecArray(Lattice.modifierInt.get(Lattice.top)
+                            + Lattice.numModifiers * (supertype.getId() - 1));
                 }
                 //AnnotationUtils.areSameIgnoringValues(a,subtype.getValue())
-                for (AnnotationMirror sub : lattice.subType.get(subtype.getValue())) {
+                for (AnnotationMirror sub : Lattice.subType.get(subtype.getValue())) {
                     if (!areSameType(sub,subtype.getValue())) {
-                        numForsupertype = lattice.modifierInt.get(sub)
-                                + lattice.numModifiers
+                        numForsupertype = Lattice.modifierInt.get(sub)
+                                + Lattice.numModifiers
                                 * (supertype.getId() - 1);
                         list.add(-numForsupertype);
                     }
@@ -95,15 +90,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                     ConstantSlot supertype, SubtypeConstraint constraint) {
                 int numForsupertype = 0;
                 List<Integer> list = new ArrayList<Integer>();
-                if (areSameType(supertype.getValue(),lattice.bottom)) {
-                    return asVecArray(lattice.modifierInt.get(lattice.bottom)
-                            + lattice.numModifiers * (subtype.getId() - 1));
+                if (areSameType(supertype.getValue(),Lattice.bottom)) {
+                    return asVecArray(Lattice.modifierInt.get(Lattice.bottom)
+                            + Lattice.numModifiers * (subtype.getId() - 1));
                 }
 
-                for (AnnotationMirror sup : lattice.superType.get(supertype.getValue())) {
+                for (AnnotationMirror sup : Lattice.superType.get(supertype.getValue())) {
                     if (!areSameType(sup,supertype.getValue())) {
-                        numForsupertype = lattice.modifierInt.get(sup)
-                                + lattice.numModifiers * (subtype.getId() - 1);
+                        numForsupertype = Lattice.modifierInt.get(sup)
+                                + Lattice.numModifiers * (subtype.getId() - 1);
                         list.add(-numForsupertype);
                     }
                 }
@@ -122,40 +117,40 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             protected VecInt[] variable_variable(VariableSlot subtype,
                     VariableSlot supertype, SubtypeConstraint constraint) {
                 VecInt supertypeOfTop = asVec(
-                        -(lattice.modifierInt.get(lattice.top) + lattice.numModifiers
+                        -(Lattice.modifierInt.get(Lattice.top) + Lattice.numModifiers
                                 * (subtype.getId() - 1)),
-                        lattice.modifierInt.get(lattice.top)
-                                + lattice.numModifiers
+                        Lattice.modifierInt.get(Lattice.top)
+                                + Lattice.numModifiers
                                 * (supertype.getId() - 1));
                 VecInt subtypeOfBottom = asVec(
-                        -(lattice.modifierInt.get(lattice.bottom) + lattice.numModifiers
+                        -(Lattice.modifierInt.get(Lattice.bottom) + Lattice.numModifiers
                                 * (supertype.getId() - 1)),
-                        lattice.modifierInt.get(lattice.bottom)
-                                + lattice.numModifiers * (subtype.getId() - 1));
+                        Lattice.modifierInt.get(Lattice.bottom)
+                                + Lattice.numModifiers * (subtype.getId() - 1));
 
                 List<VecInt> list = new ArrayList<VecInt>();
-                for (AnnotationMirror modifier : lattice.allTypes) {
+                for (AnnotationMirror modifier : Lattice.allTypes) {
                     // if we know subtype
-                    if (!areSameType(modifier,lattice.top)) {
-                        int[] superArray = new int[lattice.superType.get(modifier).size()+1];
+                    if (!areSameType(modifier,Lattice.top)) {
+                        int[] superArray = new int[Lattice.superType.get(modifier).size()+1];
                         int i = 1;
-                        superArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));
-                        for (AnnotationMirror sup : lattice.superType.get(modifier)) {
+                        superArray[0] = -(Lattice.modifierInt.get(modifier) + Lattice.numModifiers * (subtype.getId() - 1));
+                        for (AnnotationMirror sup : Lattice.superType.get(modifier)) {
                             //if (!areSameType(sup,modifier)) {
-                                superArray[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (supertype.getId() - 1);
+                                superArray[i] = Lattice.modifierInt.get(sup) + Lattice.numModifiers * (supertype.getId() - 1);
                                 i++;
                             //}
                         }
                         list.add(asVec(superArray));
                     }
                     // if we know supertype
-                    if (!areSameType(modifier, lattice.bottom)) {
-                        int[] subArray = new int[lattice.subType.get(modifier).size()+1];
+                    if (!areSameType(modifier, Lattice.bottom)) {
+                        int[] subArray = new int[Lattice.subType.get(modifier).size()+1];
                         int j = 1;
-                        subArray[0] = -(lattice.modifierInt.get(modifier) + lattice.numModifiers * (supertype.getId()-1));
-                        for (AnnotationMirror sub : lattice.subType.get(modifier)) {
+                        subArray[0] = -(Lattice.modifierInt.get(modifier) + Lattice.numModifiers * (supertype.getId()-1));
+                        for (AnnotationMirror sub : Lattice.subType.get(modifier)) {
                             //if (!areSameType(sub,modifier)){
-                                subArray[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (subtype.getId()-1);
+                                subArray[j] = Lattice.modifierInt.get(sub) + Lattice.numModifiers * (subtype.getId()-1);
                                 j++;
                             //}
                         }
@@ -177,17 +172,17 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                VecInt[] result = new VecInt[lattice.numModifiers];
+                VecInt[] result = new VecInt[Lattice.numModifiers];
                 int i =0;
-                for (AnnotationMirror modifiers : lattice.allTypes) {
+                for (AnnotationMirror modifiers : Lattice.allTypes) {
                     if (areSameType(slot1.getValue(), modifiers)) {
                         result[i] = asVec(
-                                lattice.modifierInt.get(slot1.getValue()) + lattice.numModifiers * (slot2.getId() - 1));
+                                Lattice.modifierInt.get(slot1.getValue()) + Lattice.numModifiers * (slot2.getId() - 1));
                     }
                     else{
                         //cannot be other modifiers
                         result[i] = asVec(
-                                -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1)));
+                                -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1)));
                     }
                     i++;
                 }
@@ -202,15 +197,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 // a <=> b which is the same as (!a v b) & (!b v a)
-                VecInt[] result = new VecInt[lattice.numModifiers * 2];
+                VecInt[] result = new VecInt[Lattice.numModifiers * 2];
                 int i = 0;
-                for (AnnotationMirror modifiers : lattice.allTypes) {
+                for (AnnotationMirror modifiers : Lattice.allTypes) {
                     result[i] = asVec(
-                            -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1)),
-                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1));
+                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1)),
+                            Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1));
                     result[i + 1] = asVec(
-                            -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1)),
-                            lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1));
+                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1)),
+                            Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1));
                     i = i + 2;
                 }
                 return result;
@@ -225,7 +220,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
                 return asVecArray(
-                        -(lattice.modifierInt.get(slot1.getValue()) + lattice.numModifiers * (slot2.getId() - 1)));
+                        -(Lattice.modifierInt.get(slot1.getValue()) + Lattice.numModifiers * (slot2.getId() - 1)));
             }
 
             @Override
@@ -236,13 +231,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
-                VecInt[] result = new VecInt[lattice.numModifiers * 2];
+                VecInt[] result = new VecInt[Lattice.numModifiers * 2];
                 int i = 0;
-                for (AnnotationMirror modifiers : lattice.allTypes) {
+                for (AnnotationMirror modifiers : Lattice.allTypes) {
                     result[i] = asVec(
-                            -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1)),
-                            -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId() - 1)));
-                    //result[i+1] = asVec(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot2.getId()-1), lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId()-1));
+                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1)),
+                            -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId() - 1)));
+                    //result[i+1] = asVec(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot2.getId()-1), Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId()-1));
                     i++;
                 }
                 return result;
@@ -260,13 +255,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, ComparableConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 List<VecInt> list = new ArrayList<VecInt>();
-                for (AnnotationMirror modifiers : lattice.allTypes) {
-                    if (!lattice.notComparableType.get(modifiers).isEmpty()) {
-                        for (AnnotationMirror notComparable : lattice.notComparableType.get(modifiers)) {
+                for (AnnotationMirror modifiers : Lattice.allTypes) {
+                    if (!Lattice.notComparableType.get(modifiers).isEmpty()) {
+                        for (AnnotationMirror notComparable : Lattice.notComparableType.get(modifiers)) {
                             list.add(asVec(
-                                    -(lattice.modifierInt.get(modifiers) + lattice.numModifiers * (slot1.getId() - 1)),
-                                    -(lattice.modifierInt.get(notComparable)
-                                            + lattice.numModifiers * (slot2.getId() - 1))));
+                                    -(Lattice.modifierInt.get(modifiers) + Lattice.numModifiers * (slot1.getId() - 1)),
+                                    -(Lattice.modifierInt.get(notComparable)
+                                            + Lattice.numModifiers * (slot2.getId() - 1))));
                         }
                     }
                 }

@@ -26,7 +26,7 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
-import constraintsolver.LatticeGenerator;
+import constraintsolver.Lattice;
 
 /**
  * @author jianchu
@@ -37,7 +37,7 @@ import constraintsolver.LatticeGenerator;
 public class MaxSatBackEnd extends BackEnd {
     
     private SlotManager slotManager;
-    private LatticeGenerator lattice;
+    private Lattice lattice;
 
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
@@ -45,7 +45,7 @@ public class MaxSatBackEnd extends BackEnd {
             ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
-        this.lattice = new LatticeGenerator(qualHierarchy);
+        this.lattice = new Lattice(qualHierarchy);
 
     }
 

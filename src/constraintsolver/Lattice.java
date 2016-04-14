@@ -11,19 +11,19 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
-public class LatticeGenerator {
+public class Lattice {
     QualifierHierarchy qualHierarchy;
-    public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
-    public Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
-    public Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
-    public Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
-    public Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
-    public Set<? extends AnnotationMirror> allTypes;
-    public AnnotationMirror top;
-    public AnnotationMirror bottom;
-    public int numModifiers;
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
+    public static Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
+    public static Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
+    public static Set<? extends AnnotationMirror> allTypes;
+    public static AnnotationMirror top;
+    public static AnnotationMirror bottom;
+    public static int numModifiers;
 
-    public LatticeGenerator(QualifierHierarchy qualHierarchy) {
+    public Lattice(QualifierHierarchy qualHierarchy) {
         this.qualHierarchy = qualHierarchy;
         this.allTypes = qualHierarchy.getTypeQualifiers();
         this.top = qualHierarchy.getTopAnnotations().iterator().next();

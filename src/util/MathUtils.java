@@ -2,18 +2,18 @@ package util;
 
 import javax.lang.model.element.AnnotationMirror;
 
-import constraintsolver.LatticeGenerator;
+import constraintsolver.Lattice;
 
 public class MathUtils {
 
-    public static int mapIdToMatrixEntry(int id, LatticeGenerator lattice, AnnotationMirror type) {
+    public static int mapIdToMatrixEntry(int id, Lattice lattice, AnnotationMirror type) {
         int column = lattice.modifierInt.get(type);
         int row = id - 1;
         int length = lattice.numModifiers;
         return column + row * length;
     }
 
-    public static int mapIdToMatrixEntry(int id, LatticeGenerator lattice, int type) {
+    public static int mapIdToMatrixEntry(int id, Lattice lattice, int type) {
         int column = type;
         int row = id - 1;
         int length = lattice.numModifiers;
