@@ -13,15 +13,15 @@ import javax.lang.model.element.AnnotationMirror;
 
 public class LatticeGenerator {
     QualifierHierarchy qualHierarchy;
-    Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
     Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
     Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
-    Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
-    Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
-    Set<? extends AnnotationMirror> allTypes;
+    public Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
+    public Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
+    public Set<? extends AnnotationMirror> allTypes;
     AnnotationMirror top;
     AnnotationMirror bottom;
-    int numModifiers;
+    public int numModifiers;
 
     public LatticeGenerator(QualifierHierarchy qualHierarchy) {
         this.qualHierarchy = qualHierarchy;

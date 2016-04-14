@@ -5,6 +5,7 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
+import util.MathUtils;
+import util.VectorUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
@@ -24,7 +27,16 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
 
+/**
+ * @author jianchu
+ *         MaxSat back end converts constraints to VecInt, and solves then by
+ *         sat4j.
+ */
+
 public class MaxSatBackEnd extends BackEnd {
+    
+    private SlotManager slotManager;
+    private LatticeGenerator lattice;
 
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
@@ -36,8 +48,7 @@ public class MaxSatBackEnd extends BackEnd {
 
     }
 
-    private SlotManager slotManager;
-    private LatticeGenerator lattice;
+
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
 
     private boolean isLast(int var) {
@@ -78,11 +89,15 @@ public class MaxSatBackEnd extends BackEnd {
             }
         }
     }
-    
+
+    /**
+     * Convert constraints to list of VecInt.
+     */
     @Override
     public List<VecInt> convertAll() {
         List<VecInt> serializedConstraints = new LinkedList<VecInt>();
         for (Constraint constraint : constraints) {
+            collectVarSlots(constraint);
             for (VecInt res : (VecInt[]) constraint.serialize(realSerializer)) {
                 if (res.size() != 0) {
                     serializedConstraints.add(res);
@@ -92,10 +107,41 @@ public class MaxSatBackEnd extends BackEnd {
         return serializedConstraints;
     }
 
+    /**
+     * generate well form clauses such that there is one and only one beta value
+     * can be true.
+     * 
+     * @param clauses
+     */
+    private void generateWellForm(List<VecInt> clauses) {
+        for (Integer id : this.varSlotIds) {
+            int[] leastOneIsTrue = new int[lattice.numModifiers];
+            for (Integer i : lattice.IntModifier.keySet()) {
+                leastOneIsTrue[i] = MathUtils.mapIdToMatrixEntry(id, lattice, i.intValue());
+            }
+            clauses.add(VectorUtils.asVec(leastOneIsTrue));
+
+            Iterator<Integer> entries1 = lattice.IntModifier.keySet().iterator();
+            Set<Integer> entries2 = lattice.IntModifier.keySet();
+            while (entries1.hasNext()) {
+                Integer entry1 = entries1.next();
+                for (Integer entry2 : entries2) {
+                    int[] onlyOneIsTrue = new int[2];
+                    if (entry2.intValue() != entry1.intValue()) {
+                        onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, lattice, entry1.intValue());
+                        onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, lattice, entry2.intValue());
+                        clauses.add(VectorUtils.asVec(onlyOneIsTrue));
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public InferenceSolution solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         List<VecInt> clauses = this.convertAll();
+
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);
         final int totalClauses = clauses.size();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(

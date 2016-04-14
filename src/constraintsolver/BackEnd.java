@@ -3,14 +3,18 @@ package constraintsolver;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
 import checkers.inference.InferenceSolution;
+import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
+import checkers.inference.model.VariableSlot;
 
 public abstract class BackEnd {
 
@@ -20,6 +24,7 @@ public abstract class BackEnd {
     public QualifierHierarchy qualHierarchy;
     public ProcessingEnvironment processingEnvironment;
     public Serializer realSerializer;
+    public Set<Integer> varSlotIds;
 
     public BackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -31,10 +36,23 @@ public abstract class BackEnd {
         this.qualHierarchy = qualHierarchy;
         this.processingEnvironment = processingEnvironment;
         this.realSerializer = realSerializer;
+        this.varSlotIds = new HashSet<Integer>();
     }
 
     public abstract InferenceSolution solve();
 
     public abstract Object convertAll();
 
+    /**
+     * Get slot id from variable slot.
+     * 
+     * @param constraint
+     */
+    public void collectVarSlots(Constraint constraint) {
+        for (Slot slot : constraint.getSlots()) {
+            if (!(slot instanceof ConstantSlot)) {
+                this.varSlotIds.add(((VariableSlot) slot).getId());
+            }
+        }
+    }
 }
