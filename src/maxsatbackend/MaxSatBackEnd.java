@@ -5,6 +5,7 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
+import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
@@ -23,20 +25,20 @@ import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
 
 public class MaxSatBackEnd extends BackEnd {
+
+
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
+        this.slotManager = InferenceMain.getInstance().getSlotManager();
+        this.lattice = new LatticeGenerator(qualHierarchy);
+
     }
 
-    private Collection<Constraint> constraints;
-    private GeneralCnfVecIntSerializer serializer;
     private SlotManager slotManager;
     private LatticeGenerator lattice;
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
-
-
-
 
     private boolean isLast(int var) {
         return (Math.abs(var) % lattice.numModifiers == 0);
@@ -76,11 +78,24 @@ public class MaxSatBackEnd extends BackEnd {
             }
         }
     }
+    
+    @Override
+    public List<VecInt> convertAll() {
+        List<VecInt> serializedConstraints = new LinkedList<VecInt>();
+        for (Constraint constraint : constraints) {
+            for (VecInt res : (VecInt[]) constraint.serialize(realSerializer)) {
+                if (res.size() != 0) {
+                    serializedConstraints.add(res);
+                }
+            }
+        }
+        return serializedConstraints;
+    }
 
     @Override
     public InferenceSolution solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
-        List<VecInt> clauses = serializer.convertAll(constraints);
+        List<VecInt> clauses = this.convertAll();
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);
         final int totalClauses = clauses.size();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(

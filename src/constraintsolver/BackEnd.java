@@ -34,4 +34,7 @@ public abstract class BackEnd {
     }
 
     public abstract InferenceSolution solve();
+
+    public abstract Object convertAll();
+
 }

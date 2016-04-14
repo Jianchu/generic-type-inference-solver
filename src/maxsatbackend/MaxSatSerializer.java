@@ -29,11 +29,11 @@ import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
 
-public class GeneralCnfVecIntSerializer implements Serializer<VecInt[], VecInt[]> {
+public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     // private final SlotManager slotManager;
     private final LatticeGenerator lattice;
 
-    public GeneralCnfVecIntSerializer(SlotManager slotManager,
+    public MaxSatSerializer(SlotManager slotManager,
             LatticeGenerator lattice) {
         // this.slotManager = slotManager;
         this.lattice = lattice;
