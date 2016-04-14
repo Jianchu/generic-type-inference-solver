@@ -12,7 +12,7 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 
 public class Lattice {
-    QualifierHierarchy qualHierarchy;
+    static QualifierHierarchy qualHierarchy;
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
@@ -23,17 +23,18 @@ public class Lattice {
     public static AnnotationMirror bottom;
     public static int numModifiers;
 
-    public Lattice(QualifierHierarchy qualHierarchy) {
-        this.qualHierarchy = qualHierarchy;
-        this.allTypes = qualHierarchy.getTypeQualifiers();
-        this.top = qualHierarchy.getTopAnnotations().iterator().next();
-        this.bottom = qualHierarchy.getBottomAnnotations().iterator().next();
-        this.numModifiers = qualHierarchy.getTypeQualifiers().size();
+    public static void configure(QualifierHierarchy qualHierarchy) {
+        qualHierarchy = qualHierarchy;
+        allTypes = qualHierarchy.getTypeQualifiers();
+        top = qualHierarchy.getTopAnnotations().iterator().next();
+        bottom = qualHierarchy.getBottomAnnotations().iterator().next();
+        numModifiers = qualHierarchy.getTypeQualifiers().size();
         getSubSupertype();
         getNotComparable();
     }
+    
 
-    private void getSubSupertype() {
+    private static void getSubSupertype() {
         int num = 1;
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> subtypeFori = new HashSet<AnnotationMirror>();
@@ -57,7 +58,7 @@ public class Lattice {
 //        }
     }
 
-    private void getNotComparable() {
+    private static void getNotComparable() {
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> notComparableFori = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {

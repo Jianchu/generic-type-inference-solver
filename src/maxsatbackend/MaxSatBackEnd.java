@@ -37,15 +37,13 @@ import constraintsolver.Lattice;
 public class MaxSatBackEnd extends BackEnd {
     
     private SlotManager slotManager;
-    private Lattice lattice;
-
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
-        this.lattice = new Lattice(qualHierarchy);
+        Lattice.configure(qualHierarchy);
 
     }
 
@@ -53,17 +51,16 @@ public class MaxSatBackEnd extends BackEnd {
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
 
     private boolean isLast(int var) {
-        return (Math.abs(var) % lattice.numModifiers == 0);
+        return (Math.abs(var) % Lattice.numModifiers == 0);
     }
 
     private int findSlotId(int var) {
-        return (Math.abs(var) / lattice.numModifiers + 1);
+        return (Math.abs(var) / Lattice.numModifiers + 1);
 
     }
 
     private int findModifierNumber(int var) {
-        return Math.abs(var) - (Math.abs(var) / lattice.numModifiers)
-                * lattice.numModifiers;
+        return Math.abs(var) - (Math.abs(var) / Lattice.numModifiers) * Lattice.numModifiers;
     }
 
     private void mapSlot_Set(Integer slotId, Integer number, int isPositive) {
@@ -82,10 +79,10 @@ public class MaxSatBackEnd extends BackEnd {
     private void decodeSolverResult(Map<Integer, AnnotationMirror> result) {
         for (Integer slotId : typeForSlot.keySet()) {
             Collection<Integer> ModifiersForthisSlot = typeForSlot.get(slotId);
-            result.put(slotId, lattice.top);
+            result.put(slotId, Lattice.top);
             for (Integer modifier : ModifiersForthisSlot) {
                 if (modifier.intValue() > 0) {
-                    result.put(slotId,lattice.IntModifier.get(modifier));
+                    result.put(slotId, Lattice.IntModifier.get(modifier));
                 }
             }
         }
@@ -116,21 +113,21 @@ public class MaxSatBackEnd extends BackEnd {
      */
     private void generateWellForm(List<VecInt> clauses) {
         for (Integer id : this.varSlotIds) {
-            int[] leastOneIsTrue = new int[lattice.numModifiers];
-            for (Integer i : lattice.IntModifier.keySet()) {
-                leastOneIsTrue[i] = MathUtils.mapIdToMatrixEntry(id, lattice, i.intValue());
+            int[] leastOneIsTrue = new int[Lattice.numModifiers];
+            for (Integer i : Lattice.IntModifier.keySet()) {
+                leastOneIsTrue[i] = MathUtils.mapIdToMatrixEntry(id, i.intValue());
             }
             clauses.add(VectorUtils.asVec(leastOneIsTrue));
 
-            Iterator<Integer> entries1 = lattice.IntModifier.keySet().iterator();
-            Set<Integer> entries2 = lattice.IntModifier.keySet();
+            Iterator<Integer> entries1 = Lattice.IntModifier.keySet().iterator();
+            Set<Integer> entries2 = Lattice.IntModifier.keySet();
             while (entries1.hasNext()) {
                 Integer entry1 = entries1.next();
                 for (Integer entry2 : entries2) {
                     int[] onlyOneIsTrue = new int[2];
                     if (entry2.intValue() != entry1.intValue()) {
-                        onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, lattice, entry1.intValue());
-                        onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, lattice, entry2.intValue());
+                        onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, entry1.intValue());
+                        onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, entry2.intValue());
                         clauses.add(VectorUtils.asVec(onlyOneIsTrue));
                     }
                 }
@@ -144,7 +141,7 @@ public class MaxSatBackEnd extends BackEnd {
         generateWellForm(clauses);
 
         Map<Integer, AnnotationMirror> result = new HashMap<>();
-        final int totalVars = (slotManager.nextId() * lattice.numModifiers);
+        final int totalVars = (slotManager.nextId() * Lattice.numModifiers);
         final int totalClauses = clauses.size();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
         solver.newVar(totalVars);
@@ -159,7 +156,8 @@ public class MaxSatBackEnd extends BackEnd {
                 int[] solution = solver.model();
                 for (Integer var : solution) {
                     if (isLast(var)) {
-                        mapSlot_Set(Math.abs(var) / lattice.numModifiers, lattice.numModifiers, var / Math.abs(var));
+                        mapSlot_Set(Math.abs(var) / Lattice.numModifiers, Lattice.numModifiers, var
+                                / Math.abs(var));
                     } else {
                         mapSlot_Set(findSlotId(var), findModifierNumber(var), var / Math.abs(var));
                     }
