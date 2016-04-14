@@ -90,6 +90,7 @@ public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], Imp
         return emptyClauses;
     }
 
+    
     @Override
     public ImpliesLogic[] serialize(SubtypeConstraint constraint) {
         return new VariableCombos<SubtypeConstraint>() {
@@ -102,7 +103,10 @@ public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], Imp
                             + lattice.numModifiers * (supertype.getId() - 1));
                 }
                 //System.out.println(subtype.toString());
-                ImpliesLogic[] result = hasNotToBeInSub(lattice.subType.get(subtype.getValue()), supertype, subtype);
+                Collection<AnnotationMirror> subOfConstant = lattice.subType.get(subtype.getValue());
+                Collection<AnnotationMirror> unCompOfConstant = lattice.notComparableType.get(subtype.getValue());
+                subOfConstant.addAll(unCompOfConstant);
+                ImpliesLogic[] result = hasNotToBeInSub(subOfConstant, supertype, subtype);
                 if (result.length > 0) {
                     return result;
                 }
@@ -116,7 +120,10 @@ public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], Imp
                     return asSingleImp(lattice.modifierInt.get(lattice.bottom)
                             + lattice.numModifiers * (subtype.getId() - 1));
                 }
-                ImpliesLogic[] result = hasNotToBeInSub(lattice.superType.get(supertype.getValue()),subtype, supertype);
+                Collection<AnnotationMirror> subOfConstant = lattice.superType.get(supertype.getValue());
+                Collection<AnnotationMirror> unCompOfConstant = lattice.notComparableType.get(supertype.getValue());
+                subOfConstant.addAll(unCompOfConstant);
+                ImpliesLogic[] result = hasNotToBeInSub(subOfConstant,subtype, supertype);
                 if (result.length > 0) {
                     return result;
                 }
@@ -142,33 +149,46 @@ public class GeneralEncodingSerializer implements Serializer<ImpliesLogic[], Imp
                 List<ImpliesLogic> list = new ArrayList<ImpliesLogic>();
                 for (AnnotationMirror modifier : lattice.allTypes) {
                     // if we know subtype
-                    if (!areSameType(modifier,lattice.top)) {
-                        int[] rightSide = new int[lattice.superType.get(modifier).size()];
+                    if (!areSameType(modifier, lattice.top)) {
+                        int[] rightSide = new int[lattice.superType.get(
+                                modifier).size()];
                         int[] leftSide = new int[1];
                         int i = 0;
-                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers * (subtype.getId() - 1));
-                        for (AnnotationMirror sup : lattice.superType.get(modifier)) {
-                            rightSide[i] = lattice.modifierInt.get(sup) + lattice.numModifiers * (supertype.getId() - 1);
+                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers
+                                * (subtype.getId() - 1));
+                        for (AnnotationMirror sup : lattice.superType
+                                .get(modifier)) {
+                            rightSide[i] = lattice.modifierInt.get(sup)
+                                    + lattice.numModifiers
+                                    * (supertype.getId() - 1);
                             i++;
                         }
-                        list.add(asMutipleImp(leftSide,rightSide,"right-false"));
+                        list.add(asMutipleImp(leftSide, rightSide,
+                                "right-false"));
                     }
                     // if we know supertype
                     if (!areSameType(modifier, lattice.bottom)) {
-                        int[] rightSide = new int[lattice.subType.get(modifier).size()];
+                        int[] rightSide = new int[lattice.subType.get(modifier)
+                                .size()];
                         int[] leftSide = new int[1];
                         int j = 0;
-                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers * (supertype.getId()-1));
-                        for (AnnotationMirror sub : lattice.subType.get(modifier)) {
-                            rightSide[j] = lattice.modifierInt.get(sub) + lattice.numModifiers * (subtype.getId()-1);
+                        leftSide[0] = (lattice.modifierInt.get(modifier) + lattice.numModifiers
+                                * (supertype.getId() - 1));
+                        for (AnnotationMirror sub : lattice.subType
+                                .get(modifier)) {
+                            rightSide[j] = lattice.modifierInt.get(sub)
+                                    + lattice.numModifiers
+                                    * (subtype.getId() - 1);
                             j++;
                         }
-                        list.add(asMutipleImp(leftSide,rightSide,"right-false"));
+                        list.add(asMutipleImp(leftSide, rightSide,
+                                "right-false"));
                     }
                 }
                 list.add(supertypeOfTop);
                 list.add(subtypeOfBottom);
-                ImpliesLogic[] result = list.toArray(new ImpliesLogic[list.size()]);
+                ImpliesLogic[] result = list.toArray(new ImpliesLogic[list
+                        .size()]);
                 return result;
             }
 

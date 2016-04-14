@@ -1,5 +1,9 @@
 package generalconstraintsolver.satsubsolver;
 
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,9 +20,6 @@ import org.sat4j.maxsat.WeightedMaxSatDecorator;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
-import generalconstraintsolver.DecodingTool;
-import generalconstraintsolver.ImpliesLogic;
-import generalconstraintsolver.LatticeGenerator;
 
 public class SatSubSolver {
     public List<ImpliesLogic> allImpliesLogic;
@@ -54,8 +55,7 @@ public class SatSubSolver {
                 slotRepresentSet.add(res.variable);
                 // System.out.println("just: " + res.variable);
             } else {
-                int[] toBevecArray = new int[res.leftSide.size()
-                        + res.rightSide.size()];
+                int[] toBevecArray = new int[res.leftSide.size() + res.rightSide.size()];
                 toBevecArray[0] = -res.leftSide.iterator().next().intValue();
                 int i = 1;
                 for (Integer imp : res.rightSide) {
@@ -90,13 +90,13 @@ public class SatSubSolver {
                         + i.intValue();
                 j++;
             }
-            //clauses.add(asVec(wellFormFirst));
-            int[] wellFormFollow = new int[2];
+            clauses.add(asVec(wellFormFirst));
             Iterator<Integer> intRep1 = lattice.IntModifier.keySet().iterator();
             Set<Integer> intRep2 = lattice.IntModifier.keySet();
             while (intRep1.hasNext()) {
                 Integer int1= intRep1.next();
                 for (Integer int2: intRep2) {
+                    int[] wellFormFollow = new int[2];
                     if (int2.intValue() != int1.intValue()) {
                         wellFormFollow[0] = -(lattice.numModifiers * (id - 1) + int1.intValue());
                         wellFormFollow[1] = -(lattice.numModifiers * (id - 1) + int2.intValue());
@@ -124,11 +124,13 @@ public class SatSubSolver {
         try {
             for (VecInt clause : clauses) {
                 // System.out.println(clause);
-                // lastClause = clause;
                 solver.addHardClause(clause);
             }
             if (solver.isSatisfiable()) {
                 int[] solution = solver.model();
+                for (int i : solution) {
+                    // System.out.println(i);
+                }
                 DecodingTool decoder = new DecodingTool(solution, lattice);
                 result = decoder.result;
             } else {
