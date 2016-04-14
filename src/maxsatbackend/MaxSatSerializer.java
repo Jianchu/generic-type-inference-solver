@@ -46,8 +46,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 int numForsupertype = 0;
                 List<Integer> list = new ArrayList<Integer>();
                 if (areSameType(subtype.getValue(), Lattice.top)) {
-                    return VectorUtils.asVecArray(Lattice.modifierInt.get(Lattice.top)
-                            + Lattice.numModifiers * (supertype.getId() - 1));
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
                 }
                 //AnnotationUtils.areSameIgnoringValues(a,subtype.getValue())
                 for (AnnotationMirror sub : Lattice.subType.get(subtype.getValue())) {
