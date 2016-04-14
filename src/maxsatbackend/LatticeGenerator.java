@@ -1,4 +1,4 @@
-package generalmaxsatsolver;
+package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;

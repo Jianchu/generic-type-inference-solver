@@ -1,4 +1,4 @@
-package generalmaxsatsolver;
+package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
@@ -15,32 +15,28 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
-import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
-import checkers.inference.InferenceSolver;
 import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
+import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
+import constraintsolver.BackEnd;
 
-public class GeneralMaxSatSolver implements InferenceSolver {
+public class MaxSatBackEnd extends BackEnd {
+    public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
+            Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
+            ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
+        super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
+    }
+
     private Collection<Constraint> constraints;
     private GeneralCnfVecIntSerializer serializer;
     private SlotManager slotManager;
     private LatticeGenerator lattice;
     Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
 
-    @Override
-    public InferenceSolution solve(Map<String, String> configuration,
-            Collection<Slot> slots, Collection<Constraint> constraints,
-            QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment) {
 
-        this.constraints = constraints;
-        this.slotManager = InferenceMain.getInstance().getSlotManager();
-        this.lattice = new LatticeGenerator(qualHierarchy);
-        this.serializer = new GeneralCnfVecIntSerializer(slotManager, lattice);
-        return solve();
-    }
+
 
     private boolean isLast(int var) {
         return (Math.abs(var) % lattice.numModifiers == 0);
@@ -81,7 +77,8 @@ public class GeneralMaxSatSolver implements InferenceSolver {
         }
     }
 
-    private InferenceSolution solve() {
+    @Override
+    public InferenceSolution solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         List<VecInt> clauses = serializer.convertAll(constraints);
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);

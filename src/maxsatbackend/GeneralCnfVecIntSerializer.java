@@ -1,4 +1,4 @@
-package generalmaxsatsolver;
+package maxsatbackend;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
