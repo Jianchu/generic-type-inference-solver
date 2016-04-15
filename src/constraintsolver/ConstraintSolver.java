@@ -38,11 +38,11 @@ public class ConstraintSolver implements InferenceSolver {
 
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
+        System.out.println("backendName: " + backEndName);
         if (backEndName == null) {
             ErrorReporter.errorAbort("not found back end.");
         } else {
-            if (backEndName.equals("Sat") || backEndName.equals("Logiql")
-                    || backEndName.equals("General")) {
+            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("Logiql") || backEndName.equals("General")) {
                 this.backEndType = backEndName;
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");
@@ -56,7 +56,7 @@ public class ConstraintSolver implements InferenceSolver {
             Serializer defaultSerializer) {
         BackEnd backEnd = null;
         try {
-            Class<?> backEndClass = Class.forName(backEndType + "Solver");
+            Class<?> backEndClass = Class.forName(backEndType + "BackEnd");
             Constructor<?> cons = backEndClass.getConstructor(Map.class, Collection.class,
                     Collection.class, QualifierHierarchy.class, ProcessingEnvironment.class,
                     Serializer.class);

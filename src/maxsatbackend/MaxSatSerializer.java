@@ -59,8 +59,9 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
 
                 mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
-                mustNotBe.addAll(Lattice.incomparableType.get(subtype.getValue()));
-
+                if (Lattice.incomparableType.values().contains(subtype.getValue())) {
+                    mustNotBe.addAll(Lattice.incomparableType.get(subtype.getValue()));
+                }
                 return getMustNotBe(mustNotBe, supertype, subtype);
             }
 
@@ -72,8 +73,9 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
 
                 mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
-                mustNotBe.addAll(Lattice.incomparableType.get(supertype.getValue()));
-
+                if (Lattice.incomparableType.values().contains(supertype.getValue())) {
+                    mustNotBe.addAll(Lattice.incomparableType.get(supertype.getValue()));
+                }
                 return getMustNotBe(mustNotBe, subtype, supertype);
             }
 
