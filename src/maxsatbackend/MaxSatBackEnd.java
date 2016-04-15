@@ -116,7 +116,6 @@ public class MaxSatBackEnd extends BackEnd {
     public InferenceSolution solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
-
         this.convertAll();
         generateWellForm(hardClauses);
         printClauses();

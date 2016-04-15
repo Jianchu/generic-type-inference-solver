@@ -53,13 +53,12 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
         return new VariableCombos<SubtypeConstraint>() {
             @Override
             protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype, SubtypeConstraint constraint) {
-
                 if (areSameType(subtype.getValue(), Lattice.top)) {
                     return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
                 }
 
                 mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
-                if (Lattice.incomparableType.values().contains(subtype.getValue())) {
+                if (Lattice.incomparableType.keySet().contains(subtype.getValue())) {
                     mustNotBe.addAll(Lattice.incomparableType.get(subtype.getValue()));
                 }
                 return getMustNotBe(mustNotBe, supertype, subtype);
@@ -67,13 +66,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
-                
+
                 if (areSameType(supertype.getValue(),Lattice.bottom)) {
                     return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
                 }
 
                 mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
-                if (Lattice.incomparableType.values().contains(supertype.getValue())) {
+                if (Lattice.incomparableType.keySet().contains(supertype.getValue())) {
                     mustNotBe.addAll(Lattice.incomparableType.get(supertype.getValue()));
                 }
                 return getMustNotBe(mustNotBe, subtype, supertype);
@@ -241,12 +240,12 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 List<VecInt> list = new ArrayList<VecInt>();
                 for (AnnotationMirror type : Lattice.allTypes) {
-                    if (!Lattice.incomparableType.get(type).isEmpty()) {
+                    if (Lattice.incomparableType.keySet().contains(type)) {
                         for (AnnotationMirror notComparable : Lattice.incomparableType.get(type)) {
                             list.add(VectorUtils.asVec(
                                     -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
-                                    -MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
-                                    MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
+                                    -MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable),
+                                    MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable),
                                     MathUtils.mapIdToMatrixEntry(slot1.getId(), type)));
                         }
                     }
