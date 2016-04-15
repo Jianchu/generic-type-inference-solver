@@ -50,47 +50,6 @@ public class MaxSatBackEnd extends BackEnd {
 
     }
 
-
-//    Map<Integer, Collection<Integer>> typeForSlot = new HashMap<Integer, Collection<Integer>>();
-//
-//    private boolean isLast(int var) {
-//        return (Math.abs(var) % Lattice.numTypes == 0);
-//    }
-//
-//    private int findSlotId(int var) {
-//        return (Math.abs(var) / Lattice.numTypes + 1);
-//
-//    }
-//
-//    private int findModifierNumber(int var) {
-//        return Math.abs(var) - (Math.abs(var) / Lattice.numTypes) * Lattice.numTypes;
-//    }
-//
-//    private void mapSlot_Set(Integer slotId, Integer number, int isPositive) {
-//        Integer booleanInt = new Integer(number.intValue() * isPositive);
-//        if (!typeForSlot.keySet().contains(slotId)) {
-//            Set<Integer> possiableModifier = new HashSet<Integer>();
-//            possiableModifier.add(booleanInt);
-//            typeForSlot.put(slotId, possiableModifier);
-//        } else {
-//            Collection<Integer> possiableModifier = typeForSlot.get(slotId);
-//            possiableModifier.add(booleanInt);
-//            typeForSlot.put(slotId, possiableModifier);
-//        }
-//    }
-//
-//    private void decodeSolverResult(Map<Integer, AnnotationMirror> result) {
-//        for (Integer slotId : typeForSlot.keySet()) {
-//            Collection<Integer> ModifiersForthisSlot = typeForSlot.get(slotId);
-//            result.put(slotId, Lattice.top);
-//            for (Integer modifier : ModifiersForthisSlot) {
-//                if (modifier.intValue() > 0) {
-//                    result.put(slotId, Lattice.intToType.get(modifier));
-//                }
-//            }
-//        }
-//    }
-
     /**
      * Convert constraints to list of VecInt.
      */
@@ -159,8 +118,8 @@ public class MaxSatBackEnd extends BackEnd {
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
 
         this.convertAll();
-        printClauses();
         generateWellForm(hardClauses);
+        printClauses();
         configureSatSolver(solver);
 
         try {
@@ -178,9 +137,11 @@ public class MaxSatBackEnd extends BackEnd {
             } else {
                 System.out.println("Not solvable!");
             }
+
         } catch (Throwable e) {
             e.printStackTrace();
         }
+
         return new DefaultInferenceSolution(result);
     }
 
