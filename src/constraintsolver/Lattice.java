@@ -12,63 +12,60 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 
 public class Lattice {
-    static QualifierHierarchy qualHierarchy;
+
+    private static QualifierHierarchy qualHierarchy;
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
-    public static Map<AnnotationMirror, Collection<AnnotationMirror>> notComparableType = AnnotationUtils.createAnnotationMap();
-    public static Map<AnnotationMirror, Integer> modifierInt = AnnotationUtils.createAnnotationMap();
-    public static Map<Integer,AnnotationMirror> IntModifier = new HashMap<Integer,AnnotationMirror>();
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> incomparableType = AnnotationUtils.createAnnotationMap();
+    public static Map<AnnotationMirror, Integer> typeToInt = AnnotationUtils.createAnnotationMap();
+    public static Map<Integer,AnnotationMirror> intToType = new HashMap<Integer,AnnotationMirror>();
     public static Set<? extends AnnotationMirror> allTypes;
     public static AnnotationMirror top;
     public static AnnotationMirror bottom;
-    public static int numModifiers;
+    public static int numTypes;
 
     public static void configure(QualifierHierarchy qualHierarchy) {
-        qualHierarchy = qualHierarchy;
+        Lattice.qualHierarchy = qualHierarchy;
         allTypes = qualHierarchy.getTypeQualifiers();
         top = qualHierarchy.getTopAnnotations().iterator().next();
         bottom = qualHierarchy.getBottomAnnotations().iterator().next();
-        numModifiers = qualHierarchy.getTypeQualifiers().size();
+        numTypes = qualHierarchy.getTypeQualifiers().size();
         getSubSupertype();
-        getNotComparable();
+        getIncomparable();
     }
     
 
     private static void getSubSupertype() {
-        int num = 1;
+        int num = 0;
         for (AnnotationMirror i : allTypes) {
-            Set<AnnotationMirror> subtypeFori = new HashSet<AnnotationMirror>();
-            Set<AnnotationMirror> supertypeFori = new HashSet<AnnotationMirror>();
+            Set<AnnotationMirror> subtypeOfi = new HashSet<AnnotationMirror>();
+            Set<AnnotationMirror> supertypeOfi = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
                 if (qualHierarchy.isSubtype(j, i)) {
-                    subtypeFori.add(j);
+                    subtypeOfi.add(j);
                 }
                 if (qualHierarchy.isSubtype(i, j)) {
-                    supertypeFori.add(j);
+                    supertypeOfi.add(j);
                 }
             }
-            subType.put(i, subtypeFori);
-            superType.put(i, supertypeFori);
-            modifierInt.put(i, num);
-            IntModifier.put(num, i);
+            subType.put(i, subtypeOfi);
+            superType.put(i, supertypeOfi);
+            typeToInt.put(i, num);
+            intToType.put(num, i);
             num++;
         }
-//        for (Integer j: IntModifier.keySet()){
-//            System.out.println("final key "+j+ "  " + "final value: " + IntModifier.get(j).toString());
-//        }
     }
 
-    private static void getNotComparable() {
+    private static void getIncomparable() {
         for (AnnotationMirror i : allTypes) {
-            Set<AnnotationMirror> notComparableFori = new HashSet<AnnotationMirror>();
+            Set<AnnotationMirror> incomparableOfi = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
-                if (!subType.get(i).contains(j)
-                        && !subType.get(j).contains(i)) {
-                    notComparableFori.add(j);
+                if (!subType.get(i).contains(j) && !subType.get(j).contains(i)) {
+                    incomparableOfi.add(j);
                 }
             }
-            if (!notComparableFori.isEmpty()) {
-                notComparableType.put(i, notComparableFori);
+            if (!incomparableOfi.isEmpty()) {
+                incomparableType.put(i, incomparableOfi);
             }
         }
     }

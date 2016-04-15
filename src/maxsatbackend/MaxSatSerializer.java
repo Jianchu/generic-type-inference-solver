@@ -59,7 +59,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
 
                 mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
-                mustNotBe.addAll(Lattice.notComparableType.get(subtype.getValue()));
+                mustNotBe.addAll(Lattice.incomparableType.get(subtype.getValue()));
 
                 return getMustNotBe(mustNotBe, supertype, subtype);
             }
@@ -72,7 +72,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
 
                 mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
-                mustNotBe.addAll(Lattice.notComparableType.get(supertype.getValue()));
+                mustNotBe.addAll(Lattice.incomparableType.get(supertype.getValue()));
 
                 return getMustNotBe(mustNotBe, subtype, supertype);
             }
@@ -179,7 +179,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 // a <=> b which is the same as (!a v b) & (!b v a)
-                VecInt[] result = new VecInt[Lattice.numModifiers * 2];
+                VecInt[] result = new VecInt[Lattice.numTypes * 2];
                 int i = 0;
                 for (AnnotationMirror type : Lattice.allTypes) {
                     result[i] = VectorUtils.asVec(
@@ -212,7 +212,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
-                VecInt[] result = new VecInt[Lattice.numModifiers * 2];
+                VecInt[] result = new VecInt[Lattice.numTypes * 2];
                 int i = 0;
                 for (AnnotationMirror type : Lattice.allTypes) {
                     result[i] = VectorUtils.asVec(
@@ -239,8 +239,8 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 List<VecInt> list = new ArrayList<VecInt>();
                 for (AnnotationMirror type : Lattice.allTypes) {
-                    if (!Lattice.notComparableType.get(type).isEmpty()) {
-                        for (AnnotationMirror notComparable : Lattice.notComparableType.get(type)) {
+                    if (!Lattice.incomparableType.get(type).isEmpty()) {
+                        for (AnnotationMirror notComparable : Lattice.incomparableType.get(type)) {
                             list.add(VectorUtils.asVec(
                                     -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
                                     -MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
