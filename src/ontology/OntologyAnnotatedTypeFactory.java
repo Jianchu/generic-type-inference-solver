@@ -66,6 +66,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                         this, variableAnnotator, slotManager));
     }
 
+    // TODO: extend this to handle arrays.
     private boolean isSequence(TypeMirror type) {
         if (TypesUtils.isDeclaredOfName(type, "java.util.LinkedList")) {
             return true;
@@ -101,6 +102,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         // private final AnnotatedTypeFactory realTypeFactory;
         // private final InferrableChecker realChecker;
 
+        //TODO : override visit variable tree... if it's sequence, then add preference constraints.
         public OntologyInferenceTreeAnnotator(InferenceAnnotatedTypeFactory atypeFactory, InferrableChecker realChecker,
                 AnnotatedTypeFactory realAnnotatedTypeFactory, VariableAnnotator variableAnnotator,
                 SlotManager slotManager) {
