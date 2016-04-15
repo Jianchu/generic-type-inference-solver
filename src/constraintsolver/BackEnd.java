@@ -41,7 +41,7 @@ public abstract class BackEnd {
 
     public abstract InferenceSolution solve();
 
-    public abstract Object convertAll();
+    public abstract void convertAll();
 
     /**
      * Get slot id from variable slot.

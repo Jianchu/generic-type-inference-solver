@@ -23,6 +23,7 @@ import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
+import checkers.inference.model.PreferenceConstraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
@@ -37,6 +38,8 @@ import constraintsolver.Lattice;
 public class MaxSatBackEnd extends BackEnd {
     
     private SlotManager slotManager;
+    List<VecInt> hardClauses = new LinkedList<VecInt>();
+    List<VecInt> softClauses = new LinkedList<VecInt>();
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -92,17 +95,19 @@ public class MaxSatBackEnd extends BackEnd {
      * Convert constraints to list of VecInt.
      */
     @Override
-    public List<VecInt> convertAll() {
-        List<VecInt> serializedConstraints = new LinkedList<VecInt>();
+    public void convertAll() {
         for (Constraint constraint : constraints) {
             collectVarSlots(constraint);
             for (VecInt res : (VecInt[]) constraint.serialize(realSerializer)) {
                 if (res.size() != 0) {
-                    serializedConstraints.add(res);
+                    if (constraint instanceof PreferenceConstraint) {
+                        softClauses.add(res);
+                    } else {
+                        hardClauses.add(res);
+                    }
                 }
             }
         }
-        return serializedConstraints;
     }
 
     /**
@@ -137,21 +142,23 @@ public class MaxSatBackEnd extends BackEnd {
 
     @Override
     public InferenceSolution solve() {
-        List<VecInt> clauses = this.convertAll();
-        generateWellForm(clauses);
-
         Map<Integer, AnnotationMirror> result = new HashMap<>();
-        final int totalVars = (slotManager.nextId() * Lattice.numModifiers);
-        final int totalClauses = clauses.size();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
-        solver.newVar(totalVars);
-        solver.setExpectedNumberOfClauses(totalClauses);
-        solver.setTimeoutMs(1000000);
+
+        this.convertAll();
+        // printClauses();
+        generateWellForm(hardClauses);
+        configureSatSolver(solver);
+
         try {
-            for (VecInt clause : clauses) {
-                // System.out.println(clause);
-                solver.addHardClause(clause);
+            for (VecInt hardClause : hardClauses) {
+                solver.addHardClause(hardClause);
             }
+
+            for (VecInt softclause : softClauses) {
+                solver.addSoftClause(softclause);
+            }
+
             if (solver.isSatisfiable()) {
                 int[] solution = solver.model();
                 for (Integer var : solution) {
@@ -163,19 +170,56 @@ public class MaxSatBackEnd extends BackEnd {
                     }
                 }
                 decodeSolverResult(result);
-                System.out.println("/***********************result*****************************/");
-                for (Integer j : result.keySet()) {
-                    System.out.println("SlotID: " + j + "  " + "Annotation: " + result.get(j).toString());
-                }
-                System.out.flush();
-                System.out.println("/**********************************************************/");
+                // printResult(result);
             } else {
                 System.out.println("Not solvable!");
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * sat solver configuration Configure
+     * 
+     * @param solver
+     */
+    private void configureSatSolver(WeightedMaxSatDecorator solver) {
+        final int totalVars = (slotManager.nextId() * Lattice.numModifiers);
+        final int totalClauses = hardClauses.size() + softClauses.size();
+
+        solver.newVar(totalVars);
+        solver.setExpectedNumberOfClauses(totalClauses);
+        solver.setTimeoutMs(1000000);
+    }
+
+    /**
+     * print all soft and hard clauses for testing.
+     */
+    private void printClauses() {
+        System.out.println("Hard clauses: ");
+        for (VecInt hardClause : hardClauses) {
+            System.out.println(hardClause);
+        }
+        System.out.println();
+        System.out.println("Soft clauses: ");
+        for (VecInt softClause : softClauses) {
+            System.out.println(softClause);
+        }
+    }
+
+    /**
+     * print result from sat solver for testing.
+     * 
+     * @param result
+     */
+    private void printResult(Map<Integer, AnnotationMirror> result) {
+        System.out.println("/***********************result*****************************/");
+        for (Integer j : result.keySet()) {
+            System.out.println("SlotID: " + j + "  " + "Annotation: " + result.get(j).toString());
+        }
+        System.out.flush();
+        System.out.println("/**********************************************************/");
     }
 }
