@@ -118,7 +118,7 @@ public class MaxSatBackEnd extends BackEnd {
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
         this.convertAll();
         generateWellForm(hardClauses);
-        printClauses();
+        // printClauses();
         configureSatSolver(solver);
 
         try {

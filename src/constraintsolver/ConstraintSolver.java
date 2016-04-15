@@ -38,7 +38,6 @@ public class ConstraintSolver implements InferenceSolver {
 
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
-        System.out.println("backendName: " + backEndName);
         if (backEndName == null) {
             ErrorReporter.errorAbort("not found back end.");
         } else {
