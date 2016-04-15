@@ -3,8 +3,10 @@ package maxsatbackend;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
@@ -38,28 +40,32 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
     @Override
     public VecInt[] serialize(SubtypeConstraint constraint) {
-        return new VariableCombos<SubtypeConstraint>() {
 
+        Set<AnnotationMirror> mustNotBe = new HashSet<AnnotationMirror>();
+
+        return new VariableCombos<SubtypeConstraint>() {
             @Override
-            protected VecInt[] constant_variable(ConstantSlot subtype,
-                    VariableSlot supertype, SubtypeConstraint constraint) {
-                int numForsupertype = 0;
-                List<Integer> list = new ArrayList<Integer>();
+            protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype,
+                    SubtypeConstraint constraint) {
+
                 if (areSameType(subtype.getValue(), Lattice.top)) {
                     return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
                 }
-                //AnnotationUtils.areSameIgnoringValues(a,subtype.getValue())
-                for (AnnotationMirror sub : Lattice.subType.get(subtype.getValue())) {
-                    if (!areSameType(sub,subtype.getValue())) {
-                        numForsupertype = Lattice.modifierInt.get(sub)
-                                + Lattice.numModifiers
-                                * (supertype.getId() - 1);
-                        list.add(-numForsupertype);
+
+                mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
+                mustNotBe.addAll(Lattice.notComparableType.get(subtype.getValue()));
+
+                List<Integer> resultList = new ArrayList<Integer>();
+
+                for (AnnotationMirror sub : mustNotBe) {
+                    if (!areSameType(sub, subtype.getValue())) {
+                        resultList.add(-MathUtils.mapIdToMatrixEntry(supertype.getId(), sub));
                     }
                 }
-                VecInt[] result = new VecInt[list.size()];
-                if (list.size() > 0) {
-                    Iterator<Integer> iterator = list.iterator();
+
+                VecInt[] result = new VecInt[resultList.size()];
+                if (resultList.size() > 0) {
+                    Iterator<Integer> iterator = resultList.iterator();
                     for (int i = 0; i < result.length; i++) {
                         result[i] = VectorUtils.asVec(iterator.next().intValue());
                     }
@@ -69,25 +75,27 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             }
 
             @Override
-            protected VecInt[] variable_constant(VariableSlot subtype,
-                    ConstantSlot supertype, SubtypeConstraint constraint) {
-                int numForsupertype = 0;
-                List<Integer> list = new ArrayList<Integer>();
+            protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype,
+                    SubtypeConstraint constraint) {
+                
                 if (areSameType(supertype.getValue(),Lattice.bottom)) {
-                    return VectorUtils.asVecArray(Lattice.modifierInt.get(Lattice.bottom)
-                            + Lattice.numModifiers * (subtype.getId() - 1));
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
                 }
 
+                mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
+                mustNotBe.addAll(Lattice.notComparableType.get(supertype.getValue()));
+
+                List<Integer> resultList = new ArrayList<Integer>();
+
                 for (AnnotationMirror sup : Lattice.superType.get(supertype.getValue())) {
-                    if (!areSameType(sup,supertype.getValue())) {
-                        numForsupertype = Lattice.modifierInt.get(sup)
-                                + Lattice.numModifiers * (subtype.getId() - 1);
-                        list.add(-numForsupertype);
+                    if (!areSameType(sup, supertype.getValue())) {
+                        resultList.add(-MathUtils.mapIdToMatrixEntry(subtype.getId(), sup));
                     }
                 }
-                VecInt[] result = new VecInt[list.size()];
-                if (list.size() > 0) {
-                    Iterator<Integer> iterator = list.iterator();
+
+                VecInt[] result = new VecInt[resultList.size()];
+                if (resultList.size() > 0) {
+                    Iterator<Integer> iterator = resultList.iterator();
                     for (int i = 0; i < result.length; i++) {
                         result[i] = VectorUtils.asVec(iterator.next().intValue());
                     }
