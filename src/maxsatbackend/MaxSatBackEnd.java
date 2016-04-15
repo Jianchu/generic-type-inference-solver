@@ -18,6 +18,7 @@ import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
 import util.MathUtils;
 import util.VectorUtils;
+import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
@@ -158,7 +159,7 @@ public class MaxSatBackEnd extends BackEnd {
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
 
         this.convertAll();
-        // printClauses();
+        printClauses();
         generateWellForm(hardClauses);
         configureSatSolver(solver);
 
@@ -173,14 +174,14 @@ public class MaxSatBackEnd extends BackEnd {
 
             if (solver.isSatisfiable()) {
                 result = decode(solver.model());
-                // printResult(result);
+                printResult(result);
             } else {
                 System.out.println("Not solvable!");
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        return null;
+        return new DefaultInferenceSolution(result);
     }
 
     /**
