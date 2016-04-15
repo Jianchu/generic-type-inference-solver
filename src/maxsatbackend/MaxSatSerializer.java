@@ -3,6 +3,7 @@ package maxsatbackend;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,12 @@ import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 import constraintsolver.Lattice;
 
+/**
+ * The serializer for maxsat back end. Converting constraints to VecInt
+ * 
+ * @author jianchu
+ *
+ */
 
 public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
@@ -38,6 +45,82 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
     }
 
+    @Override
+    public VecInt[] serialize(SubtypeConstraint constraint) {
+
+        Set<AnnotationMirror> mustNotBe = new HashSet<AnnotationMirror>();
+
+        return new VariableCombos<SubtypeConstraint>() {
+            @Override
+            protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype, SubtypeConstraint constraint) {
+
+                if (areSameType(subtype.getValue(), Lattice.top)) {
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
+                }
+
+                mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
+                mustNotBe.addAll(Lattice.notComparableType.get(subtype.getValue()));
+
+                return getMustNotBe(mustNotBe, supertype, subtype);
+            }
+
+            @Override
+            protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
+                
+                if (areSameType(supertype.getValue(),Lattice.bottom)) {
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
+                }
+
+                mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
+                mustNotBe.addAll(Lattice.notComparableType.get(supertype.getValue()));
+
+                return getMustNotBe(mustNotBe, subtype, supertype);
+            }
+
+            @Override
+            protected VecInt[] variable_variable(VariableSlot subtype,  VariableSlot supertype, SubtypeConstraint constraint) {
+
+                // if subtype is top, then supertype is top.
+                // if supertype is bottom, then subtype is bottom.
+                VecInt supertypeOfTop = VectorUtils.asVec(
+                        -MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.top),
+                        MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
+                VecInt subtypeOfBottom = VectorUtils.asVec(
+                        -MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.bottom),
+                        MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
+
+                List<VecInt> resultList = new ArrayList<VecInt>();
+                for (AnnotationMirror type : Lattice.allTypes) {
+                    // if we know subtype
+                    if (!areSameType(type, Lattice.top)) {
+                        resultList.add(VectorUtils.asVec(getMaybe(type, subtype, supertype,
+                                Lattice.superType.get(type))));
+                    }
+                    
+                    // if we know supertype
+                    if (!areSameType(type, Lattice.bottom)) {
+                        resultList.add(VectorUtils.asVec(getMaybe(type, supertype, subtype,
+                                Lattice.subType.get(type))));
+                    }
+                }
+                resultList.add(supertypeOfTop);
+                resultList.add(subtypeOfBottom);
+                VecInt[] result = resultList.toArray(new VecInt[resultList.size()]);
+                return result;
+            }
+
+        }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
+    }
+    
+    /**
+     * for subtype constraint, if supertype is constant slot, then the subtype
+     * cannot be the super type of supertype, same for subtype
+     * 
+     * @param mustNotBe
+     * @param vSlot
+     * @param cSlot
+     * @return
+     */
     private VecInt[] getMustNotBe(Set<AnnotationMirror> mustNotBe, VariableSlot vSlot, ConstantSlot cSlot) {
 
         List<Integer> resultList = new ArrayList<Integer>();
@@ -59,91 +142,24 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
         return emptyClauses;
     }
 
-    @Override
-    public VecInt[] serialize(SubtypeConstraint constraint) {
-
-        Set<AnnotationMirror> mustNotBe = new HashSet<AnnotationMirror>();
-
-        return new VariableCombos<SubtypeConstraint>() {
-            @Override
-            protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype,
-                    SubtypeConstraint constraint) {
-
-                if (areSameType(subtype.getValue(), Lattice.top)) {
-                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
-                }
-
-                mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
-                mustNotBe.addAll(Lattice.notComparableType.get(subtype.getValue()));
-
-                return getMustNotBe(mustNotBe, supertype, subtype);
-            }
-
-            @Override
-            protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype,
-                    SubtypeConstraint constraint) {
-                
-                if (areSameType(supertype.getValue(),Lattice.bottom)) {
-                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
-                }
-
-                mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
-                mustNotBe.addAll(Lattice.notComparableType.get(supertype.getValue()));
-
-                return getMustNotBe(mustNotBe, subtype, supertype);
-            }
-
-            @Override
-            protected VecInt[] variable_variable(VariableSlot subtype,
-                    VariableSlot supertype, SubtypeConstraint constraint) {
-                VecInt supertypeOfTop = VectorUtils.asVec(
-                        -(Lattice.modifierInt.get(Lattice.top) + Lattice.numModifiers
-                                * (subtype.getId() - 1)),
-                        Lattice.modifierInt.get(Lattice.top)
-                                + Lattice.numModifiers
-                                * (supertype.getId() - 1));
-                VecInt subtypeOfBottom = VectorUtils.asVec(
-                        -(Lattice.modifierInt.get(Lattice.bottom) + Lattice.numModifiers
-                                * (supertype.getId() - 1)),
-                        Lattice.modifierInt.get(Lattice.bottom)
-                                + Lattice.numModifiers * (subtype.getId() - 1));
-
-                List<VecInt> list = new ArrayList<VecInt>();
-                for (AnnotationMirror modifier : Lattice.allTypes) {
-                    // if we know subtype
-                    if (!areSameType(modifier,Lattice.top)) {
-                        int[] superArray = new int[Lattice.superType.get(modifier).size()+1];
-                        int i = 1;
-                        superArray[0] = -(Lattice.modifierInt.get(modifier) + Lattice.numModifiers * (subtype.getId() - 1));
-                        for (AnnotationMirror sup : Lattice.superType.get(modifier)) {
-                            //if (!areSameType(sup,modifier)) {
-                                superArray[i] = Lattice.modifierInt.get(sup) + Lattice.numModifiers * (supertype.getId() - 1);
-                                i++;
-                            //}
-                        }
-                        list.add(VectorUtils.asVec(superArray));
-                    }
-                    // if we know supertype
-                    if (!areSameType(modifier, Lattice.bottom)) {
-                        int[] subArray = new int[Lattice.subType.get(modifier).size()+1];
-                        int j = 1;
-                        subArray[0] = -(Lattice.modifierInt.get(modifier) + Lattice.numModifiers * (supertype.getId()-1));
-                        for (AnnotationMirror sub : Lattice.subType.get(modifier)) {
-                            //if (!areSameType(sub,modifier)){
-                                subArray[j] = Lattice.modifierInt.get(sub) + Lattice.numModifiers * (subtype.getId()-1);
-                                j++;
-                            //}
-                        }
-                        list.add(VectorUtils.asVec(subArray));
-                    }
-                }
-                list.add(supertypeOfTop);
-                list.add(subtypeOfBottom);
-                VecInt[] result = list.toArray(new VecInt[list.size()]);
-                return result;
-            }
-
-        }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
+    /**
+     * 
+     * @param type
+     * @param knownType
+     * @param unknownType
+     * @param maybeSet
+     * @return
+     */
+    private int[] getMaybe(AnnotationMirror type, VariableSlot knownType, VariableSlot unknownType,
+            Collection<AnnotationMirror> maybeSet) {
+        int[] maybeArray = new int[maybeSet.size() + 1];
+        int i = 1;
+        maybeArray[0] = -MathUtils.mapIdToMatrixEntry(knownType.getId(), type);
+        for (AnnotationMirror sup : maybeSet) {
+            maybeArray[i] = MathUtils.mapIdToMatrixEntry(unknownType.getId(), sup);
+            i++;
+        }
+        return maybeArray;
     }
 
     @Override
