@@ -14,7 +14,7 @@ public class MathUtils {
     }
 
     public static int mapIdToMatrixEntry(int id, int type) {
-        int column = type;
+        int column = type + 1;
         int row = id - 1;
         int length = Lattice.numTypes;
         return column + row * length;
