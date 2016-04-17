@@ -5,15 +5,16 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror;
 
 import javax.lang.model.element.AnnotationMirror;
 
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.NewClassTree;
-
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
 import checkers.inference.model.ConstantSlot;
+
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.NewClassTree;
+
 import dataflow.util.DataflowUtils;
 
 public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
@@ -50,10 +51,8 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     @Override
     public Void visitNewClass(final NewClassTree newClassTree,
             final AnnotatedTypeMirror atm) {
-        //System.out.println("New class Tree: " + newClassTree.toString());
-        AnnotationMirror anno = DataflowUtils
-                .genereateDataflowAnnoFromNewClass(newClassTree, atm,
-                        this.realTypeFactory.getProcessingEnv());
+        System.out.println("New class Tree: " + newClassTree.toString());
+        AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(newClassTree, atm, this.realTypeFactory.getProcessingEnv());
         ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
         atm.replaceAnnotation(cs.getValue());
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
