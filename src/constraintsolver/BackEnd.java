@@ -16,6 +16,12 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import checkers.inference.model.VariableSlot;
 
+/**
+ * The back end of inference solver, the super type of concrete solver.
+ * 
+ * @author jianchu
+ *
+ */
 public abstract class BackEnd {
 
     public Map<String, String> configuration;

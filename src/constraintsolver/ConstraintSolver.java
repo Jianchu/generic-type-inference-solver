@@ -15,6 +15,13 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 
+/**
+ * The default solver that could be called if there is no view adaptation
+ * constraint in current type system.
+ * 
+ * @author jianchu
+ *
+ */
 public class ConstraintSolver implements InferenceSolver {
 
     public BackEnd realBackEnd;

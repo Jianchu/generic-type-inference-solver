@@ -11,6 +11,11 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
+/**
+ * 
+ * @author jianchu
+ *
+ */
 public class Lattice {
 
     private static QualifierHierarchy qualHierarchy;

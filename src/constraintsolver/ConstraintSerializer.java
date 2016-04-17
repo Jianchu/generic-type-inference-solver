@@ -14,6 +14,15 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
+/**
+ * Default serializer if the constraint solver is called by user.
+ * ConstraintSerializer delivers all kinds of constraint to the real serializer.
+ * 
+ * @author jianchu
+ *
+ * @param <S>
+ * @param <T>
+ */
 public class ConstraintSerializer<S, T> implements Serializer<S, T> {
 
     public Serializer<S, T> realSerializer;
