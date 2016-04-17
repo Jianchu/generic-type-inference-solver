@@ -4,6 +4,7 @@ import ontology.qual.OntologyBottom;
 import ontology.qual.OntologyTop;
 import ontology.qual.Sequence;
 import ontology.qual.SortedSequence;
+import ontology.util.OntologyUtils;
 
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
@@ -16,10 +17,8 @@ import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
-import org.checkerframework.javacutil.TypesUtils;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.type.TypeMirror;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
@@ -66,14 +65,6 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                         this, variableAnnotator, slotManager));
     }
 
-    // TODO: extend this to handle arrays.
-    private boolean isSequence(TypeMirror type) {
-        if (TypesUtils.isDeclaredOfName(type, "java.util.LinkedList")) {
-            return true;
-        }
-        return false;
-    }
-
     public class OntologyTreeAnnotator extends TreeAnnotator {
 
         public OntologyTreeAnnotator() {
@@ -82,7 +73,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitNewClass(NewClassTree newClassTree, AnnotatedTypeMirror atm) {
-            if (isSequence(atm.getUnderlyingType())) {
+            if (OntologyUtils.isSequence(atm.getUnderlyingType())) {
                 atm.replaceAnnotation(SEQ);
             }
             return super.visitNewClass(newClassTree, atm);
@@ -117,7 +108,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         @Override
         public Void visitNewClass(final NewClassTree newClassTree,
                 final AnnotatedTypeMirror atm) {
-            if (isSequence(atm.getUnderlyingType())) {
+            if (OntologyUtils.isSequence(atm.getUnderlyingType())) {
                 ConstantSlot cs = variableAnnotator.createConstant(SEQ, newClassTree);
                 atm.replaceAnnotation(cs.getValue());
                 variableAnnotator.visit(atm, newClassTree.getIdentifier());
