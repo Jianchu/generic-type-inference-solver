@@ -294,9 +294,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
         return emptyClauses;
     }
 
+    // TODO: we should consider the situation that the type annotations with
+    // different weights.
     @Override
     public VecInt[] serialize(PreferenceConstraint preferenceConstraint) {
-        throw new UnsupportedOperationException("APPLY WEIGHTING FOR WEIGHTED MAX-SAT");
+        VariableSlot vs = preferenceConstraint.getVariable();
+        ConstantSlot cs = preferenceConstraint.getGoal();
+        return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue()));
     }
 
     boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
