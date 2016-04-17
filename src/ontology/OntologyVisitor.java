@@ -29,11 +29,11 @@ public class OntologyVisitor extends InferenceVisitor<OntologyChecker, BaseAnnot
     @Override
     public Void visitVariable(VariableTree node, Void p) {
         AnnotatedTypeMirror type = atypeFactory.getAnnotatedType(node);
-        ConstraintManager cm = InferenceMain.getInstance().getConstraintManager();
-        SlotManager sm = InferenceMain.getInstance().getSlotManager();
-        VariableSlot vs = sm.getVariableSlot(type);
+        ConstraintManager cManager = InferenceMain.getInstance().getConstraintManager();
+        SlotManager sManager = InferenceMain.getInstance().getSlotManager();
+        VariableSlot vSlot = sManager.getVariableSlot(type);
         if (OntologyUtils.isSequence(type.getUnderlyingType())) {
-            cm.add(new PreferenceConstraint(vs, new ConstantSlot(ontologyATF.SEQ, sm.nextId()), 50));
+            cManager.add(new PreferenceConstraint(vSlot, new ConstantSlot(ontologyATF.SEQ, sManager.nextId()), 50));
         }
         return super.visitVariable(node, p);
     }
