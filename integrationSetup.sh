@@ -22,4 +22,5 @@ ln -s $MYDIR/testing/ontology $MYDIR/../checker-framework-inference/testdata
 
 ln -s $MYDIR/testing/dataflowexample $MYDIR/..
 
+bash $MYDIR/scripts/compile.sh
 gradle -b $MYDIR/../checker-framework-inference/build.gradle dist
