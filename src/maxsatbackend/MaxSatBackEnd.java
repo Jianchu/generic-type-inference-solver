@@ -16,8 +16,6 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
-import util.MathUtils;
-import util.VectorUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
@@ -28,26 +26,25 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
 import constraintsolver.Lattice;
+import util.MathUtils;
+import util.VectorUtils;
 
 /**
- * @author jianchu
- *         MaxSat back end converts constraints to VecInt, and solves then by
- *         sat4j.
+ * @author jianchu MaxSat back end converts constraints to VecInt, and solves
+ *         them by sat4j.
  */
+public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
-public class MaxSatBackEnd extends BackEnd {
-    
-    private SlotManager slotManager;
-    List<VecInt> hardClauses = new LinkedList<VecInt>();
-    List<VecInt> softClauses = new LinkedList<VecInt>();
+    private final SlotManager slotManager;
+    private final List<VecInt> hardClauses = new LinkedList<VecInt>();
+    private final List<VecInt> softClauses = new LinkedList<VecInt>();
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
+            ProcessingEnvironment processingEnvironment, Serializer<VecInt[], VecInt[]> realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         Lattice.configure(qualHierarchy);
-
     }
 
     /**
@@ -57,7 +54,7 @@ public class MaxSatBackEnd extends BackEnd {
     public void convertAll() {
         for (Constraint constraint : constraints) {
             collectVarSlots(constraint);
-            for (VecInt res : (VecInt[]) constraint.serialize(realSerializer)) {
+            for (VecInt res : constraint.serialize(realSerializer)) {
                 if (res.size() != 0) {
                     if (constraint instanceof PreferenceConstraint) {
                         softClauses.add(res);
@@ -72,7 +69,7 @@ public class MaxSatBackEnd extends BackEnd {
     /**
      * generate well form clauses such that there is one and only one beta value
      * can be true.
-     * 
+     *
      * @param clauses
      */
     private void generateWellForm(List<VecInt> clauses) {
@@ -146,7 +143,7 @@ public class MaxSatBackEnd extends BackEnd {
 
     /**
      * sat solver configuration Configure
-     * 
+     *
      * @param solver
      */
     private void configureSatSolver(WeightedMaxSatDecorator solver) {
@@ -175,7 +172,7 @@ public class MaxSatBackEnd extends BackEnd {
 
     /**
      * print result from sat solver for testing.
-     * 
+     *
      * @param result
      */
     private void printResult(Map<Integer, AnnotationMirror> result) {
