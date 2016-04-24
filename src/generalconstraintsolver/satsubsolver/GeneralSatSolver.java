@@ -21,13 +21,18 @@ public class GeneralSatSolver extends GeneralConstrainsSolver {
         SatSubSolver satSolver = new SatSubSolver(allImpliesLogic, slotManager, lattice);
         InferenceSolution solution = satSolver.satSolve();
 
+        if (solution == null) {
+            System.out.println("No solution received from the SAT Solver!");
+            return null;
+        }
+
         System.out.println("From Sat:");
-        System.out.println("/*************the result from Sat Solver*******************/");
+        System.out.println("/*************** Result from SAT Solver *******************/");
         for (Slot s : this.slots) {
             if (s.getKind() == Slot.Kind.VARIABLE) {
                 VariableSlot vs = (VariableSlot) s;
                 System.out.println("SlotID: " + vs.getId() + "  " + "Annotation: "
-                        + solution.getAnnotation(vs.getId()).toString());
+                        + solution.getAnnotation(vs.getId()));
             }
         }
         System.out.flush();
