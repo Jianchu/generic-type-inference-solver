@@ -1,11 +1,5 @@
 package ontology;
 
-import ontology.qual.OntologyBottom;
-import ontology.qual.OntologyTop;
-import ontology.qual.Sequence;
-import ontology.qual.SortedSequence;
-import ontology.util.OntologyUtils;
-
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
@@ -20,6 +14,9 @@ import org.checkerframework.javacutil.AnnotationUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
+
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
 import checkers.inference.InferrableAnnotatedTypeFactory;
@@ -27,9 +24,11 @@ import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
 import checkers.inference.model.ConstantSlot;
-
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
+import ontology.qual.OntologyBottom;
+import ontology.qual.OntologyTop;
+import ontology.qual.Sequence;
+import ontology.qual.SortedSequence;
+import ontology.util.OntologyUtils;
 
 public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         implements InferrableAnnotatedTypeFactory {
@@ -73,8 +72,9 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitNewClass(NewClassTree newClassTree, AnnotatedTypeMirror atm) {
-            if (OntologyUtils.isSequence(atm.getUnderlyingType())) {
-                atm.replaceAnnotation(SEQ);
+            AnnotationMirror anno = OntologyUtils.determineAnnotation(elements, atm.getUnderlyingType());
+            if (anno != null) {
+                atm.replaceAnnotation(anno);
             }
             return super.visitNewClass(newClassTree, atm);
         }
@@ -108,8 +108,9 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         @Override
         public Void visitNewClass(final NewClassTree newClassTree,
                 final AnnotatedTypeMirror atm) {
-            if (OntologyUtils.isSequence(atm.getUnderlyingType())) {
-                ConstantSlot cs = variableAnnotator.createConstant(SEQ, newClassTree);
+            AnnotationMirror anno = OntologyUtils.determineAnnotation(elements, atm.getUnderlyingType());
+            if (anno != null) {
+                ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
                 atm.replaceAnnotation(cs.getValue());
                 variableAnnotator.visit(atm, newClassTree.getIdentifier());
             }
