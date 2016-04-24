@@ -18,24 +18,26 @@ import checkers.inference.model.VariableSlot;
 
 /**
  * The back end of inference solver, the super type of concrete solver.
- * 
+ *
  * @author jianchu
  *
+ *         Type parameters S and T correspond to the corresponding type
+ *         parameters of Serializer.
  */
-public abstract class BackEnd {
+// JLTODO: go through all uses of BackEnd and add type arguments
+public abstract class BackEnd<S, T> {
 
-    public Map<String, String> configuration;
-    public Collection<Slot> slots;
-    public Collection<Constraint> constraints;
-    public QualifierHierarchy qualHierarchy;
-    public ProcessingEnvironment processingEnvironment;
-    public Serializer realSerializer;
-    public Set<Integer> varSlotIds;
+    protected final Map<String, String> configuration;
+    protected final Collection<Slot> slots;
+    protected final Collection<Constraint> constraints;
+    protected final QualifierHierarchy qualHierarchy;
+    protected final ProcessingEnvironment processingEnvironment;
+    protected final Serializer<S, T> realSerializer;
+    protected final Set<Integer> varSlotIds;
 
     public BackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment, Serializer realSerializer) {
-
+            ProcessingEnvironment processingEnvironment, Serializer<S, T> realSerializer) {
         this.configuration = configuration;
         this.slots = slots;
         this.constraints = constraints;
@@ -51,7 +53,7 @@ public abstract class BackEnd {
 
     /**
      * Get slot id from variable slot.
-     * 
+     *
      * @param constraint
      */
     public void collectVarSlots(Constraint constraint) {

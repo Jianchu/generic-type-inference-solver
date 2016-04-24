@@ -18,7 +18,7 @@ import checkers.inference.model.Slot;
 /**
  * The default solver that could be called if there is no view adaptation
  * constraint in current type system.
- * 
+ *
  * @author jianchu
  *
  */
@@ -37,7 +37,7 @@ public class ConstraintSolver implements InferenceSolver {
             ProcessingEnvironment processingEnvironment) {
 
         configure(configuration);
-        Serializer defaultSerializer = createSerializer(backEndType);
+        Serializer<?, ?> defaultSerializer = createSerializer(backEndType);
         realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                 processingEnvironment, defaultSerializer);
         return solve();
@@ -59,7 +59,7 @@ public class ConstraintSolver implements InferenceSolver {
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy, ProcessingEnvironment processingEnvironment,
-            Serializer defaultSerializer) {
+            Serializer<?, ?> defaultSerializer) {
         BackEnd backEnd = null;
         try {
             Class<?> backEndClass = Class.forName(backEndType + "BackEnd");
@@ -75,13 +75,11 @@ public class ConstraintSolver implements InferenceSolver {
         return backEnd;
     }
 
-    protected Serializer createSerializer(String value) {
-
-        return new ConstraintSerializer(value);
+    protected Serializer<?, ?> createSerializer(String value) {
+        return new ConstraintSerializer<>(value);
     }
 
     protected InferenceSolution solve() {
-
         return realBackEnd.solve();
     }
 }
