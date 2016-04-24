@@ -6,7 +6,7 @@ set -e
 
 export SHELLOPTS
 
-./.travis-build-without-test.sh
+. ./.travis-build-without-test.sh
 
 cd $ROOT/checker-framework-inference
 
