@@ -12,9 +12,13 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 
 /**
- * 
+ *
  * @author jianchu
  *
+ */
+/* JLTODO: it is not nice that there is so much public static state in this class.
+ * Determine who needs access to this information and instanciate the class there.
+ * Make the fields private and final, as much as possible.
  */
 public class Lattice {
 
@@ -38,7 +42,6 @@ public class Lattice {
         getSubSupertype();
         getIncomparable();
     }
-    
 
     private static void getSubSupertype() {
         int num = 0;
