@@ -13,3 +13,5 @@ src/generalconstraintsolver/dataflowsolver/logicdata/
 src/generalconstraintsolver/logiqlsubsolver/logicdata/
 scripts/annotated/
 scripts/*.java
+scripts/ontology/roundtripOntologyMaxSat.sh
+scripts/ontology/runOntologyGe.sh
