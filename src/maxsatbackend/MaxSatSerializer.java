@@ -48,7 +48,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     @Override
     public VecInt[] serialize(SubtypeConstraint constraint) {
 
-        Set<AnnotationMirror> mustNotBe = new HashSet<AnnotationMirror>();
+        final Set<AnnotationMirror> mustNotBe = new HashSet<AnnotationMirror>();
 
         return new VariableCombos<SubtypeConstraint>() {
             @Override
