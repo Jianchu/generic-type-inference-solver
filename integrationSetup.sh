@@ -12,7 +12,9 @@ ant -buildfile $MYDIR/testing/dataflowexample/build.xml compile-libs
 ln -s $MYDIR/src/dataflow $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/ontology $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/generalconstraintsolver $MYDIR/../checker-framework-inference/src
-
+ln -s $MYDIR/src/maxsatbackend $MYDIR/../checker-framework-inference/src
+ln -s $MYDIR/src/util $MYDIR/../checker-framework-inference/src
+ln -s $MYDIR/src/constraintsolver $MYDIR/../checker-framework-inference/src
 
 ln -s $MYDIR/testing/tests/DataflowTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
 ln -s $MYDIR/testing/tests/OntologyTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
