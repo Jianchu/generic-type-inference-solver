@@ -17,7 +17,7 @@ import checkers.inference.model.VariableSlot;
 /**
  * Default serializer if the constraint solver is called by user.
  * ConstraintSerializer delivers all kinds of constraint to the real serializer.
- * 
+ *
  * @author jianchu
  *
  * @param <S>
@@ -28,10 +28,11 @@ public class ConstraintSerializer<S, T> implements Serializer<S, T> {
     public Serializer<S, T> realSerializer;
 
     public ConstraintSerializer(String backEndType) {
-        Class<?> serializerClass;
         try {
-            serializerClass = Class.forName(backEndType + "Serializer");
-            realSerializer = (Serializer<S, T>) serializerClass.newInstance();
+            Class<?> serializerClass = Class.forName(backEndType + "Serializer");
+            @SuppressWarnings("unchecked")
+            Serializer<S, T> createdSerializer = (Serializer<S, T>) serializerClass.newInstance();
+            realSerializer = createdSerializer;
         } catch (Exception e) {
             e.printStackTrace();
         }

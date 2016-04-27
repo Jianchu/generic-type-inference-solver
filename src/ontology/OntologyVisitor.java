@@ -1,9 +1,11 @@
 package ontology;
 
-import ontology.util.OntologyUtils;
-
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
+
+import javax.lang.model.element.AnnotationMirror;
+
+import com.sun.source.tree.VariableTree;
 
 import checkers.inference.ConstraintManager;
 import checkers.inference.InferenceChecker;
@@ -13,17 +15,13 @@ import checkers.inference.SlotManager;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.PreferenceConstraint;
 import checkers.inference.model.VariableSlot;
-
-import com.sun.source.tree.VariableTree;
+import ontology.util.OntologyUtils;
 
 public class OntologyVisitor extends InferenceVisitor<OntologyChecker, BaseAnnotatedTypeFactory> {
 
-    private final OntologyAnnotatedTypeFactory ontologyATF;
-    
     public OntologyVisitor(OntologyChecker checker, InferenceChecker ichecker, BaseAnnotatedTypeFactory factory,
             boolean infer) {
         super(checker, ichecker, factory, infer);
-        this.ontologyATF = (OntologyAnnotatedTypeFactory) InferenceMain.getInstance().getRealTypeFactory();
     }
 
     @Override
@@ -32,8 +30,11 @@ public class OntologyVisitor extends InferenceVisitor<OntologyChecker, BaseAnnot
         ConstraintManager cManager = InferenceMain.getInstance().getConstraintManager();
         SlotManager sManager = InferenceMain.getInstance().getSlotManager();
         VariableSlot vSlot = sManager.getVariableSlot(type);
-        if (OntologyUtils.isSequence(type.getUnderlyingType())) {
-            cManager.add(new PreferenceConstraint(vSlot, new ConstantSlot(ontologyATF.SEQ, sManager.nextId()), 50));
+        AnnotationMirror anno = OntologyUtils.determineAnnotation(elements, type.getUnderlyingType());
+        if (anno != null) {
+            // JLTODO: Is it good to use 'new ConstantSlot' here instead of the
+            // 'variableAnnotator.createConstant' used in the ATF?
+            cManager.add(new PreferenceConstraint(vSlot, new ConstantSlot(anno, sManager.nextId()), 50));
         }
         return super.visitVariable(node, p);
     }
