@@ -18,12 +18,12 @@ import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
 import constraintsolver.Lattice;
 
-public class LogiqlBackEnd extends BackEnd<String, String> {
+public class LogiQLBackEnd extends BackEnd<String, String> {
 
     private final SlotManager slotManager;
     private final List<String> logiQLText = new ArrayList<String>();
 
-    public LogiqlBackEnd(Map<String, String> configuration, Collection<Slot> slots,
+    public LogiQLBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<String, String> realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
@@ -34,7 +34,8 @@ public class LogiqlBackEnd extends BackEnd<String, String> {
     @Override
     public InferenceSolution solve() {
         this.convertAll();
-        // TODO Auto-generated method stub
+        System.out.println("hehe");
+        // LogiqlConstraintGenerator l = new LogiqlConstraintGenerator();
         return null;
     }
 

@@ -14,7 +14,7 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 
-public class LogiqlSerializer implements Serializer<String, String> {
+public class LogiQLSerializer implements Serializer<String, String> {
 
     @Override
     public String serialize(SubtypeConstraint constraint) {
