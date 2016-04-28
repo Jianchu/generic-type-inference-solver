@@ -50,7 +50,8 @@ public class ConstraintSolver implements InferenceSolver {
             // TODO: warning
             // ErrorReporter.errorAbort("not found back end.");
         } else {
-            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("Logiql") || backEndName.equals("General")) {
+            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.Logiql")
+                    || backEndName.equals("General")) {
                 this.backEndType = backEndName;
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");
