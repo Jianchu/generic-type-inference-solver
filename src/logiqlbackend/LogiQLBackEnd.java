@@ -34,7 +34,6 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     @Override
     public InferenceSolution solve() {
         this.convertAll();
-        System.out.println("hehe");
         // LogiqlConstraintGenerator l = new LogiqlConstraintGenerator();
         return null;
     }
