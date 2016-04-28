@@ -1,4 +1,4 @@
-package logicsolver;
+package logiqlbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 

@@ -1,4 +1,4 @@
-package logicsolver;
+package logiqlbackend;
 
 import java.io.File;
 import java.io.PrintWriter;
