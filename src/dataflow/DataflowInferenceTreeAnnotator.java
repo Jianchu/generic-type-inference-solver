@@ -14,6 +14,10 @@ import checkers.inference.model.ConstantSlot;
 
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
 
 import dataflow.util.DataflowUtils;
 
@@ -53,6 +57,19 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
         atm.replaceAnnotation(cs.getValue());
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
+        return null;
+    }
+
+    @Override
+    public Void visitParameterizedType(final ParameterizedTypeTree param, final AnnotatedTypeMirror atm) {
+        TreePath path = atypeFactory.getPath(param);
+        if (path != null) {
+            final TreePath parentPath = path.getParentPath();
+            final Tree parentNode = parentPath.getLeaf();
+            if (!parentNode.getKind().equals(Kind.NEW_CLASS)) {
+                variableAnnotator.visit(atm, param);
+            }
+        }
         return null;
     }
 
