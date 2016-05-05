@@ -16,6 +16,10 @@ import javax.lang.model.element.AnnotationMirror;
 
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
@@ -122,6 +126,19 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             ConstantSlot cs = variableAnnotator.createConstant(SEQ, newArrayTree);
             atm.replaceAnnotation(cs.getValue());
             variableAnnotator.visit(atm, newArrayTree);
+            return null;
+        }
+        
+        @Override
+        public Void visitParameterizedType(final ParameterizedTypeTree param, final AnnotatedTypeMirror atm) {
+            TreePath path = atypeFactory.getPath(param);
+            if (path != null) {
+                final TreePath parentPath = path.getParentPath();
+                final Tree parentNode = parentPath.getLeaf();
+                if (!parentNode.getKind().equals(Kind.NEW_CLASS)) {
+                    variableAnnotator.visit(atm, param);
+                }
+            }
             return null;
         }
     }
