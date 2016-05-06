@@ -19,7 +19,7 @@ import javax.lang.model.element.AnnotationMirror;
  * @author Jianchu Li
  *
  */
-public class LogiqlConstraintGenerator {
+public class LogiQLPredicateGenerator {
 
     Map<String, String> subtype = new HashMap<String, String>();
     Map<String, String> supertype = new HashMap<String, String>();
@@ -34,7 +34,7 @@ public class LogiqlConstraintGenerator {
     final String cannotBeAnnotated;
     QualifierHierarchy qualHierarchy;
 
-    public LogiqlConstraintGenerator(QualifierHierarchy qualHierarchy,
+    public LogiQLPredicateGenerator(QualifierHierarchy qualHierarchy,
             String path) {
         this.qualHierarchy = qualHierarchy;
         this.path = path;

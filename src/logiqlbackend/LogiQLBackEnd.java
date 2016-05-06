@@ -2,6 +2,7 @@ package logiqlbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +23,10 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     private final SlotManager slotManager;
     private final List<String> logiQLText = new ArrayList<String>();
+    private final String currentPath = new File("").getAbsolutePath();
+    File file = new File(currentPath);
+    String base = file.getParent().toString();
+    String path = base + "/LogicData";
 
     public LogiQLBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -33,6 +38,15 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     @Override
     public InferenceSolution solve() {
+        /**
+         * creating a instance of LogiqlConstraintGenerator and running
+         * GenerateLogiqlEncoding method, in order to generate the logiql fixed
+         * encoding part of current type system.
+         */
+        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(qualHierarchy, path);
+        constraintGenerator.GenerateLogiqlEncoding();
+        System.out.println(path);
+
         this.convertAll();
         // LogiqlConstraintGenerator l = new LogiqlConstraintGenerator();
         return null;
