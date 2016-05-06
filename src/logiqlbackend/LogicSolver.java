@@ -45,8 +45,7 @@ public class LogicSolver implements InferenceSolver {
          * GenerateLogiqlEncoding method, in order to generate the logiql fixed
          * encoding part of current type system.
          */
-        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(
-                qualHierarchy, path);
+        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(path);
             constraintGenerator.GenerateLogiqlEncoding();
 
         /**

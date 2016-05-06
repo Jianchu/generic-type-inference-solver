@@ -1,15 +1,13 @@
 package logiqlbackend;
 
-import org.checkerframework.framework.type.QualifierHierarchy;
-
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
+
+import constraintsolver.Lattice;
 
 /**
  * LogiqlConstraintGenerator take QualifierHierarchy of current type system as
@@ -21,30 +19,26 @@ import javax.lang.model.element.AnnotationMirror;
  */
 public class LogiQLPredicateGenerator {
 
-    Map<String, String> subtype = new HashMap<String, String>();
-    Map<String, String> supertype = new HashMap<String, String>();
-    Map<String, String> notComparable = new HashMap<String, String>();
-    Map<AnnotationMirror, String> qualifierName = new HashMap<AnnotationMirror, String>();
-    Set<? extends AnnotationMirror> allTypes;
-    String top = "";
-    String bottom = "";
-    String path = "";
-    final String isAnnotated;
-    final String mayBeAnnotated;
-    final String cannotBeAnnotated;
-    QualifierHierarchy qualHierarchy;
+    // Map<String, String> subtype = new HashMap<String, String>();
+    // Map<String, String> supertype = new HashMap<String, String>();
+    // Map<String, String> notComparable = new HashMap<String, String>();
+    // Map<AnnotationMirror, String> qualifierName = new
+    // HashMap<AnnotationMirror, String>();
+    // Set<? extends AnnotationMirror> allTypes;
+    // String top = "";
+    // String bottom = "";
+    private String path = "";
+    private final String isAnnotated = "isAnnotated";
+    private final String mayBeAnnotated = "mayBeAnnotated";
+    private final String cannotBeAnnotated = "cannotBeAnnotated";
 
-    public LogiQLPredicateGenerator(QualifierHierarchy qualHierarchy,
-            String path) {
-        this.qualHierarchy = qualHierarchy;
+    // QualifierHierarchy qualHierarchy;
+
+    public LogiQLPredicateGenerator(String path) {
         this.path = path;
-        isAnnotated = "isAnnotated";
-        mayBeAnnotated = "mayBeAnnotated";
-        cannotBeAnnotated = "cannotBeAnnotated";
     }
 
     public void GenerateLogiqlEncoding() {
-        allTypes = qualHierarchy.getTypeQualifiers();
         Set<String> allTypesInString = new HashSet<String>();
         StringBuilder encodingForEqualityConModifier = new StringBuilder();
         StringBuilder encodingForInequalityConModifier = new StringBuilder();
@@ -59,24 +53,14 @@ public class LogiQLPredicateGenerator {
         for (AnnotationMirror i : allTypes) {
             allTypesInString.add(qualifierName.get(i));
         }
-        getTopBottomQualifier(qualHierarchy);
-        getSubSupertype(qualHierarchy);
-        getNotComparable();
         getBasicString(allTypesInString, basicEncoding);
-        getEncodingForEqualityConModifier(allTypesInString,
-                encodingForEqualityConModifier);
-        getEncodingForInequalityConModifier(allTypesInString,
-                encodingForInequalityConModifier);
-        getEncodingForEqualityConstraint(allTypesInString,
-                encodingForEqualityConstraint);
-        getEncodingForInequalityConstraint(allTypesInString,
-                encodingForInequalityConstraint);
-        getEncodingForComparableConstraint(allTypesInString,
-                encodingForComparableConstraint);
-        getEncodingForSubtypeConTopBottom(allTypesInString,
-                encodingForSubtypeConTopBottom);
-        getEncodingForSubtypeConstraint(allTypesInString,
-                encodingForSubtypeConstraint);
+        getEncodingForEqualityConModifier(allTypesInString, encodingForEqualityConModifier);
+        getEncodingForInequalityConModifier(allTypesInString, encodingForInequalityConModifier);
+        getEncodingForEqualityConstraint(allTypesInString, encodingForEqualityConstraint);
+        getEncodingForInequalityConstraint(allTypesInString, encodingForInequalityConstraint);
+        getEncodingForComparableConstraint(allTypesInString, encodingForComparableConstraint);
+        getEncodingForSubtypeConTopBottom(allTypesInString, encodingForSubtypeConTopBottom);
+        getEncodingForSubtypeConstraint(allTypesInString, encodingForSubtypeConstraint);
         getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
         writeFile(basicEncoding.append(encodingForEqualityConModifier)
@@ -100,67 +84,8 @@ public class LogiQLPredicateGenerator {
     }
 
     private void mapSimpleOriginalName() {
-        for (AnnotationMirror modifier : qualHierarchy.getTypeQualifiers()) {
-            qualifierName.put(modifier,
-                    modifier.toString().replaceAll("[.@]", "_"));
-        }
-    }
-
-    /**
-     * get the top and bottom modifier of current type system.
-     *
-     * @param hierarchy
-     */
-    private void getTopBottomQualifier(QualifierHierarchy hierarchy) {
-        for (AnnotationMirror i : hierarchy.getTopAnnotations()) {
-            top = qualifierName.get(i);
-        }
-        for (AnnotationMirror j : hierarchy.getBottomAnnotations()) {
-            bottom = qualifierName.get(j);
-        }
-    }
-
-    /**
-     * put a key-value pair in HashMap subtype if value is subtype of key, or in
-     * HashMap supertype if value is super type of key. For value, different
-     * modifier's name is divided by space.
-     */
-    private void getSubSupertype(QualifierHierarchy hierarchy) {
-        for (AnnotationMirror i : allTypes) {
-            String subtypeFori = "";
-            String supertypeFori = "";
-            for (AnnotationMirror j : allTypes) {
-                if (hierarchy.isSubtype(j, i)) {
-                    subtypeFori = subtypeFori + " " + qualifierName.get(j);
-                }
-                if (hierarchy.isSubtype(i, j)) {
-                    supertypeFori = supertypeFori + " " + qualifierName.get(j);
-                }
-            }
-            supertype.put(qualifierName.get(i), supertypeFori);
-            subtype.put(qualifierName.get(i), subtypeFori);
-        }
-    }
-
-    /**
-     * get the information of which two modifiers are not comparable. And put
-     * this result to HashMap "notComparable"
-     */
-    private void getNotComparable() {
-        for (AnnotationMirror i : allTypes) {
-            String notComparableFori = "";
-            for (AnnotationMirror j : allTypes) {
-                if (!subtype.get(qualifierName.get(i)).contains(
-                        qualifierName.get(j))
-                        && !subtype.get(qualifierName.get(j)).contains(
-                                qualifierName.get(i))) {
-                    notComparableFori = notComparableFori + " "
-                            + qualifierName.get(j);
-                }
-            }
-            if (!notComparableFori.equals("")) {
-                notComparable.put(qualifierName.get(i), notComparableFori);
-            }
+        for (AnnotationMirror modifier : Lattice.allTypes()) {
+            qualifierName.put(modifier, modifier.toString().replaceAll("[.@]", "_"));
         }
     }
 
@@ -486,7 +411,7 @@ public class LogiQLPredicateGenerator {
         try {
             String writePath = path + "/LogiqlEncoding.logic";
             File f = new File(writePath);
-            PrintWriter pw = new PrintWriter(f);
+            PrintWriter pw = new PrintWriter(writePath);
             pw.write(output);
             pw.close();
         } catch (Exception e) {

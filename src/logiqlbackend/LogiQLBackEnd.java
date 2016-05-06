@@ -23,10 +23,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     private final SlotManager slotManager;
     private final List<String> logiQLText = new ArrayList<String>();
-    private final String currentPath = new File("").getAbsolutePath();
-    File file = new File(currentPath);
-    String base = file.getParent().toString();
-    String path = base + "/LogicData";
+    private final File logiqldata = new File(new File("").getAbsolutePath() + "/logiqldata");
 
     public LogiQLBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -34,18 +31,20 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         Lattice.configure(qualHierarchy);
+        logiqldata.mkdir();
+
     }
 
     @Override
     public InferenceSolution solve() {
+        String logiqldataPath = logiqldata.getAbsolutePath();
         /**
          * creating a instance of LogiqlConstraintGenerator and running
          * GenerateLogiqlEncoding method, in order to generate the logiql fixed
          * encoding part of current type system.
          */
-        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(qualHierarchy, path);
+        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(logiqldataPath);
         constraintGenerator.GenerateLogiqlEncoding();
-        System.out.println(path);
 
         this.convertAll();
         // LogiqlConstraintGenerator l = new LogiqlConstraintGenerator();
