@@ -3,8 +3,10 @@ package ontology.util;
 import ontology.qual.Ontology;
 
 import org.checkerframework.framework.util.AnnotationBuilder;
+import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.TypesUtils;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -64,5 +66,17 @@ public class OntologyUtils {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
         builder.setValue("typeNames", dataType);
         return builder.build();
+    }
+    
+    public static String[] getOntologyValue(AnnotationMirror type) {
+        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,"typeNames", String.class, true);
+        //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
+        String[] allTypesInArray = new String[allTypesList.size()];
+        int i = 0;
+        for (Object o : allTypesList) {
+            allTypesInArray[i] = o.toString();
+            i++;
+        }
+        return allTypesInArray;
     }
 }

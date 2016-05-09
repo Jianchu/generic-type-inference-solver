@@ -1,6 +1,7 @@
 package ontology;
 
 import ontology.qual.Ontology;
+import ontology.qual.OntologyTop;
 import ontology.util.OntologyUtils;
 
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
@@ -39,8 +40,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 
-import dataflow.qual.DataFlowTop;
-
 public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         implements InferrableAnnotatedTypeFactory {
 
@@ -52,7 +51,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         super(checker);
         ONTOLOGY = AnnotationUtils.fromClass(elements, Ontology.class);
         ONTOLOGYBOTTOM = OntologyUtils.createOntologyAnnotation(OntologyUtils.convert(""), processingEnv);
-        ONTOLOGYTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
+        ONTOLOGYTOP = AnnotationUtils.fromClass(elements, OntologyTop.class);
         postInit();
     }
 
