@@ -1,5 +1,8 @@
 package ontology;
 
+import ontology.qual.Ontology;
+import ontology.util.OntologyUtils;
+
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
@@ -11,15 +14,15 @@ import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
+import org.checkerframework.javacutil.TreeUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
-
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
-import com.sun.source.util.TreePath;
+import javax.lang.model.element.ExecutableElement;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
@@ -28,29 +31,34 @@ import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
 import checkers.inference.model.ConstantSlot;
-import ontology.qual.OntologyBottom;
-import ontology.qual.OntologyTop;
-import ontology.qual.Sequence;
-import ontology.qual.SortedSequence;
-import ontology.util.OntologyUtils;
+
+import com.sun.source.tree.NewArrayTree;
+import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParameterizedTypeTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
+
+import dataflow.qual.DataFlowTop;
 
 public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         implements InferrableAnnotatedTypeFactory {
 
-    protected final AnnotationMirror SEQ, SORTEDSEQ, ONTTOP, ONTBOT;
+    protected final AnnotationMirror ONTOLOGY, ONTOLOGYBOTTOM, ONTOLOGYTOP;
+    private ExecutableElement ontologyValue = TreeUtils.getMethod("ontology.qual.Ontology", "typeNames",
+            0, processingEnv);
 
     public OntologyAnnotatedTypeFactory(BaseTypeChecker checker) {
         super(checker);
-        SEQ = AnnotationUtils.fromClass(elements, Sequence.class);
-        SORTEDSEQ = AnnotationUtils.fromClass(elements, SortedSequence.class);
-        ONTTOP = AnnotationUtils.fromClass(elements, OntologyTop.class);
-        ONTBOT = AnnotationUtils.fromClass(elements, OntologyBottom.class);
+        ONTOLOGY = AnnotationUtils.fromClass(elements, Ontology.class);
+        ONTOLOGYBOTTOM = OntologyUtils.createOntologyAnnotation(OntologyUtils.convert(""), processingEnv);
+        ONTOLOGYTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
         postInit();
     }
 
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
-        return new GraphQualifierHierarchy(factory, ONTBOT);
+        return new GraphQualifierHierarchy(factory, ONTOLOGYBOTTOM);
     }
 
     @Override
@@ -68,67 +76,106 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                         this, variableAnnotator, slotManager));
     }
 
-    public class OntologyTreeAnnotator extends TreeAnnotator {
+    private final class OntologyQualifierHierarchy extends GraphQualifierHierarchy {
 
+        public OntologyQualifierHierarchy(MultiGraphFactory f, AnnotationMirror bottom) {
+            super(f, bottom);
+        }
+
+        @Override
+        public boolean isSubtype(AnnotationMirror rhs, AnnotationMirror lhs) {
+            if (AnnotationUtils.areSameIgnoringValues(rhs, ONTOLOGY)
+                    && AnnotationUtils.areSameIgnoringValues(lhs, ONTOLOGY)) {
+                String[] rhsValue = getDataflowValue(rhs);
+                String[] lhsValue = getDataflowValue(lhs);
+                Set<String> rSet = new HashSet<String>(Arrays.asList(rhsValue));
+                Set<String> lSet = new HashSet<String>(Arrays.asList(lhsValue));
+                if (lSet.containsAll(rSet)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                // if (rhs != null && lhs != null)
+                if (AnnotationUtils.areSameIgnoringValues(rhs, ONTOLOGY)) {
+                    rhs = ONTOLOGY;
+                } else if (AnnotationUtils.areSameIgnoringValues(lhs, ONTOLOGY)) {
+                    lhs = ONTOLOGY;
+                }
+                return super.isSubtype(rhs, lhs);
+            }
+        }
+
+        private String[] getDataflowValue(AnnotationMirror type) {
+            @SuppressWarnings("unchecked")
+            List<String> allTypesList = ((List<String>) AnnotationUtils
+                    .getElementValuesWithDefaults(type).get(ontologyValue).getValue());
+            // types in this list is
+            // org.checkerframework.framework.util.AnnotationBuilder.
+            String[] allTypesInArray = new String[allTypesList.size()];
+            int i = 0;
+            for (Object o : allTypesList) {
+                allTypesInArray[i] = o.toString();
+                i++;
+                // System.out.println(o.toString());
+            }
+            return allTypesInArray;
+        }
+    }
+
+    public class OntologyTreeAnnotator extends TreeAnnotator {
         public OntologyTreeAnnotator() {
             super(OntologyAnnotatedTypeFactory.this);
         }
 
         @Override
-        public Void visitNewClass(NewClassTree newClassTree, AnnotatedTypeMirror atm) {
-            AnnotationMirror anno = OntologyUtils.determineAnnotation(elements, atm.getUnderlyingType());
-            if (anno != null) {
-                atm.replaceAnnotation(anno);
+        public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
+            if (OntologyUtils.determineAnnotation(type.getUnderlyingType())) {
+                AnnotationMirror dataFlowType = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
+                type.replaceAnnotation(dataFlowType);
             }
-            return super.visitNewClass(newClassTree, atm);
+            return super.visitNewClass(node, type);
         }
 
         @Override
         public Void visitNewArray(final NewArrayTree newArrayTree, final AnnotatedTypeMirror atm) {
-            atm.replaceAnnotation(SEQ);
+            AnnotationMirror anno = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
+            atm.replaceAnnotation(anno);
             return super.visitNewArray(newArrayTree, atm);
         }
     }
 
     public class OntologyInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
-        // private final SlotManager slotManager;
         private final VariableAnnotator variableAnnotator;
-        // private final AnnotatedTypeFactory realTypeFactory;
-        // private final InferrableChecker realChecker;
 
-        //TODO : override visit variable tree... if it's sequence, then add preference constraints.
-        public OntologyInferenceTreeAnnotator(InferenceAnnotatedTypeFactory atypeFactory, InferrableChecker realChecker,
-                AnnotatedTypeFactory realAnnotatedTypeFactory, VariableAnnotator variableAnnotator,
-                SlotManager slotManager) {
+        public OntologyInferenceTreeAnnotator(InferenceAnnotatedTypeFactory atypeFactory,
+                InferrableChecker realChecker, AnnotatedTypeFactory realAnnotatedTypeFactory,
+                VariableAnnotator variableAnnotator, SlotManager slotManager) {
             super(atypeFactory, realChecker, realAnnotatedTypeFactory, variableAnnotator, slotManager);
-
-            // this.slotManager = slotManager;
             this.variableAnnotator = variableAnnotator;
-            // this.realTypeFactory = realAnnotatedTypeFactory;
-            // this.realChecker = realChecker;
         }
 
         @Override
-        public Void visitNewClass(final NewClassTree newClassTree,
-                final AnnotatedTypeMirror atm) {
-            AnnotationMirror anno = OntologyUtils.determineAnnotation(elements, atm.getUnderlyingType());
-            if (anno != null) {
+        public Void visitNewClass(final NewClassTree newClassTree, final AnnotatedTypeMirror atm) {
+            if (OntologyUtils.determineAnnotation(atm.getUnderlyingType())) {
+                AnnotationMirror anno = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
                 ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
                 atm.replaceAnnotation(cs.getValue());
-                variableAnnotator.visit(atm, newClassTree.getIdentifier());
             }
+            variableAnnotator.visit(atm, newClassTree.getIdentifier());
             return null;
         }
 
         @Override
         public Void visitNewArray(final NewArrayTree newArrayTree, final AnnotatedTypeMirror atm) {
-            ConstantSlot cs = variableAnnotator.createConstant(SEQ, newArrayTree);
+            AnnotationMirror anno = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
+            ConstantSlot cs = variableAnnotator.createConstant(anno, newArrayTree);
             atm.replaceAnnotation(cs.getValue());
             variableAnnotator.visit(atm, newArrayTree);
             return null;
         }
-        
+
         @Override
         public Void visitParameterizedType(final ParameterizedTypeTree param, final AnnotatedTypeMirror atm) {
             TreePath path = atypeFactory.getPath(param);

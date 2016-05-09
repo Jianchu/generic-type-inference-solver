@@ -1,25 +1,68 @@
 package ontology.util;
 
-import org.checkerframework.javacutil.AnnotationUtils;
+import ontology.qual.Ontology;
+
+import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.javacutil.TypesUtils;
 
+import java.util.Set;
+
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
-
-import ontology.qual.Sequence;
 
 public class OntologyUtils {
 
-    public static AnnotationMirror determineAnnotation(Elements elements, TypeMirror type) {
-        if (TypesUtils.isDeclaredOfName(type, "java.util.LinkedList") ||
-                TypesUtils.isDeclaredOfName(type, "java.util.ArrayList") ||
-                type.getKind().equals(TypeKind.ARRAY)) {
-            AnnotationMirror SEQ = AnnotationUtils.fromClass(elements, Sequence.class);
-            return SEQ;
+    public static boolean determineAnnotation(TypeMirror type) {
+        if (TypesUtils.isDeclaredOfName(type, "java.util.LinkedList")
+                || TypesUtils.isDeclaredOfName(type, "java.util.ArrayList")
+                || type.getKind().equals(TypeKind.ARRAY)) {
+            return true;
         }
-        return null;
+        return false;
     }
 
+    public static AnnotationMirror genereateOntologyAnnoFromNew(ProcessingEnvironment processingEnv) {
+        String className = "sequence";
+        AnnotationMirror dataFlowType = createOntologyAnnotation(convert(className), processingEnv);
+        return dataFlowType;
+    }
+
+    // public static AnnotationMirror
+    // genereateDataflowAnnoFromNewArray(ProcessingEnvironment processingEnv) {
+    // String className = "sequence";
+    // AnnotationMirror dataFlowType =
+    // createOntologyAnnotation(convert(className), processingEnv);
+    // return dataFlowType;
+    // }
+
+    public static String[] convert(String... typeName) {
+        return typeName;
+    }
+
+    public static AnnotationMirror createOntologyAnnotation(Set<String> datatypes,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
+        return createOntologyAnnotation(datatypes, builder);
+    }
+
+    private static AnnotationMirror createOntologyAnnotation(final Set<String> datatypes,
+            final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[datatypes.size()];
+        int i = 0;
+        for (String datatype : datatypes) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+        builder.setValue("typeNames", datatypesInArray);
+        return builder.build();
+    }
+
+    public static AnnotationMirror createOntologyAnnotation(String[] dataType,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
+        builder.setValue("typeNames", dataType);
+        return builder.build();
+    }
 }
