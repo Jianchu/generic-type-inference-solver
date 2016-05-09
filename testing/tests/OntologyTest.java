@@ -21,7 +21,7 @@ public class OntologyTest extends CFInferenceTest {
 
     @Override
     public Pair<String, List<String>> getSolverNameAndOptions() {
-        return Pair.<String, List<String>> of(ConstraintSolver.class.getCanonicalName(), new ArrayList<String>());
+        return Pair.<String, List<String>> of(OntologySolver.class.getCanonicalName(), new ArrayList<String>());
     }
 
     @Parameters
