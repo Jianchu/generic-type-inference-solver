@@ -1,5 +1,7 @@
 package checkers.inference;
 
+import ontology.solver.OntologySolver;
+
 import org.checkerframework.framework.test.TestUtilities;
 import org.checkerframework.javacutil.Pair;
 
@@ -10,7 +12,6 @@ import java.util.List;
 import org.junit.runners.Parameterized.Parameters;
 
 import checkers.inference.test.CFInferenceTest;
-import constraintsolver.ConstraintSolver;
 
 public class OntologyTest extends CFInferenceTest {
 

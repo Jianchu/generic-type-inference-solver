@@ -57,7 +57,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
-        return new GraphQualifierHierarchy(factory, ONTOLOGYBOTTOM);
+        return new OntologyQualifierHierarchy(factory, ONTOLOGYBOTTOM);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         public boolean isSubtype(AnnotationMirror rhs, AnnotationMirror lhs) {
             if (AnnotationUtils.areSameIgnoringValues(rhs, ONTOLOGY)
                     && AnnotationUtils.areSameIgnoringValues(lhs, ONTOLOGY)) {
-                String[] rhsValue = getDataflowValue(rhs);
-                String[] lhsValue = getDataflowValue(lhs);
+                String[] rhsValue = getOntologyValue(rhs);
+                String[] lhsValue = getOntologyValue(lhs);
                 Set<String> rSet = new HashSet<String>(Arrays.asList(rhsValue));
                 Set<String> lSet = new HashSet<String>(Arrays.asList(lhsValue));
                 if (lSet.containsAll(rSet)) {
@@ -105,7 +105,7 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             }
         }
 
-        private String[] getDataflowValue(AnnotationMirror type) {
+        private String[] getOntologyValue(AnnotationMirror type) {
             @SuppressWarnings("unchecked")
             List<String> allTypesList = ((List<String>) AnnotationUtils
                     .getElementValuesWithDefaults(type).get(ontologyValue).getValue());
