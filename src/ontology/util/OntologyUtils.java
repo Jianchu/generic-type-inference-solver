@@ -35,28 +35,28 @@ public class OntologyUtils {
         return typeName;
     }
 
-    public static AnnotationMirror createOntologyAnnotation(Set<String> datatypes,
+    public static AnnotationMirror createOntologyAnnotation(Set<String> values,
             ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
-        return createOntologyAnnotation(datatypes, builder);
+        return createOntologyAnnotation(values, builder);
     }
 
-    private static AnnotationMirror createOntologyAnnotation(final Set<String> datatypes,
+    private static AnnotationMirror createOntologyAnnotation(final Set<String> values,
             final AnnotationBuilder builder) {
-        String[] datatypesInArray = new String[datatypes.size()];
+        String[] valuesInArray = new String[values.size()];
         int i = 0;
-        for (String datatype : datatypes) {
-            datatypesInArray[i] = datatype.toString();
+        for (String value : values) {
+            valuesInArray[i] = value.toString();
             i++;
         }
-        builder.setValue("values", datatypesInArray);
+        builder.setValue("values", valuesInArray);
         return builder.build();
     }
 
-    public static AnnotationMirror createOntologyAnnotation(String[] dataType,
+    public static AnnotationMirror createOntologyAnnotation(String[] value,
             ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
-        builder.setValue("values", dataType);
+        builder.setValue("values", value);
         return builder.build();
     }
     

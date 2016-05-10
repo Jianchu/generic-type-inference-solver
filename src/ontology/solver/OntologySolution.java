@@ -40,51 +40,51 @@ public class OntologySolution implements InferenceSolution {
 
     private void mergeResults(SequenceSolution solution) {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {
-            boolean shouldContainDatatype = shouldContainDatatype(entry);
-            String datatype = solution.getDatatype();
+            boolean shouldContainValue = shouldContainValue(entry);
+            String value = solution.getValue();
 
-            Set<String> datatypes = results.get(entry.getKey());
-            if (datatypes == null) {
-                datatypes = new TreeSet<>();
-                results.put(entry.getKey(), datatypes);
+            Set<String> values = results.get(entry.getKey());
+            if (values == null) {
+                values = new TreeSet<>();
+                results.put(entry.getKey(), values);
             }
 
-            if (shouldContainDatatype) {
-                datatypes.add(datatype);
+            if (shouldContainValue) {
+                values.add(value);
             }
         }
     }
 
-    protected boolean shouldContainDatatype(Map.Entry<Integer, Boolean> entry) {
+    protected boolean shouldContainValue(Map.Entry<Integer, Boolean> entry) {
         return entry.getValue();
     }
 
     private void createAnnotations(ProcessingEnvironment processingEnv) {
         for (Map.Entry<Integer, Set<String>> entry : results.entrySet()) {
             int slotId = entry.getKey();
-            Set<String> datatypes = entry.getValue();
-            AnnotationMirror anno = createAnnotationFromDatatypes(processingEnv, datatypes);
+            Set<String> values = entry.getValue();
+            AnnotationMirror anno = createAnnotationFromValues(processingEnv, values);
             annotationResults.put(slotId, anno);
         }
     }
 
-    protected AnnotationMirror createAnnotationFromDatatypes(ProcessingEnvironment processingEnv,
-            Set<String> datatypes) {
-        return OntologyUtils.createOntologyAnnotation(datatypes, processingEnv);
+    protected AnnotationMirror createAnnotationFromValues(ProcessingEnvironment processingEnv,
+            Set<String> values) {
+        return OntologyUtils.createOntologyAnnotation(values, processingEnv);
     }
 
 
     private void mergeIdToExistance(SequenceSolution solution) {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {
             int id = entry.getKey();
-            boolean existsDatatype = entry.getValue();
+            boolean existsValue = entry.getValue();
             if (idToExistance.containsKey(id)) {
                 boolean alreadyExists = idToExistance.get(id);
-                if (alreadyExists ^ existsDatatype) {
+                if (alreadyExists ^ existsValue) {
                     InferenceMain.getInstance().logger.log(Level.INFO, "Mismatch between existance of annotation");
                 }
             } else {
-                idToExistance.put(id, existsDatatype);
+                idToExistance.put(id, existsValue);
             }
         }
     }

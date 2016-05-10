@@ -5,27 +5,27 @@ import java.util.Map;
 
 public class SequenceSolution {
     private final Map<Integer, Boolean> result;
-    private final String datatype;
+    private final String value;
 
-    public SequenceSolution(Map<Integer, Boolean> result, String datatype) {
+    public SequenceSolution(Map<Integer, Boolean> result, String value) {
         this.result = result;
-        this.datatype = datatype;
+        this.value = value;
     }
 
-    private SequenceSolution(String datatype) {
-        this(new HashMap<Integer, Boolean>(), datatype);
+    private SequenceSolution(String value) {
+        this(new HashMap<Integer, Boolean>(), value);
     }
 
     public Map<Integer, Boolean> getResult() {
         return result;
     }
 
-    public String getDatatype() {
-        return datatype;
+    public String getValue() {
+        return value;
     }
 
-    public static SequenceSolution noSolution(String datatype) {
-        return new SequenceSolution(datatype);
+    public static SequenceSolution noSolution(String value) {
+        return new SequenceSolution(value);
     }
 
 }

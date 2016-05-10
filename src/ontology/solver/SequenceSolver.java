@@ -16,12 +16,12 @@ import checkers.inference.model.Constraint;
 
 public class SequenceSolver {
     private final SlotManager slotManager;
-    private final String datatype;
+    private final String value;
     private final OntologySerializer serializer;
     private final List<VecInt> clauses;
 
-    public SequenceSolver(String datatype, Collection<Constraint> constraints, OntologySerializer serializer) {
-        this.datatype = datatype;
+    public SequenceSolver(String value, Collection<Constraint> constraints, OntologySerializer serializer) {
+        this.value = value;
         this.serializer = serializer;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.clauses = convertToCNF(constraints);
@@ -36,8 +36,8 @@ public class SequenceSolver {
         newdir.mkdir();
         String base = file.toString();
         String path = base + "/CNFfiles";
-        String writePath = path + "/CNFResultFor-" + datatype + ".txt";
-        sb.append("CNF for type " + datatype + ":" + "\n");
+        String writePath = path + "/CNFResultFor-" + value + ".txt";
+        sb.append("CNF for type " + value + ":" + "\n");
 
         for (VecInt clause : clauses) {
             sb.append("(");
@@ -110,7 +110,7 @@ public class SequenceSolver {
                     }
                 }
                 // System.out.println("*******************************");
-                return new SequenceSolution(result, datatype);
+                return new SequenceSolution(result, value);
             }
 
         } catch (Throwable th) {
@@ -118,6 +118,6 @@ public class SequenceSolver {
             throw new RuntimeException("Error MAX-SAT solving! " + lastClause, th);
         }
 
-        return SequenceSolution.noSolution(datatype);
+        return SequenceSolution.noSolution(value);
     }
 }

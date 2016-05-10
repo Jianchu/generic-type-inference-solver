@@ -50,6 +50,11 @@ public class OntologySolver implements InferenceSolver {
             sequenceSolvers.add(solver);
         }
 
+        // List<DatatypeSolution> solutions = new ArrayList<>();
+        // for (DatatypeSolver solver : dataflowSolvers) {
+        // solutions.add(solver.solve());
+        // }
+
         List<SequenceSolution> solutions = new ArrayList<>();
         try {
             solutions = solveInparallel(sequenceSolvers);

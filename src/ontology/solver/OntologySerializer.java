@@ -28,12 +28,12 @@ import checkers.inference.model.serialization.CnfVecIntSerializer;
 
 public class OntologySerializer extends CnfVecIntSerializer {
 
-    protected final String datatype;
+    protected final String value;
     private final Set<Integer> touchedSlots = new HashSet<Integer>();
 
-    public OntologySerializer(String datatype) {
+    public OntologySerializer(String value) {
         super(InferenceMain.getInstance().getSlotManager());
-        this.datatype = datatype;
+        this.value = value;
     }
 
     @Override
@@ -46,8 +46,8 @@ public class OntologySerializer extends CnfVecIntSerializer {
         if (AnnotationUtils.areSameByClass(anno, OntologyTop.class)) {
             return true;
         }
-        String[] datatypes = OntologyUtils.getOntologyValue(anno);
-        return Arrays.asList(datatypes).contains(datatype);
+        String[] values = OntologyUtils.getOntologyValue(anno);
+        return Arrays.asList(values).contains(value);
     }
 
     @Override
