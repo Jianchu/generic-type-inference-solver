@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @SubtypeOf({ OntologyTop.class })
 
 public @interface Ontology {
-    String[] typeNames() default {};
+    String[] values() default {};
 }

@@ -31,14 +31,6 @@ public class OntologyUtils {
         return dataFlowType;
     }
 
-    // public static AnnotationMirror
-    // genereateDataflowAnnoFromNewArray(ProcessingEnvironment processingEnv) {
-    // String className = "sequence";
-    // AnnotationMirror dataFlowType =
-    // createOntologyAnnotation(convert(className), processingEnv);
-    // return dataFlowType;
-    // }
-
     public static String[] convert(String... typeName) {
         return typeName;
     }
@@ -57,19 +49,19 @@ public class OntologyUtils {
             datatypesInArray[i] = datatype.toString();
             i++;
         }
-        builder.setValue("typeNames", datatypesInArray);
+        builder.setValue("values", datatypesInArray);
         return builder.build();
     }
 
     public static AnnotationMirror createOntologyAnnotation(String[] dataType,
             ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, Ontology.class);
-        builder.setValue("typeNames", dataType);
+        builder.setValue("values", dataType);
         return builder.build();
     }
     
     public static String[] getOntologyValue(AnnotationMirror type) {
-        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,"typeNames", String.class, true);
+        List<String> allTypesList = AnnotationUtils.getElementValueArray(type, "values", String.class, true);
         //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
         String[] allTypesInArray = new String[allTypesList.size()];
         int i = 0;

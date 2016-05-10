@@ -40,11 +40,11 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 
-public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
-        implements InferrableAnnotatedTypeFactory {
+public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory implements
+        InferrableAnnotatedTypeFactory {
 
     protected final AnnotationMirror ONTOLOGY, ONTOLOGYBOTTOM, ONTOLOGYTOP;
-    private ExecutableElement ontologyValue = TreeUtils.getMethod("ontology.qual.Ontology", "typeNames",
+    private ExecutableElement ontologyValue = TreeUtils.getMethod("ontology.qual.Ontology", "values",
             0, processingEnv);
 
     public OntologyAnnotatedTypeFactory(BaseTypeChecker checker) {
