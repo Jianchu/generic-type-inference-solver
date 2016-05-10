@@ -42,22 +42,17 @@ public class OntologySolver implements InferenceSolver {
         Ontology = AnnotationUtils.fromClass(elements, Ontology.class);
 
         Collection<String> datatypesUsed = getDatatypesUsed(slots);
-        List<SequenceSolver> dataflowSolvers = new ArrayList<>();
+        List<SequenceSolver> sequenceSolvers = new ArrayList<>();
 
         // Configure datatype solvers
         for (String datatype : datatypesUsed) {
             SequenceSolver solver = new SequenceSolver(datatype, constraints, getSerializer(datatype));
-            dataflowSolvers.add(solver);
+            sequenceSolvers.add(solver);
         }
-
-        // List<DatatypeSolution> solutions = new ArrayList<>();
-        // for (DatatypeSolver solver : dataflowSolvers) {
-        // solutions.add(solver.solve());
-        // }
 
         List<SequenceSolution> solutions = new ArrayList<>();
         try {
-            solutions = solveInparallel(dataflowSolvers);
+            solutions = solveInparallel(sequenceSolvers);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -65,13 +60,13 @@ public class OntologySolver implements InferenceSolver {
         return getMergedSolution(processingEnvironment, solutions);
     }
 
-    private List<SequenceSolution> solveInparallel(List<SequenceSolver> dataflowSolvers)
+    private List<SequenceSolution> solveInparallel(List<SequenceSolver> ontologySolvers)
             throws InterruptedException, ExecutionException {
-        ExecutorService service = Executors.newFixedThreadPool(dataflowSolvers.size());
+        ExecutorService service = Executors.newFixedThreadPool(ontologySolvers.size());
 
         List<Future<SequenceSolution>> futures = new ArrayList<Future<SequenceSolution>>();
 
-        for (final SequenceSolver solver : dataflowSolvers) {
+        for (final SequenceSolver solver : ontologySolvers) {
             Callable<SequenceSolution> callable = new Callable<SequenceSolution>() {
                 @Override
                 public SequenceSolution call() throws Exception {
@@ -96,9 +91,9 @@ public class OntologySolver implements InferenceSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, Ontology)) {
-                    String[] dataflowValues = OntologyUtils.getOntologyValue(anno);
-                    for (String dataflowValue : dataflowValues) {
-                        types.add(dataflowValue);
+                    String[] ontologyValues = OntologyUtils.getOntologyValue(anno);
+                    for (String ontologyValue : ontologyValues) {
+                        types.add(ontologyValue);
                     }
                 }
             }

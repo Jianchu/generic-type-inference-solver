@@ -130,8 +130,8 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory imple
         @Override
         public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
             if (OntologyUtils.determineAnnotation(type.getUnderlyingType())) {
-                AnnotationMirror dataFlowType = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
-                type.replaceAnnotation(dataFlowType);
+                AnnotationMirror ontologyValue = OntologyUtils.genereateOntologyAnnoFromNew(processingEnv);
+                type.replaceAnnotation(ontologyValue);
             }
             return super.visitNewClass(node, type);
         }

@@ -28,7 +28,7 @@ public class OntologySolution implements InferenceSolution {
         merge(solutions);
         createAnnotations(processingEnv);
 
-        System.out.println("FINAL RESULT FROM DATAFLOWSOVLER: " + annotationResults.toString());
+        System.out.println("FINAL RESULT FROM ONTOLOGYSOVLER: " + annotationResults.toString());
     }
 
     public void merge(Collection<SequenceSolution> solutions) {

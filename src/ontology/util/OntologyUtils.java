@@ -27,8 +27,8 @@ public class OntologyUtils {
 
     public static AnnotationMirror genereateOntologyAnnoFromNew(ProcessingEnvironment processingEnv) {
         String className = "sequence";
-        AnnotationMirror dataFlowType = createOntologyAnnotation(convert(className), processingEnv);
-        return dataFlowType;
+        AnnotationMirror ontologyValue = createOntologyAnnotation(convert(className), processingEnv);
+        return ontologyValue;
     }
 
     public static String[] convert(String... typeName) {

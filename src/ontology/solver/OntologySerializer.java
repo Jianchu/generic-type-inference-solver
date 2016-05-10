@@ -27,15 +27,13 @@ import checkers.inference.model.VariableSlot;
 import checkers.inference.model.serialization.CnfVecIntSerializer;
 
 public class OntologySerializer extends CnfVecIntSerializer {
-    // private SlotManager slotManager;
+
     protected final String datatype;
     private final Set<Integer> touchedSlots = new HashSet<Integer>();
 
     public OntologySerializer(String datatype) {
         super(InferenceMain.getInstance().getSlotManager());
-        // this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.datatype = datatype;
-        // System.out.println(datatype);
     }
 
     @Override
@@ -63,13 +61,9 @@ public class OntologySerializer extends CnfVecIntSerializer {
                         results.add(res);
                     }
                 }
-                // constraints.iterator().remove();
             } else {
                 constraintsNoBaseCase.add(constraint);
             }
-
-            // System.out.println("This constraint: ****" +
-            // constraint.toString());
         }
         iterateNormalCases(constraintsNoBaseCase, results);
         return results;

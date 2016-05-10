@@ -104,7 +104,7 @@ public class SequenceSolver {
                         // means this top(type) should present:
                         // If the solution is false, that means top was
                         // inferred.
-                        // For dataflow, that means that the annotation should
+                        // For ontology, that means that the annotation should
                         // have the type.
                         result.put(var, !varIsTrue);
                     }
