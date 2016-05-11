@@ -42,15 +42,16 @@ public class OntologySolution implements InferenceSolution {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {
             boolean shouldContainValue = shouldContainValue(entry);
             String value = solution.getValue();
+            if (!value.equals("")) {
+                Set<String> values = results.get(entry.getKey());
+                if (values == null) {
+                    values = new TreeSet<>();
+                    results.put(entry.getKey(), values);
+                }
 
-            Set<String> values = results.get(entry.getKey());
-            if (values == null) {
-                values = new TreeSet<>();
-                results.put(entry.getKey(), values);
-            }
-
-            if (shouldContainValue) {
-                values.add(value);
+                if (shouldContainValue) {
+                    values.add(value);
+                }
             }
         }
     }
