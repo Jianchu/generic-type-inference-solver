@@ -22,13 +22,7 @@ import constraintsolver.Lattice;
  */
 public class LogiQLPredicateGenerator {
 
-    // Map<String, String> subtype = new HashMap<String, String>();
-    // Map<String, String> supertype = new HashMap<String, String>();
-    // Map<String, String> notComparable = new HashMap<String, String>();
     Map<AnnotationMirror, String> qualifierName = new HashMap<AnnotationMirror, String>();
-    // Set<? extends AnnotationMirror> allTypes;
-    // String top = "";
-    // String bottom = "";
     private final String path;
     private final String ISANNOTATED = "isAnnotated";
     private final String MAYBEANNOTATED = "mayBeAnnotated";
@@ -42,20 +36,10 @@ public class LogiQLPredicateGenerator {
 
 
     public void GenerateLogiqlEncoding() {
-        // Set<String> allTypesInString = new HashSet<String>();
-        // StringBuilder encodingForEqualityConModifier = new StringBuilder();
-        // StringBuilder encodingForInequalityConModifier = new StringBuilder();
-        // StringBuilder encodingForEqualityConstraint = new StringBuilder();
-        // StringBuilder encodingForInequalityConstraint = new StringBuilder();
-        // StringBuilder encodingForComparableConstraint = new StringBuilder();
-        // StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
-        // StringBuilder encodingForSubtypeConstraint = new StringBuilder();
-        // mapSimpleOriginalName();
-        // for (AnnotationMirror i : Lattice.allTypes) {
-        // allTypesInString.add(qualifierName.get(i));
-        // }
         final String basicEncoding = getBasicEncoding();
+        final String equalityEncoding = getEqualityConstraintEncoding();
         System.out.println(basicEncoding);
+        System.out.println(equalityEncoding);
         // getEncodingForEqualityConModifier(allTypesInString,
         // encodingForEqualityConModifier);
         // getEncodingForInequalityConModifier(allTypesInString,
@@ -89,12 +73,6 @@ public class LogiQLPredicateGenerator {
         // System.out.println(encodingForAdaptationConstraint);
     }
 
-    private void mapSimpleOriginalName() {
-        for (AnnotationMirror modifier : Lattice.allTypes) {
-            qualifierName.put(modifier, modifier.toString().replaceAll("[.@]", "_"));
-        }
-    }
-
     /**
      * generate the encoding of EqualityConstraint for the case that both
      * modifiers of two slots are unknown.
@@ -107,11 +85,17 @@ public class LogiQLPredicateGenerator {
      * @returns encodingForEqualityConstraint, which is the logiql encoding of
      *          equality constraint for current type system.
      */
-    private void getEncodingForEqualityConstraint(Set<String> allTypesInString, StringBuilder encodingForEqualityConstraint) {
-        for (String s : allTypesInString) {
-            encodingForEqualityConstraint.append(ISANNOTATED + s + "(v1) <- equalityConstraint(v1,v2), " + ISANNOTATED + s + "(v2).\n");
-            encodingForEqualityConstraint.append(ISANNOTATED + s + "(v2) <- equalityConstraint(v1,v2), " + ISANNOTATED + s + "(v1).\n");
+    private String getEqualityConstraintEncoding() {
+        StringBuilder equalityEncoding = new StringBuilder();
+        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+            String simpleName = getSimpleName(annoMirror);
+            equalityEncoding.append("is" + simpleName + "[v2] = true <- equalityConstraint(v1, v2), is"
+                    + simpleName + "[v1] = true.\n");
+            equalityEncoding.append("is" + simpleName
+                    + "[v2] = true <- equalityConstraintContainsConstant(v1, v2), hasconstantName(v1:\""
+                    + simpleName + "\").\n");
         }
+        return equalityEncoding.toString();
     }
     
     /**
