@@ -2,7 +2,9 @@ package logiqlbackend;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -22,21 +24,21 @@ public class LogiQLPredicateGenerator {
     // Map<String, String> subtype = new HashMap<String, String>();
     // Map<String, String> supertype = new HashMap<String, String>();
     // Map<String, String> notComparable = new HashMap<String, String>();
-    // Map<AnnotationMirror, String> qualifierName = new
-    // HashMap<AnnotationMirror, String>();
+    Map<AnnotationMirror, String> qualifierName = new HashMap<AnnotationMirror, String>();
     // Set<? extends AnnotationMirror> allTypes;
     // String top = "";
     // String bottom = "";
-    private String path = "";
-    private final String isAnnotated = "isAnnotated";
-    private final String mayBeAnnotated = "mayBeAnnotated";
-    private final String cannotBeAnnotated = "cannotBeAnnotated";
+    private final String path;
+    private final String ISANNOTATED = "isAnnotated";
+    private final String MAYBEANNOTATED = "mayBeAnnotated";
+    private final String CANNOTBEANNOTATED = "cannotBeAnnotated";
 
     // QualifierHierarchy qualHierarchy;
 
     public LogiQLPredicateGenerator(String path) {
         this.path = path;
     }
+
 
     public void GenerateLogiqlEncoding() {
         Set<String> allTypesInString = new HashSet<String>();
@@ -47,10 +49,9 @@ public class LogiQLPredicateGenerator {
         StringBuilder encodingForComparableConstraint = new StringBuilder();
         StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
         StringBuilder encodingForSubtypeConstraint = new StringBuilder();
-        StringBuilder encodingForAdaptationConstraint = new StringBuilder();
         StringBuilder basicEncoding = new StringBuilder();
         mapSimpleOriginalName();
-        for (AnnotationMirror i : allTypes) {
+        for (AnnotationMirror i : Lattice.allTypes) {
             allTypesInString.add(qualifierName.get(i));
         }
         getBasicString(allTypesInString, basicEncoding);
@@ -61,16 +62,13 @@ public class LogiQLPredicateGenerator {
         getEncodingForComparableConstraint(allTypesInString, encodingForComparableConstraint);
         getEncodingForSubtypeConTopBottom(allTypesInString, encodingForSubtypeConTopBottom);
         getEncodingForSubtypeConstraint(allTypesInString, encodingForSubtypeConstraint);
-        getEncodingForAdaptationConstraint(encodingForAdaptationConstraint);
 
         writeFile(basicEncoding.append(encodingForEqualityConModifier)
                 .append(encodingForInequalityConModifier)
                 .append(encodingForEqualityConstraint)
                 .append(encodingForInequalityConstraint)
                 .append(encodingForComparableConstraint)
-                .append(encodingForSubtypeConTopBottom)
-                .append(encodingForSubtypeConstraint)
-                .append(encodingForAdaptationConstraint).toString());
+                .append(encodingForSubtypeConTopBottom).append(encodingForSubtypeConstraint).toString());
 
         // System.out.println(basicEncoding);
         // System.out.println(encodingForEqualityConModifier);
@@ -84,7 +82,7 @@ public class LogiQLPredicateGenerator {
     }
 
     private void mapSimpleOriginalName() {
-        for (AnnotationMirror modifier : Lattice.allTypes()) {
+        for (AnnotationMirror modifier : Lattice.allTypes) {
             qualifierName.put(modifier, modifier.toString().replaceAll("[.@]", "_"));
         }
     }
@@ -101,16 +99,30 @@ public class LogiQLPredicateGenerator {
      * @returns encodingForEqualityConstraint, which is the logiql encoding of
      *          equality constraint for current type system.
      */
-    private void getEncodingForEqualityConstraint(
-            Set<String> allTypesInString,
-            StringBuilder encodingForEqualityConstraint) {
+    private void getEncodingForEqualityConstraint(Set<String> allTypesInString, StringBuilder encodingForEqualityConstraint) {
         for (String s : allTypesInString) {
-            encodingForEqualityConstraint.append(isAnnotated + s
-                    + "(v1) <- equalityConstraint(v1,v2), " + isAnnotated + s
-                    + "(v2).\n");
-            encodingForEqualityConstraint.append(isAnnotated + s
-                    + "(v2)<- equalityConstraint(v1,v2), " + isAnnotated + s
-                    + "(v1).\n");
+            encodingForEqualityConstraint.append(ISANNOTATED + s + "(v1) <- equalityConstraint(v1,v2), " + ISANNOTATED + s + "(v2).\n");
+            encodingForEqualityConstraint.append(ISANNOTATED + s + "(v2)<- equalityConstraint(v1,v2), " + ISANNOTATED + s + "(v1).\n");
+        }
+    }
+    
+    /**
+     * generate the encoding of equality constraint for the case that if one
+     * slot's modifier is known.
+     *
+     * @param allTypesInString
+     *            is a set contains all modifiers of current type system in
+     *            string.
+     * @param encodingForEqualityConModifier
+     *            is the return value.
+     * @returns encodingForEqualityConModifier, which is the logiql encoding of
+     *          equality constraint for current type system.
+     */
+    private void getEncodingForEqualityConModifier(
+            Set<String> allTypesInString,
+            StringBuilder encodingForEqualityConModifier) {
+        for (String s : allTypesInString) {
+            encodingForEqualityConModifier.append(ISANNOTATED + s + "(v2) <- equalityConstraintContainsModifier(v1,v2), v1 = \""  + s + "\".\n");
         }
     }
 
@@ -125,9 +137,7 @@ public class LogiQLPredicateGenerator {
      * @returns encodingForSubtypeConstraint, which is the logiql encoding of
      *          subtype constraint for current type system.
      */
-    private void getEncodingForSubtypeConstraint(
-            Set<String> allTypesInString,
-            StringBuilder encodingForSubtypeConstraint) {
+    private void getEncodingForSubtypeConstraint(Set<String> allTypesInString, StringBuilder encodingForSubtypeConstraint) {
         String[] subtypeFors;
         String[] supertypeFors;
         for (String subkey : allTypesInString) {
@@ -136,33 +146,33 @@ public class LogiQLPredicateGenerator {
             for (int i = 1; i < subtypeFors.length; i++) {
                 if (!subtypeFors[i].equals(subkey)
                         && !subtypeFors[i].equals(" ")) {
-                    encodingForSubtypeConstraint.append(cannotBeAnnotated
-                            + subkey + "(v1) <- subtypeConstraint(v1,v2), "
-                            + isAnnotated + subtypeFors[i] + "(v2).\n");
+                    encodingForSubtypeConstraint.append(CANNOTBEANNOTATED + subkey
+                            + "(v1) <- subtypeConstraint(v1,v2), " + ISANNOTATED + subtypeFors[i]
+                            + "(v2).\n");
                 }
                 if (!subtypeFors[i].equals(" ")
                         && !(subkey.equals(top) && subtypeFors[i].equals(top))) {
-                    encodingForSubtypeConstraint.append(mayBeAnnotated + subkey
-                            + "(v2) <- subtypeConstraint(v1,v2), "
-                            + isAnnotated + subtypeFors[i] + "(v1), " + "!"
-                            + cannotBeAnnotated + subkey + "(v2).\n");
+                    encodingForSubtypeConstraint.append(MAYBEANNOTATED + subkey
+                            + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED + subtypeFors[i]
+                            + "(v1), " + "!" + CANNOTBEANNOTATED + subkey + "(v2).\n");
                 }
             }
 
             for (int j = 1; j < supertypeFors.length; j++) {
                 if (!supertypeFors[j].equals(subkey)
                         && !supertypeFors[j].equals(" ")) {
-                    encodingForSubtypeConstraint.append(cannotBeAnnotated
-                            + subkey + "(v2) <- subtypeConstraint(v1,v2), "
-                            + isAnnotated + supertypeFors[j] + "(v1).\n");
+                    encodingForSubtypeConstraint.append(CANNOTBEANNOTATED
+ + subkey
+                            + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED + supertypeFors[j]
+                            + "(v1).\n");
                 }
                 if (!supertypeFors[j].equals(" ")
                         && !(subkey.equals(bottom) && supertypeFors[j]
                                 .equals(bottom))) {
-                    encodingForSubtypeConstraint.append(mayBeAnnotated + subkey
+                    encodingForSubtypeConstraint.append(MAYBEANNOTATED + subkey
                             + "(v1) <- subtypeConstraint(v1,v2), "
-                            + isAnnotated + supertypeFors[j] + "(v2), " + "!"
-                            + cannotBeAnnotated + subkey + "(v1).\n");
+ + ISANNOTATED + supertypeFors[j]
+                            + "(v2), " + "!" + CANNOTBEANNOTATED + subkey + "(v1).\n");
                 }
 
             }
@@ -189,16 +199,16 @@ public class LogiQLPredicateGenerator {
         for (String subkey : subtype.keySet()) {
             subtypeFors = subtype.get(subkey).split(" ");
             if (subtypeFors.length == allTypesInString.size() + 1) {
-                encodingForSubtypeConTopBottom.append(isAnnotated + subkey
-                        + "(v2) <- subtypeConstraint(v1,v2), " + isAnnotated
+                encodingForSubtypeConTopBottom.append(ISANNOTATED + subkey
+                        + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED
                         + subkey + "(v1).\n");
             }
         }
         for (String superkey : supertype.keySet()) {
             subtypeFors = supertype.get(superkey).split(" ");
             if (subtypeFors.length == allTypesInString.size() + 1) {
-                encodingForSubtypeConTopBottom.append(isAnnotated + superkey
-                        + "(v1) <- subtypeConstraint(v1,v2), " + isAnnotated
+                encodingForSubtypeConTopBottom.append(ISANNOTATED + superkey
+                        + "(v1) <- subtypeConstraint(v1,v2), " + ISANNOTATED
                         + superkey + "(v2).\n");
             }
         }
@@ -226,30 +236,30 @@ public class LogiQLPredicateGenerator {
                 for (String s : notComparableForkey) {
                     if (!s.equals("")) {
                         encodingForComparableConstraint
-                                .append(cannotBeAnnotated
+.append(CANNOTBEANNOTATED
                                         + key
                                         + "(v1)<- comparableConstraint(v1,v2), "
-                                        + isAnnotated + s + "(v2).\n");
+ + ISANNOTATED + s + "(v2).\n");
                         encodingForComparableConstraint
-                                .append(cannotBeAnnotated
+.append(CANNOTBEANNOTATED
                                         + key
                                         + "(v2)<- comparableConstraint(v1,v2), "
-                                        + isAnnotated + s + "(v1).\n");
+ + ISANNOTATED + s + "(v1).\n");
                         for (String ss : allTypesInString) {
                             if (!ss.equals(s)) {
                                 variableMaybeAnnotated
-                                        .append(mayBeAnnotated
+.append(MAYBEANNOTATED
                                                 + ss
                                                 + "(v1) <- comparableConstraint(v1,v2), "
-                                                + isAnnotated + key + "(v2), !"
-                                                + cannotBeAnnotated + ss
+ + ISANNOTATED + key
+                                        + "(v2), !" + CANNOTBEANNOTATED + ss
                                                 + "(v1).\n");
                                 variableMaybeAnnotated
-                                        .append(mayBeAnnotated
+.append(MAYBEANNOTATED
                                                 + ss
                                                 + "(v2) <- comparableConstraint(v1,v2), "
-                                                + isAnnotated + key + "(v1), !"
-                                                + cannotBeAnnotated + ss
+ + ISANNOTATED + key
+                                        + "(v1), !" + CANNOTBEANNOTATED + ss
                                                 + "(v2).\n");
                             }
                         }
@@ -277,21 +287,23 @@ public class LogiQLPredicateGenerator {
             StringBuilder encodingForInequalityConstraint) {
         StringBuilder variableMaybeAnnotated = new StringBuilder();
         for (String s : allTypesInString) {
-            encodingForInequalityConstraint.append(cannotBeAnnotated + s
-                    + "(v1) <- inequalityConstraint(v1,v2), " + isAnnotated + s
+            encodingForInequalityConstraint.append(CANNOTBEANNOTATED + s
+                    + "(v1) <- inequalityConstraint(v1,v2), " + ISANNOTATED + s
                     + "(v2).\n");
-            encodingForInequalityConstraint.append(cannotBeAnnotated + s
-                    + "(v2) <- inequalityConstraint(v1,v2), " + isAnnotated + s
+            encodingForInequalityConstraint.append(CANNOTBEANNOTATED + s
+                    + "(v2) <- inequalityConstraint(v1,v2), " + ISANNOTATED + s
                     + "(v1).\n");
             for (String ss : allTypesInString) {
                 if (s != ss) {
-                    variableMaybeAnnotated.append(mayBeAnnotated + ss
+                    variableMaybeAnnotated.append(MAYBEANNOTATED + ss
                             + "(v1) <- inequalityConstraint(v1,v2), "
-                            + isAnnotated + s + "(v2), !" + cannotBeAnnotated
+ + ISANNOTATED + s + "(v2), !"
+                            + CANNOTBEANNOTATED
                             + ss + "(v1).\n");
-                    variableMaybeAnnotated.append(mayBeAnnotated + ss
+                    variableMaybeAnnotated.append(MAYBEANNOTATED + ss
                             + "(v2) <- inequalityConstraint(v1,v2), "
-                            + isAnnotated + s + "(v1), !" + cannotBeAnnotated
+ + ISANNOTATED + s + "(v1), !"
+                            + CANNOTBEANNOTATED
                             + ss + "(v2).\n");
                 }
             }
@@ -316,36 +328,14 @@ public class LogiQLPredicateGenerator {
             StringBuilder encodingForInequalityConModifier) {
         for (String s : allTypesInString) {
             encodingForInequalityConModifier
-                    .append(cannotBeAnnotated
+.append(CANNOTBEANNOTATED
                             + s
                             + "(v1) <- inequalityConstraintContainsModifier(v1,v2), v2 = \""
                             + s + "\".\n");
         }
     }
 
-    /**
-     * generate the encoding of equality constraint for the case that if one
-     * slot's modifier is known.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForEqualityConModifier
-     *            is the return value.
-     * @returns encodingForEqualityConModifier, which is the logiql encoding of
-     *          equality constraint for current type system.
-     */
-    private void getEncodingForEqualityConModifier(
-            Set<String> allTypesInString,
-            StringBuilder encodingForEqualityConModifier) {
-        for (String s : allTypesInString) {
-            encodingForEqualityConModifier
-                    .append(isAnnotated
-                            + s
-                            + "(v2) <- equalityConstraintContainsModifier(v1,v2), v1 = \""
-                            + s + "\".\n");
-        }
-    }
+
 
     /**
      * generate the basic predicate of encoding.
@@ -377,29 +367,11 @@ public class LogiQLPredicateGenerator {
                         + "\ncomparableConstraint(v1,v2) -> variable(v1), variable(v2)."
                         + "\nsubtypeConstraint(v1,v2) -> variable(v1), variable(v2).\n");
         for (String s : allTypesInString) {
-            basicEncoding.append(isAnnotated + s + "(v) ->variable(v).\n"
-                    + mayBeAnnotated + s + "(v) ->variable(v).\n"
-                    + cannotBeAnnotated + s + "(v) ->variable(v).\n"
+            basicEncoding.append(ISANNOTATED + s + "(v) ->variable(v).\n" + MAYBEANNOTATED + s
+                    + "(v) ->variable(v).\n" + CANNOTBEANNOTATED + s + "(v) ->variable(v).\n"
                     + "AnnotationOf[v] = \"" + s + "\" <-isAnnotated" + s
                     + "(v).\n");
         }
-    }
-
-    /**
-     * generate the encoding of adaptation constraint of universe type system.
-     *
-     * @param encodingForAdaptationConstraint
-     *            is the return value.
-     * @returns encodingForAdaptationConstraint is the encoding of adaptation
-     *          constraint for universe type system.
-     */
-    private void getEncodingForAdaptationConstraint(
-         StringBuilder encodingForAdaptationConstraint) {
-//         InferenceChecker IC = new InferenceChecker();
-//         if (IC instanceof AdaptationInference ){
-//             GUTIChecker GC = (GUTIChecker) IC;
-//         encodingForAdaptationConstraint.append(GC.viewpointEncodingFor());
-//         }
     }
 
     /**
