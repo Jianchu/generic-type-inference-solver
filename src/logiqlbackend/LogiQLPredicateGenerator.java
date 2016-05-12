@@ -1,9 +1,10 @@
 package logiqlbackend;
 
+import org.checkerframework.javacutil.AnnotationUtils;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,24 +42,28 @@ public class LogiQLPredicateGenerator {
 
 
     public void GenerateLogiqlEncoding() {
-        Set<String> allTypesInString = new HashSet<String>();
-        StringBuilder encodingForEqualityConModifier = new StringBuilder();
-        StringBuilder encodingForInequalityConModifier = new StringBuilder();
-        StringBuilder encodingForEqualityConstraint = new StringBuilder();
-        StringBuilder encodingForInequalityConstraint = new StringBuilder();
-        StringBuilder encodingForComparableConstraint = new StringBuilder();
-        StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
-        StringBuilder encodingForSubtypeConstraint = new StringBuilder();
-        StringBuilder basicEncoding = new StringBuilder();
-        mapSimpleOriginalName();
-        for (AnnotationMirror i : Lattice.allTypes) {
-            allTypesInString.add(qualifierName.get(i));
-        }
-        getBasicString(allTypesInString, basicEncoding);
-        getEncodingForEqualityConModifier(allTypesInString, encodingForEqualityConModifier);
-        getEncodingForInequalityConModifier(allTypesInString, encodingForInequalityConModifier);
-        getEncodingForEqualityConstraint(allTypesInString, encodingForEqualityConstraint);
-        getEncodingForInequalityConstraint(allTypesInString, encodingForInequalityConstraint);
+        // Set<String> allTypesInString = new HashSet<String>();
+        // StringBuilder encodingForEqualityConModifier = new StringBuilder();
+        // StringBuilder encodingForInequalityConModifier = new StringBuilder();
+        // StringBuilder encodingForEqualityConstraint = new StringBuilder();
+        // StringBuilder encodingForInequalityConstraint = new StringBuilder();
+        // StringBuilder encodingForComparableConstraint = new StringBuilder();
+        // StringBuilder encodingForSubtypeConTopBottom = new StringBuilder();
+        // StringBuilder encodingForSubtypeConstraint = new StringBuilder();
+        // mapSimpleOriginalName();
+        // for (AnnotationMirror i : Lattice.allTypes) {
+        // allTypesInString.add(qualifierName.get(i));
+        // }
+        final String basicEncoding = getBasicEncoding();
+        System.out.println(basicEncoding);
+        // getEncodingForEqualityConModifier(allTypesInString,
+        // encodingForEqualityConModifier);
+        // getEncodingForInequalityConModifier(allTypesInString,
+        // encodingForInequalityConModifier);
+        // getEncodingForEqualityConstraint(allTypesInString,
+        // encodingForEqualityConstraint);
+        // getEncodingForInequalityConstraint(allTypesInString,
+        // encodingForInequalityConstraint);
         // getEncodingForComparableConstraint(allTypesInString,
         // encodingForComparableConstraint);
         // getEncodingForSubtypeConTopBottom(allTypesInString,
@@ -66,12 +71,12 @@ public class LogiQLPredicateGenerator {
         // getEncodingForSubtypeConstraint(allTypesInString,
         // encodingForSubtypeConstraint);
 
-        writeFile(basicEncoding.append(encodingForEqualityConModifier)
-                .append(encodingForInequalityConModifier)
-                .append(encodingForEqualityConstraint)
-                .append(encodingForInequalityConstraint)
-                .append(encodingForComparableConstraint)
-                .append(encodingForSubtypeConTopBottom).append(encodingForSubtypeConstraint).toString());
+        // writeFile(basicEncoding.append(encodingForEqualityConModifier)
+        // .append(encodingForInequalityConModifier)
+        // .append(encodingForEqualityConstraint)
+        // .append(encodingForInequalityConstraint)
+        // .append(encodingForComparableConstraint)
+        // .append(encodingForSubtypeConTopBottom).append(encodingForSubtypeConstraint).toString());
 
         // System.out.println(basicEncoding);
         // System.out.println(encodingForEqualityConModifier);
@@ -347,42 +352,60 @@ public class LogiQLPredicateGenerator {
      *            string.
      * @param basicEncoding
      *            is the return value.
+     * 
      * @returns basicEncoding.
      */
-    private void getBasicString(Set<String> allTypesInString, StringBuilder basicEncoding) {
-        basicEncoding.append("variable(v), hasvariableName(v:i) -> int(i).");
-        basicEncoding.append("constant(m), hasconstantName(m:i) -> string(i).");
-        basicEncoding.append("AnnotationOf[v] = a -> variable(v), string(a).");
+    private String getBasicEncoding() {
+        StringBuilder basicEncoding = new StringBuilder();
+        basicEncoding.append("variable(v), hasvariableName(v:i) -> int(i).\n");
+        basicEncoding.append("constant(m), hasconstantName(m:i) -> string(i).\n");
+        basicEncoding.append("AnnotationOf[v] = a -> variable(v), string(a).\n");
         //predicates for making output in order.
-        basicEncoding.append("variableOrder(v) -> int(v).");
-        basicEncoding.append("variableOrder(i) <- variable(v), hasvariableName(v:i).");
-        basicEncoding.append("orderVariable[o] = v -> int(o), int(v).");
-        basicEncoding.append("orderVariable[o] = v <- seq<<o=v>> variableOrder(v).");
-        basicEncoding.append("orderedAnnotationOf[v] = a -> int(v), string(a).");
-        basicEncoding.append("orderedAnnotationOf[v] = a <- variable(q), hasvariableName(q:v), AnnotationOf[q]=a, orderVariable[_]=v.");
+        basicEncoding.append("variableOrder(v) -> int(v).\n");
+        basicEncoding.append("variableOrder(i) <- variable(v), hasvariableName(v:i).\n");
+        basicEncoding.append("orderVariable[o] = v -> int(o), int(v).\n");
+        basicEncoding.append("orderVariable[o] = v <- seq<<o=v>> variableOrder(v).\n");
+        basicEncoding.append("orderedAnnotationOf[v] = a -> int(v), string(a).\n");
+        basicEncoding.append("orderedAnnotationOf[v] = a <- variable(q), hasvariableName(q:v), AnnotationOf[q]=a, orderVariable[_]=v.\n");
         //predicates for constraints.
         //equality constraint
-        basicEncoding.append("equalityConstraint(v1,v2) -> variable(v1), variable(v2).");
-        basicEncoding.append("equalityConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).");
+        basicEncoding.append("equalityConstraint(v1,v2) -> variable(v1), variable(v2).\n");
+        basicEncoding.append("equalityConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).\n");
         //inequality constraint
-        basicEncoding.append("inequalityConstraint(v1,v2) -> variable(v1), variable(v2).");
-        basicEncoding.append("inequalityConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).");
+        basicEncoding.append("inequalityConstraint(v1,v2) -> variable(v1), variable(v2).\n");
+        basicEncoding.append("inequalityConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).\n");
         //subtype constraint
-        basicEncoding.append("subtypeConstraint(v1,v2) -> variable(v1), variable(v2).");
-        basicEncoding.append("subtypeConstraintLeftConstant(v1,v2) -> constant(v1), variable(v2).");
-        basicEncoding.append("subtypeConstraintRightConstant(v1,v2) -> variable(v1), constant(v2).");
+        basicEncoding.append("subtypeConstraint(v1,v2) -> variable(v1), variable(v2).\n");
+        basicEncoding.append("subtypeConstraintLeftConstant(v1,v2) -> constant(v1), variable(v2).\n");
+        basicEncoding.append("subtypeConstraintRightConstant(v1,v2) -> variable(v1), constant(v2).\n");
         //comparable constraint
-        basicEncoding.append("comparableConstraint(v1,v2) -> variable(v1), variable(v2).");
-        basicEncoding.append("comparableConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).");
-        
-        for (String s : allTypesInString) {
-            basicEncoding.append(ISANNOTATED + s + "(v) ->variable(v).\n" + MAYBEANNOTATED + s
-                    + "(v) ->variable(v).\n" + CANNOTBEANNOTATED + s + "(v) ->variable(v).\n"
-                    + "AnnotationOf[v] = \"" + s + "\" <-isAnnotated" + s
-                    + "(v).\n");
+        basicEncoding.append("comparableConstraint(v1,v2) -> variable(v1), variable(v2).\n");
+        basicEncoding.append("comparableConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).\n");
+        // each type
+        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+            basicEncoding.append("is" + getSimpleName(annoMirror) + "[v] = i -> variable(v), boolean(i).\n");
         }
+        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+            String simpleName = getSimpleName(annoMirror);
+            basicEncoding.append("AnnotationOf[v] = \"" + simpleName + "\" <- " + "is" + simpleName + "[v] = true.\n");
+        }
+        for (AnnotationMirror rightAnnoMirror : Lattice.allTypes) {
+            for (AnnotationMirror leftAnnoMirror : Lattice.allTypes) {
+                String leftAnnoName = getSimpleName(leftAnnoMirror);
+                String rightAnnoName = getSimpleName(rightAnnoMirror);
+                if (!leftAnnoName.equals(rightAnnoMirror)) {
+                    basicEncoding.append("is" + leftAnnoName + "[v] = false <- is" + rightAnnoName + "[v] = true.\n");
+                }
+                
+            }
+        }
+        return basicEncoding.toString();
     }
 
+    private String getSimpleName(AnnotationMirror annoMirror) {
+        return AnnotationUtils.annotationSimpleName(annoMirror).toString();
+    }
+    
     /**
      * write all encoding generated by this class to file LogiqlEncoding.logic.
      *
