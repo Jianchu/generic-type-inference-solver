@@ -4,9 +4,6 @@ import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
@@ -22,13 +19,7 @@ import constraintsolver.Lattice;
  */
 public class LogiQLPredicateGenerator {
 
-    Map<AnnotationMirror, String> qualifierName = new HashMap<AnnotationMirror, String>();
     private final String path;
-    private final String ISANNOTATED = "isAnnotated";
-    private final String MAYBEANNOTATED = "mayBeAnnotated";
-    private final String CANNOTBEANNOTATED = "cannotBeAnnotated";
-
-    // QualifierHierarchy qualHierarchy;
 
     public LogiQLPredicateGenerator(String path) {
         this.path = path;
@@ -38,22 +29,10 @@ public class LogiQLPredicateGenerator {
     public void GenerateLogiqlEncoding() {
         final String basicEncoding = getBasicEncoding();
         final String equalityEncoding = getEqualityConstraintEncoding();
+        final String inequalityEncoding = getInequalityConstraintEncoding();
         System.out.println(basicEncoding);
         System.out.println(equalityEncoding);
-        // getEncodingForEqualityConModifier(allTypesInString,
-        // encodingForEqualityConModifier);
-        // getEncodingForInequalityConModifier(allTypesInString,
-        // encodingForInequalityConModifier);
-        // getEncodingForEqualityConstraint(allTypesInString,
-        // encodingForEqualityConstraint);
-        // getEncodingForInequalityConstraint(allTypesInString,
-        // encodingForInequalityConstraint);
-        // getEncodingForComparableConstraint(allTypesInString,
-        // encodingForComparableConstraint);
-        // getEncodingForSubtypeConTopBottom(allTypesInString,
-        // encodingForSubtypeConTopBottom);
-        // getEncodingForSubtypeConstraint(allTypesInString,
-        // encodingForSubtypeConstraint);
+        System.out.println(inequalityEncoding);
 
         // writeFile(basicEncoding.append(encodingForEqualityConModifier)
         // .append(encodingForInequalityConModifier)
@@ -62,29 +41,9 @@ public class LogiQLPredicateGenerator {
         // .append(encodingForComparableConstraint)
         // .append(encodingForSubtypeConTopBottom).append(encodingForSubtypeConstraint).toString());
 
-        // System.out.println(basicEncoding);
-        // System.out.println(encodingForEqualityConModifier);
-        // System.out.println(encodingForInequalityConModifier);
-        // System.out.println(encodingForEqualityConstraint);
-        // System.out.println(encodingForInequalityConstraint);
-        // System.out.println(encodingForComparableConstraint);
-        // System.out.println(encodingForSubtypeConTopBottom);
-        // System.out.println(encodingForSubtypeConstraint);
-        // System.out.println(encodingForAdaptationConstraint);
     }
 
-    /**
-     * generate the encoding of EqualityConstraint for the case that both
-     * modifiers of two slots are unknown.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForEqualityConstraint
-     *            is the return value.
-     * @returns encodingForEqualityConstraint, which is the logiql encoding of
-     *          equality constraint for current type system.
-     */
+
     private String getEqualityConstraintEncoding() {
         StringBuilder equalityEncoding = new StringBuilder();
         for (AnnotationMirror annoMirror : Lattice.allTypes) {
@@ -98,24 +57,19 @@ public class LogiQLPredicateGenerator {
         return equalityEncoding.toString();
     }
     
-    /**
-     * generate the encoding of equality constraint for the case that if one
-     * slot's modifier is known.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForEqualityConModifier
-     *            is the return value.
-     * @returns encodingForEqualityConModifier, which is the logiql encoding of
-     *          equality constraint for current type system.
-     */
-    private void getEncodingForEqualityConModifier(Set<String> allTypesInString, StringBuilder encodingForEqualityConModifier) {
-        for (String s : allTypesInString) {
-            encodingForEqualityConModifier.append(ISANNOTATED + s + "(v2) <- equalityConstraintContainsModifier(v1,v2), v1 = \""  + s + "\".\n");
+    private String getInequalityConstraintEncoding() {
+        StringBuilder inequalityEncoding = new StringBuilder();
+        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+            String simpleName = getSimpleName(annoMirror);
+            inequalityEncoding.append("is" + simpleName + "[v2] = false <- inequalityConstraint(v1, v2), is"
+                    + simpleName + "[v1] = true.\n");
+            inequalityEncoding.append("is" + simpleName
+                    + "[v2] = false <- inequalityConstraintContainsConstant(v1, v2), hasconstantName(v1:\""
+                    + simpleName + "\").\n");
         }
+        return inequalityEncoding.toString();
     }
-
+    
     /**
      * generate the encoding of subtype constraint.
      *
@@ -260,71 +214,6 @@ public class LogiQLPredicateGenerator {
     // }
     // encodingForComparableConstraint.append(variableMaybeAnnotated);
     // }
-
-    /**
-     * generate the encoding of inequality constraint for the case that both
-     * modifiers of two slots are unknown.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForInequalityConstraint
-     *            is the return value.
-     * @returns encodingForInequalityConstraint, which is the logiql encoding of
-     *          inequality constraint for current type system.
-     */
-    private void getEncodingForInequalityConstraint(
-            Set<String> allTypesInString,
-            StringBuilder encodingForInequalityConstraint) {
-        StringBuilder variableMaybeAnnotated = new StringBuilder();
-        for (String s : allTypesInString) {
-            encodingForInequalityConstraint.append(CANNOTBEANNOTATED + s
-                    + "(v1) <- inequalityConstraint(v1,v2), " + ISANNOTATED + s
-                    + "(v2).\n");
-            encodingForInequalityConstraint.append(CANNOTBEANNOTATED + s
-                    + "(v2) <- inequalityConstraint(v1,v2), " + ISANNOTATED + s
-                    + "(v1).\n");
-            for (String ss : allTypesInString) {
-                if (s != ss) {
-                    variableMaybeAnnotated.append(MAYBEANNOTATED + ss
-                            + "(v1) <- inequalityConstraint(v1,v2), "
- + ISANNOTATED + s + "(v2), !"
-                            + CANNOTBEANNOTATED
-                            + ss + "(v1).\n");
-                    variableMaybeAnnotated.append(MAYBEANNOTATED + ss
-                            + "(v2) <- inequalityConstraint(v1,v2), "
- + ISANNOTATED + s + "(v1), !"
-                            + CANNOTBEANNOTATED
-                            + ss + "(v2).\n");
-                }
-            }
-        }
-        encodingForInequalityConstraint.append(variableMaybeAnnotated);
-    }
-
-    /**
-     * generate the encoding of inequality constraint for the case that if one
-     * slot's modifier is known.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForInequalityConModifier
-     *            is the return value.
-     * @returns encodingForInequalityConModifier, which is the logiql encoding
-     *          of inequality constraint for current type system.
-     */
-    private void getEncodingForInequalityConModifier(
-            Set<String> allTypesInString,
-            StringBuilder encodingForInequalityConModifier) {
-        for (String s : allTypesInString) {
-            encodingForInequalityConModifier
-.append(CANNOTBEANNOTATED
-                            + s
-                            + "(v1) <- inequalityConstraintContainsModifier(v1,v2), v2 = \""
-                            + s + "\".\n");
-        }
-    }
 
 
 
