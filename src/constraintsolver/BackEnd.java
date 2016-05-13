@@ -31,7 +31,7 @@ public abstract class BackEnd<S, T> {
     protected final Collection<Slot> slots;
     protected final Collection<Constraint> constraints;
     protected final QualifierHierarchy qualHierarchy;
-    protected final ProcessingEnvironment processingEnvironment;
+    private final ProcessingEnvironment processingEnvironment;
     protected final Serializer<S, T> realSerializer;
     protected final Set<Integer> varSlotIds;
 
@@ -62,5 +62,9 @@ public abstract class BackEnd<S, T> {
                 this.varSlotIds.add(((VariableSlot) slot).getId());
             }
         }
+    }
+
+    public ProcessingEnvironment getEnvironment() {
+        return this.processingEnvironment;
     }
 }
