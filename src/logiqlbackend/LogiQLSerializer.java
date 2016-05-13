@@ -33,9 +33,9 @@ public class LogiQLSerializer implements Serializer<String, String> {
             protected String constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 String constantName = NameUtils.getSimpleName(slot1.getValue());
                 int variableId = slot2.getId();
-                String encoding = "+equalityConstraintContainsConstant(c, v), +constant(c), +hasconstantName[c] = \""
+                String logiQLData = "+equalityConstraintContainsConstant(c, v), +constant(c), +hasconstantName[c] = \""
                         + constantName + "\", +variable(v), +hasvariableName[v] = " + variableId + ".\n";
-                return encoding;
+                return logiQLData;
             }
 
             @Override
@@ -47,10 +47,10 @@ public class LogiQLSerializer implements Serializer<String, String> {
             @Override
             protected String variable_variable(VariableSlot slot1, VariableSlot slot2,
                     EqualityConstraint constraint) {
-                String encoding = "+equalityConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
+                String logiQLData = "+equalityConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
                         + slot1.getId() + ", +variable(v2), +hasvariableName[v2] = " + slot2.getId()
                         + ".";
-                return encoding;
+                return logiQLData;
             }
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
@@ -63,8 +63,36 @@ public class LogiQLSerializer implements Serializer<String, String> {
 
     @Override
     public String serialize(InequalityConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+        return new VariableCombos<InequalityConstraint>() {
+
+            @Override
+            protected String constant_variable(ConstantSlot slot1, VariableSlot slot2,
+                    InequalityConstraint constraint) {
+                String constantName = NameUtils.getSimpleName(slot1.getValue());
+                int variableId = slot2.getId();
+                String logiQLData = "+inequalityConstraintContainsConstant(c, v), +constant(c), +hasconstantName[c] = \""
+                        + constantName + "\", +variable(v), +hasvariableName[v] = " + variableId + ".\n";
+                return logiQLData;
+            }
+
+            @Override
+            protected String variable_constant(VariableSlot slot1, ConstantSlot slot2,
+                    InequalityConstraint constraint) {
+                return constant_variable(slot2, slot1, constraint);
+            }
+
+            @Override
+            protected String variable_variable(VariableSlot slot1, VariableSlot slot2,
+                    InequalityConstraint constraint) {
+                String logiQLData = "+inequalityConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
+                        + slot1.getId()
+                        + ", +variable(v2), +hasvariableName[v2] = "
+                        + slot2.getId()
+                        + ".";
+                return logiQLData;
+            }
+
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
     @Override
