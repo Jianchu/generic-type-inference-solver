@@ -35,7 +35,6 @@ public class ConstraintSolver implements InferenceSolver {
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
-
         configure(configuration);
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType);
         realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
@@ -50,7 +49,8 @@ public class ConstraintSolver implements InferenceSolver {
             // TODO: warning
             // ErrorReporter.errorAbort("not found back end.");
         } else {
-            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("Logiql") || backEndName.equals("General")) {
+            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.LogiQL")
+                    || backEndName.equals("General")) {
                 this.backEndType = backEndName;
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");
