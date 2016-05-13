@@ -22,29 +22,22 @@ import constraintsolver.Lattice;
 public class LogiQLPredicateGenerator {
 
     private final String path;
+    private final StringBuilder allEncodings = new StringBuilder();
 
     public LogiQLPredicateGenerator(String path) {
         this.path = path;
     }
 
     public void GenerateLogiqlEncoding() {
-        final String basicEncoding = getBasicEncoding();
-        final String equalityEncoding = getEqualityConstraintEncoding();
-        final String inequalityEncoding = getInequalityConstraintEncoding();
-        final String subTypeEncoding = getSubTypeConstraintEncoding();
-        final String comparableEncoding = getComparableConstraintEncoding();
-        System.out.println(basicEncoding);
-        System.out.println(equalityEncoding);
-        System.out.println(inequalityEncoding);
-        System.out.println(subTypeEncoding);
-        System.out.println(comparableEncoding);
+        allEncodings.append(getBasicEncoding());
+        allEncodings.append(getEqualityConstraintEncoding());
+        allEncodings.append(getInequalityConstraintEncoding());
+        allEncodings.append(getSubTypeConstraintEncoding());
+        allEncodings.append(getComparableConstraintEncoding());
 
-        // writeFile(basicEncoding.append(encodingForEqualityConModifier)
-        // .append(encodingForInequalityConModifier)
-        // .append(encodingForEqualityConstraint)
-        // .append(encodingForInequalityConstraint)
-        // .append(encodingForComparableConstraint)
-        // .append(encodingForSubtypeConTopBottom).append(encodingForSubtypeConstraint).toString());
+        System.out.println(allEncodings.toString());
+
+        writeFile(allEncodings.toString());
 
     }
 
