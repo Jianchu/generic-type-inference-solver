@@ -51,6 +51,10 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         addVariables();
         addConstants();
         writeLogiQLData(logiqldataPath);
+        writeDeleteData(logiqldataPath);
+        LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath);
+        runLogicBlox.runLogicBlox();
+
         // System.out.println(logiQLText.toString());
 
         return null;
@@ -87,6 +91,19 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
             PrintWriter pw = new PrintWriter(f);
             pw.write(logiQLText.toString());
             pw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeDeleteData(String path) {
+        try {
+            String writeDeletePath = path + "/deleteData.logic";
+            String deleteContent = "-variable(v) <- variable@prev(v).";
+            File df = new File(writeDeletePath);
+            PrintWriter dpw = new PrintWriter(df);
+            dpw.write(deleteContent);
+            dpw.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
