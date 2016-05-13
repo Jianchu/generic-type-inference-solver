@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
-import util.InferredResultPrinter;
+import util.PrintUtils;
 import util.NameUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
@@ -58,7 +58,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         runLogicBlox.runLogicBlox();
         DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath);
         result = DecodeTool.decodeResult();
-        InferredResultPrinter.printResult(result);
+        PrintUtils.printResult(result);
 
         return new DefaultInferenceSolution(result);
     }

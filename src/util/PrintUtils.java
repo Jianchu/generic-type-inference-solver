@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 
-public class InferredResultPrinter {
+public class PrintUtils {
 
     /**
      * print result from sat solver for testing.
