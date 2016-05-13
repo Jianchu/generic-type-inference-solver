@@ -5,11 +5,13 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
+import util.InferredResultPrinter;
 import util.NameUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
@@ -39,6 +41,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     @Override
     public InferenceSolution solve() {
         String logiqldataPath = logiqldata.getAbsolutePath();
+        Map<Integer, AnnotationMirror> result = new HashMap<>();
         /**
          * creating a instance of LogiqlConstraintGenerator and running
          * GenerateLogiqlEncoding method, in order to generate the logiql fixed
@@ -51,12 +54,14 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         addVariables();
         addConstants();
         writeLogiQLData(logiqldataPath);
+        // System.out.println(logiQLText.toString());
         // delete and create new workspace in local machine for testing.
         // writeDeleteData(logiqldataPath);
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath);
         runLogicBlox.runLogicBlox();
-
-        // System.out.println(logiQLText.toString());
+        DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath);
+        result = DecodeTool.decodeResult();
+        InferredResultPrinter.printResult(result);
 
         return null;
     }
