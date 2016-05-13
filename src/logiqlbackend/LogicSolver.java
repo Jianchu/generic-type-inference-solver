@@ -48,14 +48,6 @@ public class LogicSolver implements InferenceSolver {
         LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(path);
             constraintGenerator.GenerateLogiqlEncoding();
 
-        /**
-         * creating a instance of dataGenerator and running GenerateLogiqlData
-         * method, in order to generate the logiql encoding for current input
-         * program.
-         */
-        LogiqlDataGenerator dataGenerator = new LogiqlDataGenerator(slots,
-                constraints, path);
-        dataGenerator.generateLogiqlData();
 
         /**
          * creating a instance of LogicBloxRunner and running runLogicBlox

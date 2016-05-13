@@ -51,7 +51,8 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         addVariables();
         addConstants();
         writeLogiQLData(logiqldataPath);
-        writeDeleteData(logiqldataPath);
+        // delete and create new workspace in local machine for testing.
+        // writeDeleteData(logiqldataPath);
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath);
         runLogicBlox.runLogicBlox();
 
