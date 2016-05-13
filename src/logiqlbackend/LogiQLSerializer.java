@@ -37,8 +37,11 @@ public class LogiQLSerializer implements Serializer<String, String> {
             protected String variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
                 String supertypeName = NameUtils.getSimpleName(supertype.getValue());
                 int subtypeId = subtype.getId();
-                String logiQLData = "+subtypeConstraintRightConstant(c, v), +constant(c), +hasconstantName[c] = \""
-                        + supertypeName + "\", +variable(v), +hasvariableName[v] = " + subtypeId + ".\n";
+                String logiQLData = "+subtypeConstraintRightConstant(v, c), +variable(v), +hasvariableName[v] = "
+                        + subtypeId
+                        + ", +constant(c), +hasconstantName[c] = \""
+                        + supertypeName
+                        + "\" .\n";
                 return logiQLData;
             }
 
