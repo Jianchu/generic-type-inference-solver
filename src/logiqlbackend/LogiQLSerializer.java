@@ -21,8 +21,36 @@ public class LogiQLSerializer implements Serializer<String, String> {
 
     @Override
     public String serialize(SubtypeConstraint constraint) {
-        // TODO Auto-generated method stub
-        return null;
+
+        return new VariableCombos<SubtypeConstraint>() {
+            
+            @Override
+            protected String constant_variable(ConstantSlot subtype, VariableSlot supertype, SubtypeConstraint constraint) {
+                String subtypeName = NameUtils.getSimpleName(subtype.getValue());
+                int supertypeId = supertype.getId();
+                String logiQLData = "+subtypeConstraintLeftConstant(c, v), +constant(c), +hasconstantName[c] = \""
+                        + subtypeName + "\", +variable(v), +hasvariableName[v] = " + supertypeId + ".\n";
+                return logiQLData;
+            }
+
+            @Override
+            protected String variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
+                String supertypeName = NameUtils.getSimpleName(supertype.getValue());
+                int subtypeId = subtype.getId();
+                String logiQLData = "+subtypeConstraintRightConstant(c, v), +constant(c), +hasconstantName[c] = \""
+                        + supertypeName + "\", +variable(v), +hasvariableName[v] = " + subtypeId + ".\n";
+                return logiQLData;
+            }
+
+            @Override
+            protected String variable_variable(VariableSlot subtype,  VariableSlot supertype, SubtypeConstraint constraint) {
+                String logiQLData = "+subtypeConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
+                        + subtype.getId() + ", +variable(v2), +hasvariableName[v2] = "
+                        + supertype.getId() + ".";
+                return logiQLData;
+            }
+
+        }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
 
     @Override
@@ -52,6 +80,7 @@ public class LogiQLSerializer implements Serializer<String, String> {
                         + ".";
                 return logiQLData;
             }
+
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
