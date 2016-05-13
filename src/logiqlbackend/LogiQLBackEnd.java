@@ -3,9 +3,8 @@ package logiqlbackend;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -24,7 +23,7 @@ import constraintsolver.Lattice;
 public class LogiQLBackEnd extends BackEnd<String, String> {
 
     private final SlotManager slotManager;
-    private final List<String> logiQLText = new ArrayList<String>();
+    private final StringBuilder logiQLText = new StringBuilder();
     private final File logiqldata = new File(new File("").getAbsolutePath() + "/logiqldata");
 
     public LogiQLBackEnd(Map<String, String> configuration, Collection<Slot> slots,
@@ -53,9 +52,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         addConstants();
 
         System.out.println("logiQLText: ");
-        for (String s : logiQLText) {
-            System.out.println(s);
-        }
+        System.out.println(logiQLText.toString());
 
         return null;
     }
@@ -66,7 +63,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
             collectVarSlots(constraint);
             String serializedConstrant = constraint.serialize(realSerializer);
             if (serializedConstrant != null) {
-                logiQLText.add(serializedConstrant);
+                logiQLText.append(serializedConstrant);
             }
         }
     }
@@ -74,13 +71,25 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     private void addConstants() {
         for (AnnotationMirror annoMirror : Lattice.allTypes) {
             String constant = NameUtils.getSimpleName(annoMirror);
-            logiQLText.add(0, "+constant(c), +hasconstantName[c] = \"" + constant + "\".");
+            logiQLText.insert(0, "+constant(c), +hasconstantName[c] = \"" + constant + "\".\n");
         }
     }
 
     private void addVariables() {
         for (Integer variable : varSlotIds) {
-            logiQLText.add(0, "+variable(v), +hasvariableName[v] = " + variable + ".");
+            logiQLText.insert(0, "+variable(v), +hasvariableName[v] = " + variable + ".\n");
+        }
+    }
+
+    private void writeLogiQLData(String path) {
+        try {
+            String writePath = path + "/data.logic";
+            File f = new File(writePath);
+            PrintWriter pw = new PrintWriter(f);
+            pw.write(logiQLText.toString());
+            pw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

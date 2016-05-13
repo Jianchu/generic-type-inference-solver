@@ -49,7 +49,7 @@ public class LogiQLSerializer implements Serializer<String, String> {
             protected String variable_variable(VariableSlot subtype,  VariableSlot supertype, SubtypeConstraint constraint) {
                 String logiQLData = "+subtypeConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
                         + subtype.getId() + ", +variable(v2), +hasvariableName[v2] = "
-                        + supertype.getId() + ".";
+                        + supertype.getId() + ".\n";
                 return logiQLData;
             }
 
@@ -80,7 +80,7 @@ public class LogiQLSerializer implements Serializer<String, String> {
                     EqualityConstraint constraint) {
                 String logiQLData = "+equalityConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
                         + slot1.getId() + ", +variable(v2), +hasvariableName[v2] = " + slot2.getId()
-                        + ".";
+                        + ".\n";
                 return logiQLData;
             }
 
@@ -120,7 +120,7 @@ public class LogiQLSerializer implements Serializer<String, String> {
                         + slot1.getId()
                         + ", +variable(v2), +hasvariableName[v2] = "
                         + slot2.getId()
-                        + ".";
+                        + ".\n";
                 return logiQLData;
             }
 
@@ -184,7 +184,7 @@ public class LogiQLSerializer implements Serializer<String, String> {
                         + slot1.getId()
                         + ", +variable(v2), +hasvariableName[v2] = "
                         + slot2.getId()
-                        + ".";
+                        + ".\n";
                 return logiQLData;
             }
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
