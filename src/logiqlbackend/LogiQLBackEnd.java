@@ -13,9 +13,8 @@ import javax.lang.model.element.AnnotationMirror;
 
 import util.InferredResultPrinter;
 import util.NameUtils;
-import checkers.inference.InferenceMain;
+import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
-import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
@@ -24,7 +23,6 @@ import constraintsolver.Lattice;
 
 public class LogiQLBackEnd extends BackEnd<String, String> {
 
-    private final SlotManager slotManager;
     private final StringBuilder logiQLText = new StringBuilder();
     private final File logiqldata = new File(new File("").getAbsolutePath() + "/logiqldata");
 
@@ -32,7 +30,6 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<String, String> realSerializer) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
-        this.slotManager = InferenceMain.getInstance().getSlotManager();
         Lattice.configure(qualHierarchy);
         logiqldata.mkdir();
 
@@ -63,7 +60,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         result = DecodeTool.decodeResult();
         InferredResultPrinter.printResult(result);
 
-        return null;
+        return new DefaultInferenceSolution(result);
     }
 
     @Override
