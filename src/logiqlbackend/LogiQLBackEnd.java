@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 
+import util.NameUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
@@ -47,7 +49,14 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         constraintGenerator.GenerateLogiqlEncoding();
 
         this.convertAll();
-        // LogiqlConstraintGenerator l = new LogiqlConstraintGenerator();
+        addVariables();
+        addConstants();
+
+        System.out.println("logiQLText: ");
+        for (String s : logiQLText) {
+            System.out.println(s);
+        }
+
         return null;
     }
 
@@ -55,7 +64,23 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     public void convertAll() {
         for (Constraint constraint : constraints) {
             collectVarSlots(constraint);
-            logiQLText.add(constraint.serialize(realSerializer));
+            String serializedConstrant = constraint.serialize(realSerializer);
+            if (serializedConstrant != null) {
+                logiQLText.add(serializedConstrant);
+            }
+        }
+    }
+
+    private void addConstants() {
+        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+            String constant = NameUtils.getSimpleName(annoMirror);
+            logiQLText.add(0, "+constant(c), +hasconstantName[c] = \"" + constant + "\".");
+        }
+    }
+
+    private void addVariables() {
+        for (Integer variable : varSlotIds) {
+            logiQLText.add(0, "+variable(v), +hasvariableName[v] = " + variable + ".");
         }
     }
 }
