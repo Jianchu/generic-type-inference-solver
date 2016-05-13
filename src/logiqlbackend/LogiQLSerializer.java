@@ -127,8 +127,35 @@ public class LogiQLSerializer implements Serializer<String, String> {
 
     @Override
     public String serialize(ComparableConstraint comparableConstraint) {
-        // TODO Auto-generated method stub
-        return null;
+        ComparableConstraint constraint = comparableConstraint;
+        return new VariableCombos<ComparableConstraint>() {
+
+            @Override
+            protected String constant_variable(ConstantSlot slot1, VariableSlot slot2,
+                    ComparableConstraint constraint) {
+                String constantName = NameUtils.getSimpleName(slot1.getValue());
+                int variableId = slot2.getId();
+                String logiQLData = "+equalityConstraintContainsConstant(c, v), +constant(c), +hasconstantName[c] = \""
+                        + constantName + "\", +variable(v), +hasvariableName[v] = " + variableId + ".\n";
+                return logiQLData;
+            }
+
+            @Override
+            protected String variable_constant(VariableSlot slot1, ConstantSlot slot2,
+                    ComparableConstraint constraint) {
+                return constant_variable(slot2, slot1, constraint);
+            }
+
+            @Override
+            protected String variable_variable(VariableSlot slot1, VariableSlot slot2, ComparableConstraint constraint) {
+                String logiQLData = "+comparableConstraint(v1, v2), +variable(v1), +hasvariableName[v1] = "
+                        + slot1.getId()
+                        + ", +variable(v2), +hasvariableName[v2] = "
+                        + slot2.getId()
+                        + ".";
+                return logiQLData;
+            }
+        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
     @Override
