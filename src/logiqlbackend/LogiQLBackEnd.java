@@ -50,9 +50,8 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         this.convertAll();
         addVariables();
         addConstants();
-
-        System.out.println("logiQLText: ");
-        System.out.println(logiQLText.toString());
+        writeLogiQLData(logiqldataPath);
+        // System.out.println(logiQLText.toString());
 
         return null;
     }
