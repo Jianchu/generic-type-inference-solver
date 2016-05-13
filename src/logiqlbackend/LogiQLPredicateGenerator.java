@@ -154,7 +154,7 @@ public class LogiQLPredicateGenerator {
             for (AnnotationMirror leftAnnoMirror : Lattice.allTypes) {
                 String leftAnnoName = NameUtils.getSimpleName(leftAnnoMirror);
                 String rightAnnoName = NameUtils.getSimpleName(rightAnnoMirror);
-                if (!leftAnnoName.equals(rightAnnoMirror)) {
+                if (!leftAnnoName.equals(rightAnnoName)) {
                     basicEncoding.append("is" + leftAnnoName + "[v] = false <- is" + rightAnnoName + "[v] = true.\n");
                 }
                 
