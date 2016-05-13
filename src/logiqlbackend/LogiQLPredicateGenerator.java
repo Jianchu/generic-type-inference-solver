@@ -4,6 +4,8 @@ import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 
@@ -25,14 +27,17 @@ public class LogiQLPredicateGenerator {
         this.path = path;
     }
 
-
     public void GenerateLogiqlEncoding() {
         final String basicEncoding = getBasicEncoding();
         final String equalityEncoding = getEqualityConstraintEncoding();
         final String inequalityEncoding = getInequalityConstraintEncoding();
+        final String subTypeEncoding = getSubTypeConstraintEncoding();
+        final String comparableEncoding = getComparableConstraintEncoding();
         System.out.println(basicEncoding);
         System.out.println(equalityEncoding);
         System.out.println(inequalityEncoding);
+        System.out.println(subTypeEncoding);
+        System.out.println(comparableEncoding);
 
         // writeFile(basicEncoding.append(encodingForEqualityConModifier)
         // .append(encodingForInequalityConModifier)
@@ -70,164 +75,54 @@ public class LogiQLPredicateGenerator {
         return inequalityEncoding.toString();
     }
     
-    /**
-     * generate the encoding of subtype constraint.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForSubtypeConstraint
-     *            is the return value.
-     * @returns encodingForSubtypeConstraint, which is the logiql encoding of
-     *          subtype constraint for current type system.
-     */
-    // private void getEncodingForSubtypeConstraint(Set<String>
-    // allTypesInString, StringBuilder encodingForSubtypeConstraint) {
-    // String[] subtypeFors;
-    // String[] supertypeFors;
-    // for (String subkey : allTypesInString) {
-    // subtypeFors = subtype.get(subkey).split(" ");
-    // supertypeFors = supertype.get(subkey).split(" ");
-    // for (int i = 1; i < subtypeFors.length; i++) {
-    // if (!subtypeFors[i].equals(subkey)
-    // && !subtypeFors[i].equals(" ")) {
-    // encodingForSubtypeConstraint.append(CANNOTBEANNOTATED + subkey
-    // + "(v1) <- subtypeConstraint(v1,v2), " + ISANNOTATED + subtypeFors[i]
-    // + "(v2).\n");
-    // }
-    // if (!subtypeFors[i].equals(" ")
-    // && !(subkey.equals(top) && subtypeFors[i].equals(top))) {
-    // encodingForSubtypeConstraint.append(MAYBEANNOTATED + subkey
-    // + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED + subtypeFors[i]
-    // + "(v1), " + "!" + CANNOTBEANNOTATED + subkey + "(v2).\n");
-    // }
-    // }
-    //
-    // for (int j = 1; j < supertypeFors.length; j++) {
-    // if (!supertypeFors[j].equals(subkey)
-    // && !supertypeFors[j].equals(" ")) {
-    // encodingForSubtypeConstraint.append(CANNOTBEANNOTATED
-    // + subkey
-    // + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED + supertypeFors[j]
-    // + "(v1).\n");
-    // }
-    // if (!supertypeFors[j].equals(" ")
-    // && !(subkey.equals(bottom) && supertypeFors[j]
-    // .equals(bottom))) {
-    // encodingForSubtypeConstraint.append(MAYBEANNOTATED + subkey
-    // + "(v1) <- subtypeConstraint(v1,v2), "
-    // + ISANNOTATED + supertypeFors[j]
-    // + "(v2), " + "!" + CANNOTBEANNOTATED + subkey + "(v1).\n");
-    // }
-    //
-    // }
-    // }
-    // }
-
-    /**
-     * Generate the encoding for a special case of subtype constraint: if the
-     * modifier A is subtype of modifier in Bottom or the modifier is the
-     * supertype of modifier in top.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForSubtypeConTopBottom
-     *            is the return value.
-     * @returns encodingForSubtypeConTopBottom, which is the logiql encoding of
-     *          subtype constraint for current type system.
-     */
-    // private void getEncodingForSubtypeConTopBottom(
-    // Set<String> allTypesInString,
-    // StringBuilder encodingForSubtypeConTopBottom) {
-    // String[] subtypeFors;
-    // for (String subkey : subtype.keySet()) {
-    // subtypeFors = subtype.get(subkey).split(" ");
-    // if (subtypeFors.length == allTypesInString.size() + 1) {
-    // encodingForSubtypeConTopBottom.append(ISANNOTATED + subkey
-    // + "(v2) <- subtypeConstraint(v1,v2), " + ISANNOTATED
-    // + subkey + "(v1).\n");
-    // }
-    // }
-    // for (String superkey : supertype.keySet()) {
-    // subtypeFors = supertype.get(superkey).split(" ");
-    // if (subtypeFors.length == allTypesInString.size() + 1) {
-    // encodingForSubtypeConTopBottom.append(ISANNOTATED + superkey
-    // + "(v1) <- subtypeConstraint(v1,v2), " + ISANNOTATED
-    // + superkey + "(v2).\n");
-    // }
-    // }
-    // }
-
-    /**
-     * Generate the encoding of comparable constraint.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param encodingForComparableConstraint
-     *            is the return value.
-     * @returns encodingForComparableConstraint, which is the logiql encoding of
-     *          comparable constraint for current type system.
-     */
-    // private void getEncodingForComparableConstraint(
-    // Set<String> allTypesInString,
-    // StringBuilder encodingForComparableConstraint) {
-    // StringBuilder variableMaybeAnnotated = new StringBuilder();
-    // if (notComparable.isEmpty() != true) {
-    // String[] notComparableForkey;
-    // for (String key : notComparable.keySet()) {
-    // notComparableForkey = notComparable.get(key).split(" ");
-    // for (String s : notComparableForkey) {
-    // if (!s.equals("")) {
-    // encodingForComparableConstraint
-    // .append(CANNOTBEANNOTATED
-    // + key
-    // + "(v1)<- comparableConstraint(v1,v2), "
-    // + ISANNOTATED + s + "(v2).\n");
-    // encodingForComparableConstraint
-    // .append(CANNOTBEANNOTATED
-    // + key
-    // + "(v2)<- comparableConstraint(v1,v2), "
-    // + ISANNOTATED + s + "(v1).\n");
-    // for (String ss : allTypesInString) {
-    // if (!ss.equals(s)) {
-    // variableMaybeAnnotated
-    // .append(MAYBEANNOTATED
-    // + ss
-    // + "(v1) <- comparableConstraint(v1,v2), "
-    // + ISANNOTATED + key
-    // + "(v2), !" + CANNOTBEANNOTATED + ss
-    // + "(v1).\n");
-    // variableMaybeAnnotated
-    // .append(MAYBEANNOTATED
-    // + ss
-    // + "(v2) <- comparableConstraint(v1,v2), "
-    // + ISANNOTATED + key
-    // + "(v1), !" + CANNOTBEANNOTATED + ss
-    // + "(v2).\n");
-    // }
-    // }
-    // }
-    // }
-    // }
-    // }
-    // encodingForComparableConstraint.append(variableMaybeAnnotated);
-    // }
-
-
-
-    /**
-     * generate the basic predicate of encoding.
-     *
-     * @param allTypesInString
-     *            is a set contains all modifiers of current type system in
-     *            string.
-     * @param basicEncoding
-     *            is the return value.
-     * 
-     * @returns basicEncoding.
-     */
+    private String getSubTypeConstraintEncoding() {
+        StringBuilder subtypeEncoding = new StringBuilder();
+        String topTypeStr = getSimpleName(Lattice.top);
+        String bottomTypeStr = getSimpleName(Lattice.bottom);
+        subtypeEncoding.append("is" + topTypeStr + "[v2] = true <- subtypeConstraint(v1, v2), is" + topTypeStr + "[v1] = true.\n");
+        subtypeEncoding.append("is" + topTypeStr+ "[v2] = true <- subtypeConstraintLeftConstant(v1, v2), hasconstantName(v1:\"" + topTypeStr + "\").\n");
+        subtypeEncoding.append("is" + bottomTypeStr + "[v1] = true <- subtypeConstraint(v1, v2), is" + bottomTypeStr + "[v2] = true.\n");
+        subtypeEncoding.append("is" + bottomTypeStr+ "[v1] = true <- subtypeConstraintRightConstant(v1, v2), hasconstantName(v2:\"" + bottomTypeStr + "\").\n\n");
+        
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.subType.entrySet()) {
+            String superTypeName = getSimpleName(entry.getKey());
+            for (AnnotationMirror subType : entry.getValue()) {
+                String subTypeName = getSimpleName(subType);
+                if (!superTypeName.equals(subTypeName)) {
+                    subtypeEncoding.append("is" + subTypeName + "[v2] = false <- subtypeConstraint(v1, v2), is" + superTypeName + "[v1] = true.\n");
+                    subtypeEncoding.append("is" + subTypeName + "[v2] = false <- subtypeConstraintLeftConstant(v1, v2), hasconstantName(v1:\"" + superTypeName + "\").\n");
+                }
+            }
+        }
+        subtypeEncoding.append("\n");
+        // duplicate code for easy understanding
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.superType.entrySet()) {
+            String subTypeName = getSimpleName(entry.getKey());
+            for (AnnotationMirror superType : entry.getValue()) {
+                String superTypeName = getSimpleName(superType);
+                if (!superTypeName.equals(subTypeName)) {
+                    subtypeEncoding.append("is" + superTypeName + "[v1] = false <- subtypeConstraintRightConstant(v1, v2), hasconstantName(v2:\"" + subTypeName + "\").\n");
+                }
+            }
+        }
+        subtypeEncoding.append("\n");
+        return subtypeEncoding.toString();
+    }
+    
+    private String getComparableConstraintEncoding() {
+        StringBuilder ComparableEncoding = new StringBuilder();
+        // duplicate code for easy understanding
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.incomparableType.entrySet()) {
+            String incompType1Name = getSimpleName(entry.getKey());
+            for (AnnotationMirror incomparableType2 : entry.getValue()) {
+                String incompType2Name = getSimpleName(incomparableType2);
+                ComparableEncoding.append("is" + incompType2Name + "[v1] = false <- subtypeConstraintRightConstant(v1, v2), hasconstantName(v2:\"" + incompType1Name + "\").\n");
+            }
+        }
+        
+        return ComparableEncoding.toString();
+    }
+    
     private String getBasicEncoding() {
         StringBuilder basicEncoding = new StringBuilder();
         basicEncoding.append("variable(v), hasvariableName(v:i) -> int(i).\n");
@@ -286,7 +181,7 @@ public class LogiQLPredicateGenerator {
      */
     private void writeFile(String output) {
         try {
-            String writePath = path + "/LogiqlEncoding.logic";
+            String writePath = path + "/logiqlEncoding.logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(writePath);
             pw.write(output);
