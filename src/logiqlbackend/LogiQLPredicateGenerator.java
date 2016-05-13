@@ -35,7 +35,7 @@ public class LogiQLPredicateGenerator {
         allEncodings.append(getSubTypeConstraintEncoding());
         allEncodings.append(getComparableConstraintEncoding());
 
-        System.out.println(allEncodings.toString());
+        // System.out.println(allEncodings.toString());
 
         writeFile(allEncodings.toString());
 
