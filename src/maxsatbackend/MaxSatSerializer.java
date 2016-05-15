@@ -1,5 +1,7 @@
 package maxsatbackend;
 
+import org.checkerframework.javacutil.ErrorReporter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -108,6 +110,16 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 VecInt[] result = resultList.toArray(new VecInt[resultList.size()]);
                 return result;
             }
+            
+            @Override
+            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, SubtypeConstraint constraint) {
+                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                    ErrorReporter.errorAbort("Confliction in subtype constraint: " + slot1.getValue()
+                            + " is not subtype of " + slot2.getValue());
+                }
+
+                return defaultAction(slot1, slot2, constraint);
+            }
 
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
@@ -192,6 +204,16 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
                 return result;
             }
+            
+            @Override
+            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
+                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                    ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
+                            + " is not equal to " + slot2.getValue());
+                }
+
+                return defaultAction(slot1, slot2, constraint);
+            }
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
@@ -225,6 +247,16 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 }
                 return result;
             }
+            
+            @Override
+            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, InequalityConstraint constraint) {
+                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                    ErrorReporter.errorAbort("Confliction in inequality constraint: " + slot1.getValue()
+                            + " is equal to " + slot2.getValue());
+                }
+
+                return defaultAction(slot1, slot2, constraint);
+            }
 
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
@@ -252,6 +284,17 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 VecInt[] result = list.toArray(new VecInt[list.size()]);
                 return result;
             }
+            
+            @Override
+            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, ComparableConstraint constraint) {
+                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                    ErrorReporter.errorAbort("Confliction in comparable constraint: " + slot1.getValue()
+                            + " is not comparable to " + slot2.getValue());
+                }
+
+                return defaultAction(slot1, slot2, constraint);
+            }
+
         }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
     }
 
