@@ -24,7 +24,7 @@ public class GraphBuilder {
         this.graph = new ConstraintGraph();
     }
 
-    public void buildGraph() {
+    public ConstraintGraph buildGraph() {
         for (Constraint constraint : constraints) {
             ArrayList<Slot> slots = new ArrayList<Slot>();
             slots.addAll(constraint.getSlots());
@@ -32,10 +32,7 @@ public class GraphBuilder {
         }
         addConstant();
         calculateIndependentPath();
-        for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
-            System.out.println(entry.getKey().getSlot());
-            System.out.println(entry.getValue());
-        }
+        return getGraph();
         // printEdges();
     }
     
@@ -100,11 +97,16 @@ public class GraphBuilder {
     }
     
     private void printEdges() {
-        // for (Edge edge : graph.getEdges()) {
-        // System.out.println(edge.getVertex1().getSlot());
-        // System.out.println(edge.getVertex2().getSlot());
-        // System.out.println(edge.getConstraint());
-        // }
+        for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
+            System.out.println(entry.getKey().getSlot());
+            System.out.println(entry.getValue());
+        }
+
+        for (Edge edge : graph.getEdges()) {
+            System.out.println(edge.getVertex1().getSlot());
+            System.out.println(edge.getVertex2().getSlot());
+            System.out.println(edge.getConstraint());
+        }
 
         for (Vertex vertex : graph.getVerticies()) {
             System.out.println(vertex.getSlot());
