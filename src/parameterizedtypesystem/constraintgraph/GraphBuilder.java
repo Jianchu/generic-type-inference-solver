@@ -32,11 +32,29 @@ public class GraphBuilder {
             Slot next = slots.get(i);
             Vertex vertex1 = new Vertex(first);
             Vertex vertex2 = new Vertex(next);
+            for (Vertex vertex : this.graph.getVerticies()) {
+                if (vertex1.equals(vertex)) {
+                    vertex1 = vertex;
+                } else if (vertex2.equals(vertex)) {
+                    vertex2 = vertex;
+                }
+            }
             Edge edge = new Edge(vertex1, vertex2, constraint);
             this.graph.addEdge(edge);
             addEdges(slots, constraint);
         }
     }
     
+    private ConstraintGraph getGraph() {
+        return this.graph;
+    }
     
+    private void printEdges() {
+        for (Edge edge : graph.getEdges()) {
+            System.out.println(edge.getVertex1().getSlot());
+            System.out.println(edge.getVertex2().getSlot());
+            System.out.println(edge.getConstraint());
+        }
+    }
+
 }
