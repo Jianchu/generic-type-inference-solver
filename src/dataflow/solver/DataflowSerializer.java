@@ -2,7 +2,6 @@ package dataflow.solver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,23 +53,13 @@ public class DataflowSerializer extends CnfVecIntSerializer {
     @Override
     public List<VecInt> convertAll(Iterable<Constraint> constraints,
             List<VecInt> results) {
-        List<Constraint> constraintsNoBaseCase = new ArrayList<Constraint>();
         for (Constraint constraint : constraints) {
-            if (checkConstraintType(constraint)) {
-                for (VecInt res : constraint.serialize(this)) {
-                    if (res.size() != 0) {
-                        results.add(res);
-                    }
+            for (VecInt res : constraint.serialize(this)) {
+                if (res.size() != 0) {
+                    results.add(res);
                 }
-                // constraints.iterator().remove();
-            } else {
-                constraintsNoBaseCase.add(constraint);
             }
-
-            // System.out.println("This constraint: ****" +
-            // constraint.toString());
         }
-        iterateNormalCases(constraintsNoBaseCase, results);
         return results;
     }
 

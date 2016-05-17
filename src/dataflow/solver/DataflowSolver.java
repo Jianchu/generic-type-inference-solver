@@ -19,6 +19,9 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.util.Elements;
 
+import parameterizedtypesystem.constraintgraph.ConstraintGraph;
+import parameterizedtypesystem.constraintgraph.GraphBuilder;
+import parameterizedtypesystem.constraintgraph.Vertex;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
@@ -39,14 +42,22 @@ public class DataflowSolver implements InferenceSolver {
 
         Elements elements = processingEnvironment.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
 
         Collection<String> datatypesUsed = getDatatypesUsed(slots);
         List<DatatypeSolver> dataflowSolvers = new ArrayList<>();
 
         // Configure datatype solvers
-        for (String datatype : datatypesUsed) {
-            DatatypeSolver solver = new DatatypeSolver(datatype, constraints, getSerializer(datatype));
-            dataflowSolvers.add(solver);
+        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
+            AnnotationMirror anno = entry.getKey().getValue();
+            if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
+                String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
+                if (dataflowValues.length == 1) {
+                    DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(), getSerializer(dataflowValues[0]));
+                    dataflowSolvers.add(solver);
+                }
+            }
         }
 
         // List<DatatypeSolution> solutions = new ArrayList<>();
