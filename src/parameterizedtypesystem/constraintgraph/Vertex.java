@@ -53,6 +53,10 @@ public class Vertex {
         return this.edges;
     }
 
+    public AnnotationMirror getValue() {
+        return this.value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof Vertex) {
