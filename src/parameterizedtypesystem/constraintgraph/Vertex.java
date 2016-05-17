@@ -16,11 +16,8 @@ public class Vertex {
     private int id;
     private AnnotationMirror value;
 
-    public Vertex() {
-        this.edges = new ArrayList<Edge>();
-    }
-
     public Vertex(Slot slot) {
+        this.edges = new ArrayList<Edge>();
         this.slot = slot;
         if (slot instanceof VariableSlot) {
             VariableSlot vs = (VariableSlot) slot;
@@ -50,6 +47,10 @@ public class Vertex {
 
     public int getId() {
         return this.id;
+    }
+
+    public List<Edge> getEdges() {
+        return this.edges;
     }
 
     @Override

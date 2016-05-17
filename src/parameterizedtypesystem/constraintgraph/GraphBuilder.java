@@ -3,6 +3,7 @@ package parameterizedtypesystem.constraintgraph;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
 
@@ -24,12 +25,16 @@ public class GraphBuilder {
             slots.addAll(constraint.getSlots());
             addEdges(slots, constraint);
         }
+        printEdges();
     }
     
     private void addEdges(ArrayList<Slot> slots, Constraint constraint) {
         Slot first = slots.remove(0);
         for (int i = 0; i < slots.size(); i++) {
             Slot next = slots.get(i);
+            if (first instanceof ConstantSlot && next instanceof ConstantSlot) {
+                continue;
+            }
             Vertex vertex1 = new Vertex(first);
             Vertex vertex2 = new Vertex(next);
             for (Vertex vertex : this.graph.getVerticies()) {
@@ -50,10 +55,15 @@ public class GraphBuilder {
     }
     
     private void printEdges() {
-        for (Edge edge : graph.getEdges()) {
-            System.out.println(edge.getVertex1().getSlot());
-            System.out.println(edge.getVertex2().getSlot());
-            System.out.println(edge.getConstraint());
+        // for (Edge edge : graph.getEdges()) {
+        // System.out.println(edge.getVertex1().getSlot());
+        // System.out.println(edge.getVertex2().getSlot());
+        // System.out.println(edge.getConstraint());
+        // }
+
+        for (Vertex vertex : graph.getVerticies()) {
+            System.out.println(vertex.getSlot());
+            System.out.println(vertex.getEdges());
         }
     }
 

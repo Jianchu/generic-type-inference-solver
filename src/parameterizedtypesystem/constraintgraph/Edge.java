@@ -12,6 +12,12 @@ public class Edge {
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;
         this.constraint = constraint;
+        attachEdge();
+    }
+
+    private void attachEdge() {
+        vertex1.addEdge(this);
+        vertex2.addEdge(this);
     }
 
     public Vertex getVertex1() {
