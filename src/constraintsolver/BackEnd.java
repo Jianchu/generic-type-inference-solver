@@ -64,6 +64,14 @@ public abstract class BackEnd<S, T> {
         }
     }
 
+    public Collection<Slot> getSlots() {
+        return this.slots;
+    }
+
+    public Collection<Constraint> getConstraints() {
+        return this.constraints;
+    }
+
     public ProcessingEnvironment getEnvironment() {
         return this.processingEnvironment;
     }
