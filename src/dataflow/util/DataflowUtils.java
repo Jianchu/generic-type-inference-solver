@@ -35,11 +35,22 @@ public class DataflowUtils {
         return getDataflowValue(type, "typeNames");
     }
 
+    public static String[] getTypeNameRoots(AnnotationMirror type) {
+        return getDataflowValue(type, "typeNameRoots");
+    }
+
     public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes, ProcessingEnvironment processingEnv) {
-        AnnotationBuilder builder =
-            new AnnotationBuilder(processingEnv, DataFlow.class);
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
 
         return createDataflowAnnotation(datatypes,builder);
+    }
+
+    public static AnnotationMirror createDataflowAnnotationWithRoots(Set<String> datatypes,
+            Set<String> datatypesRoots,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+
+        return createDataflowAnnotationWithRoots(datatypes, datatypesRoots, builder);
     }
 
     private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
@@ -67,6 +78,26 @@ public class DataflowUtils {
             datatypesInArray[i] = datatype.toString();
             i++;
         }
+        builder.setValue("typeNames", datatypesInArray);
+        return builder.build();
+    }
+
+    private static AnnotationMirror createDataflowAnnotationWithRoots(final Set<String> datatypes,
+            final Set<String> datatypesRoots, final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[datatypes.size()];
+        int i = 0;
+        for (String datatype : datatypes) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+
+        String[] datatypesRootInArray = new String[datatypesRoots.size()];
+        int j = 0;
+        for (String datatypesRoot : datatypesRoots) {
+            datatypesRootInArray[j] = datatypesRoot.toString();
+            j++;
+        }
+        builder.setValue("typeNameRoots", datatypesRootInArray);
         builder.setValue("typeNames", datatypesInArray);
         return builder.build();
     }
