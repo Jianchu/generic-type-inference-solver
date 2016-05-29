@@ -40,7 +40,7 @@ public class DataflowSerializer extends CnfVecIntSerializer {
         if (AnnotationUtils.areSameByClass(anno, DataFlowTop.class)) {
             return true;
         }
-        String[] datatypes = DataflowUtils.getDataflowValue(anno);
+        String[] datatypes = DataflowUtils.getTypeNames(anno);
         return Arrays.asList(datatypes).contains(datatype);
     }
 

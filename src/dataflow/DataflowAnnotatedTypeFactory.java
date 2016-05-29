@@ -11,6 +11,7 @@ import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
+import org.checkerframework.javacutil.ElementUtils;
 import org.checkerframework.javacutil.TreeUtils;
 
 import java.util.Arrays;
@@ -21,15 +22,17 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferrableAnnotatedTypeFactory;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
+
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.PrimitiveTypeTree;
+
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
@@ -159,5 +162,24 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             type.replaceAnnotation(dataFlowType);
             return super.visitLiteral(node, type);
         }
+
+        @Override
+        public Void visitMethodInvocation(MethodInvocationTree node, AnnotatedTypeMirror type) {
+            ExecutableElement methodElement = TreeUtils.elementFromUse(node);
+            boolean isFromStubFile = atypeFactory.isFromStubFile(methodElement);
+            boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement)
+                    && atypeFactory.declarationFromElement(methodElement) == null && !isFromStubFile;
+            if (isBytecode) {
+                AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(node,
+                        type, processingEnv);
+                type.replaceAnnotation(dataFlowType);
+            }
+            return super.visitMethodInvocation(node, type);
+        }
+    }
+
+    public AnnotatedTypeMirror refineDataflow(AnnotatedTypeMirror type) {
+
+        return null;
     }
 }

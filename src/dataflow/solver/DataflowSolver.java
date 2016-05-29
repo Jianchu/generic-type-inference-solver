@@ -52,7 +52,7 @@ public class DataflowSolver implements InferenceSolver {
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
             if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-                String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
+                String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                 if (dataflowValues.length == 1) {
                     DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(), getSerializer(dataflowValues[0]));
                     dataflowSolvers.add(solver);
@@ -106,7 +106,7 @@ public class DataflowSolver implements InferenceSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-                    String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
+                    String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                     for (String dataflowValue : dataflowValues) {
                         types.add(dataflowValue);
                     }

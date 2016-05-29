@@ -12,14 +12,15 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
 
 import dataflow.qual.DataFlow;
 
 public class DataflowUtils {
 
-    public static String[] getDataflowValue(AnnotationMirror type) {
-        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,"typeNames", String.class, true);
+    public static String[] getDataflowValue(AnnotationMirror type, String valueName) {
+        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,valueName, String.class, true);
         //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
         String[] allTypesInArray = new String[allTypesList.size()];
         int i = 0;
@@ -30,6 +31,10 @@ public class DataflowUtils {
         return allTypesInArray;
     }
 
+    public static String[] getTypeNames(AnnotationMirror type) {
+        return getDataflowValue(type, "typeNames");
+    }
+
     public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes, ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder =
             new AnnotationBuilder(processingEnv, DataFlow.class);
@@ -38,14 +43,15 @@ public class DataflowUtils {
     }
 
     private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
-        AnnotationBuilder builder =
-            new AnnotationBuilder(processingEnv, DataFlow.class);
-        // System.out.println("ddddddddddddddddddddddddddddddddddddddddddddd"
-        // + Arrays.toString(dataType));
-        // if (Arrays.toString(dataType) != null) {
-        // builder.setValue("typeNames", dataType);
-        // }
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
         builder.setValue("typeNames", dataType);
+        return builder.build();
+    }
+
+    private static AnnotationMirror createDataflowAnnotationForByte(String[] dataType,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+        builder.setValue("typeNameRoots", dataType);
         return builder.build();
     }
 
@@ -72,6 +78,14 @@ public class DataflowUtils {
         String className = tm.toString();
         AnnotationMirror dataFlowType = createDataflowAnnotation(
                 convert(className), processingEnv);
+        return dataFlowType;
+    }
+
+    public static AnnotationMirror genereateDataflowAnnoFromByteCode(MethodInvocationTree node,
+            AnnotatedTypeMirror type, ProcessingEnvironment processingEnv) {
+        TypeMirror tm = type.getUnderlyingType();
+        String className = tm.toString();
+        AnnotationMirror dataFlowType = createDataflowAnnotationForByte(convert(className), processingEnv);
         return dataFlowType;
     }
 
