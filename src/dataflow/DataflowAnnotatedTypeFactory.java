@@ -218,7 +218,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         return DataflowUtils.createDataflowAnnotationWithRoots(refinedtypeNames, refinedRoots, processingEnv);
     }
 
-    public boolean isComparable(AnnotatedDeclaredType decType, List<String> rootsList) {
+    private boolean isComparable(AnnotatedDeclaredType decType, List<String> rootsList) {
         TypeHierarchy typeHierarchy = this.getTypeHierarchy();
         for (int i = 1; i < rootsList.size(); i++) {
             AnnotatedDeclaredType comparedDecType = this.fromElement(elements.getTypeElement(rootsList.get(i)));
@@ -233,7 +233,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         return false;
     }
     
-    public boolean shouldPresent(AnnotatedDeclaredType decType, Set<String> refinedRoots) {
+    private boolean shouldPresent(AnnotatedDeclaredType decType, Set<String> refinedRoots) {
         TypeHierarchy typeHierarchy = this.getTypeHierarchy();
         for (String refinedRoot : refinedRoots) {
             AnnotatedDeclaredType comparedDecType = this.fromElement(elements.getTypeElement(refinedRoot));
