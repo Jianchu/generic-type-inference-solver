@@ -33,7 +33,6 @@ import checkers.inference.VariableAnnotator;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.PrimitiveTypeTree;
 
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
@@ -98,24 +97,23 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         }
 
         private boolean isSubtypeWithRoots(AnnotationMirror rhs, AnnotationMirror lhs) {
-            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
-            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
-            Set<String> rRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils
-                    .getTypeNameRoots(rhs)));
-            Set<String> lRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils
-                    .getTypeNameRoots(lhs)));
 
+            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNames(rhs)));
+            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNames(lhs)));
+            Set<String> rRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNameRoots(rhs)));
+            Set<String> lRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNameRoots(lhs)));
             Set<String> combinedTypeNames = new HashSet<String>();
             combinedTypeNames.addAll(rTypeNamesSet);
             combinedTypeNames.addAll(lTypeNamesSet);
-
             Set<String> combinedRoots = new HashSet<String>();
             combinedRoots.addAll(rRootsSet);
             combinedRoots.addAll(lRootsSet);
+
             AnnotationMirror combinedAnno = DataflowUtils.createDataflowAnnotationWithRoots(
                     combinedTypeNames, combinedRoots, processingEnv);
             AnnotationMirror refinedCombinedAnno = refineDataflow(combinedAnno);
             AnnotationMirror refinedLhs = refineDataflow(lhs);
+
             if (AnnotationUtils.areSame(refinedCombinedAnno, refinedLhs)) {
                 return true;
             } else {
@@ -124,8 +122,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         }
 
         private boolean isSubtypeWithoutRoots(AnnotationMirror rhs, AnnotationMirror lhs) {
-            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
-            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
+            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNames(rhs)));
+            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(DataflowUtils.getTypeNames(lhs)));
 
             if (lTypeNamesSet.containsAll(rTypeNamesSet)) {
                 return true;
@@ -138,9 +136,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         public boolean isSubtype(AnnotationMirror rhs, AnnotationMirror lhs) {
             if (AnnotationUtils.areSameIgnoringValues(rhs, DATAFLOW)
                     && AnnotationUtils.areSameIgnoringValues(lhs, DATAFLOW)) {
-
-                Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
-                Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
                 return isSubtypeWithRoots(rhs, lhs);
                 // return isSubtypeWithoutRoots(rhs, lhs);
             } else {
@@ -152,20 +147,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                 }
                 return super.isSubtype(rhs, lhs);
             }
-        }
-
-        private String[] getDataflowValue(AnnotationMirror type) {
-            @SuppressWarnings("unchecked")
-            List<String> allTypesList = ((List<String>) AnnotationUtils.getElementValuesWithDefaults(type).get(dataflowValue).getValue());
-            //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
-            String[] allTypesInArray = new String[allTypesList.size()];
-            int i = 0;
-            for (Object o : allTypesList) {
-                allTypesInArray[i] = o.toString();
-                i++;
-                //System.out.println(o.toString());
-            }
-            return allTypesInArray;
         }
     }
 
@@ -182,17 +163,10 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         }
 
         @Override
-        public Void visitPrimitiveType(PrimitiveTypeTree node, AnnotatedTypeMirror type) {
-            String primitiveTypeName = node.getPrimitiveTypeKind().toString();
-            AnnotationMirror dataFlowType = createDataflowAnnotation(convert(primitiveTypeName));
-            type.replaceAnnotation(dataFlowType);
-            return super.visitPrimitiveType(node, type);
-        }
-
-        @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
             AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(node, type, processingEnv);
             type.replaceAnnotation(dataFlowType);
+
             return super.visitLiteral(node, type);
         }
 
@@ -247,6 +221,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                 }
             }
         }
+
         return DataflowUtils.createDataflowAnnotationWithRoots(refinedtypeNames, refinedRoots, processingEnv);
     }
 
