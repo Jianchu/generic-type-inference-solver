@@ -173,16 +173,12 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         @Override
         public Void visitMethodInvocation(MethodInvocationTree node, AnnotatedTypeMirror type) {
             ExecutableElement methodElement = TreeUtils.elementFromUse(node);
-            boolean isFromStubFile = atypeFactory.isFromStubFile(methodElement);
             boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement);
-                   // && atypeFactory.declarationFromElement(methodElement) == null && !isFromStubFile;
-
             if (isBytecode) {
                 AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(node,
                         type, processingEnv);
                 type.replaceAnnotation(dataFlowType);
             }
-
             return super.visitMethodInvocation(node, type);
         }
     }
@@ -196,7 +192,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         } else if (typeNameRoots.length == 1) {
             refinedRoots.add(typeNameRoots[0]);
         } else {
-            // System.out.println(typeNameRoots[0] + typeNameRoots[1]);
             List<String> rootsList = new ArrayList<String>(Arrays.asList(typeNameRoots));
             while (rootsList.size() != 0) {
                 TypeMirror decType = elements.getTypeElement(rootsList.get(0)).asType();
