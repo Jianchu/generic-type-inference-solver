@@ -3,9 +3,7 @@ package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
-import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.framework.type.TypeHierarchy;
 import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
@@ -24,6 +22,7 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.TypeMirror;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferrableAnnotatedTypeFactory;
@@ -98,21 +97,52 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             super(f, bottom);
         }
 
+        private boolean isSubtypeWithRoots(AnnotationMirror rhs, AnnotationMirror lhs) {
+            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
+            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
+            Set<String> rRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils
+                    .getTypeNameRoots(rhs)));
+            Set<String> lRootsSet = new HashSet<String>(Arrays.asList(DataflowUtils
+                    .getTypeNameRoots(lhs)));
+
+            Set<String> combinedTypeNames = new HashSet<String>();
+            combinedTypeNames.addAll(rTypeNamesSet);
+            combinedTypeNames.addAll(lTypeNamesSet);
+
+            Set<String> combinedRoots = new HashSet<String>();
+            combinedRoots.addAll(rRootsSet);
+            combinedRoots.addAll(lRootsSet);
+            AnnotationMirror combinedAnno = DataflowUtils.createDataflowAnnotationWithRoots(
+                    combinedTypeNames, combinedRoots, processingEnv);
+            AnnotationMirror refinedCombinedAnno = refineDataflow(combinedAnno);
+            AnnotationMirror refinedLhs = refineDataflow(lhs);
+            if (AnnotationUtils.areSame(refinedCombinedAnno, refinedLhs)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private boolean isSubtypeWithoutRoots(AnnotationMirror rhs, AnnotationMirror lhs) {
+            Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
+            Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
+
+            if (lTypeNamesSet.containsAll(rTypeNamesSet)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         @Override
         public boolean isSubtype(AnnotationMirror rhs, AnnotationMirror lhs) {
-//           System.out.println("left hand side:"+lhs);
-//           System.out.println("right hand side:"+rhs);
             if (AnnotationUtils.areSameIgnoringValues(rhs, DATAFLOW)
                     && AnnotationUtils.areSameIgnoringValues(lhs, DATAFLOW)) {
-                String[] rhsValue = getDataflowValue(rhs);
-                String[] lhsValue = getDataflowValue(lhs);
-                Set<String> rSet = new HashSet<String>(Arrays.asList(rhsValue));
-                Set<String> lSet = new HashSet<String>(Arrays.asList(lhsValue));
-                if (lSet.containsAll(rSet)) {
-                    return true;
-                } else {
-                    return false;
-                }
+
+                Set<String> rTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(rhs)));
+                Set<String> lTypeNamesSet = new HashSet<String>(Arrays.asList(getDataflowValue(lhs)));
+                return isSubtypeWithRoots(rhs, lhs);
+                // return isSubtypeWithoutRoots(rhs, lhs);
             } else {
                 //if (rhs != null && lhs != null)
                 if (AnnotationUtils.areSameIgnoringValues(rhs, DATAFLOW)) {
@@ -170,19 +200,20 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         public Void visitMethodInvocation(MethodInvocationTree node, AnnotatedTypeMirror type) {
             ExecutableElement methodElement = TreeUtils.elementFromUse(node);
             boolean isFromStubFile = atypeFactory.isFromStubFile(methodElement);
-            boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement)
-                    && atypeFactory.declarationFromElement(methodElement) == null && !isFromStubFile;
+            boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement);
+                   // && atypeFactory.declarationFromElement(methodElement) == null && !isFromStubFile;
+
             if (isBytecode) {
                 AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(node,
                         type, processingEnv);
                 type.replaceAnnotation(dataFlowType);
             }
+
             return super.visitMethodInvocation(node, type);
         }
     }
 
     public AnnotationMirror refineDataflow(AnnotationMirror type) {
-        
         String[] typeNameRoots = DataflowUtils.getTypeNameRoots(type);
         Set<String> refinedRoots = new HashSet<String>();
 
@@ -191,9 +222,10 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         } else if (typeNameRoots.length == 1) {
             refinedRoots.add(typeNameRoots[0]);
         } else {
+            // System.out.println(typeNameRoots[0] + typeNameRoots[1]);
             List<String> rootsList = new ArrayList<String>(Arrays.asList(typeNameRoots));
             while (rootsList.size() != 0) {
-                AnnotatedDeclaredType decType = this.fromElement(elements.getTypeElement(rootsList.get(0)));
+                TypeMirror decType = elements.getTypeElement(rootsList.get(0)).asType();
                 if (!isComparable(decType, rootsList)) {
                     refinedRoots.add(rootsList.get(0));
                     rootsList.remove(0);
@@ -209,7 +241,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             return DataflowUtils.createDataflowAnnotation(refinedtypeNames, processingEnv);
         } else {
             for (String typeName : typeNames) {
-                AnnotatedDeclaredType decType = this.fromElement(elements.getTypeElement(typeName));
+                TypeMirror decType = elements.getTypeElement(typeName).asType();
                 if (shouldPresent(decType, refinedRoots)) {
                     refinedtypeNames.add(typeName);
                 }
@@ -218,28 +250,27 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         return DataflowUtils.createDataflowAnnotationWithRoots(refinedtypeNames, refinedRoots, processingEnv);
     }
 
-    private boolean isComparable(AnnotatedDeclaredType decType, List<String> rootsList) {
-        TypeHierarchy typeHierarchy = this.getTypeHierarchy();
+    private boolean isComparable(TypeMirror decType, List<String> rootsList) {
         for (int i = 1; i < rootsList.size(); i++) {
-            AnnotatedDeclaredType comparedDecType = this.fromElement(elements.getTypeElement(rootsList.get(i)));
-            if (typeHierarchy.isSubtype(comparedDecType, decType)) {
+            TypeMirror comparedDecType = elements.getTypeElement(rootsList.get(i)).asType();
+            if (this.types.isSubtype(comparedDecType, decType)) {
                 rootsList.remove(i);
                 return true;
-            } else if (typeHierarchy.isSubtype(decType, comparedDecType)) {
+            } else if (this.types.isSubtype(decType, comparedDecType)) {
                 rootsList.remove(0);
                 return true;
             }
         }
+
         return false;
     }
     
-    private boolean shouldPresent(AnnotatedDeclaredType decType, Set<String> refinedRoots) {
-        TypeHierarchy typeHierarchy = this.getTypeHierarchy();
+    private boolean shouldPresent(TypeMirror decType, Set<String> refinedRoots) {
         for (String refinedRoot : refinedRoots) {
-            AnnotatedDeclaredType comparedDecType = this.fromElement(elements.getTypeElement(refinedRoot));
-            if (typeHierarchy.isSubtype(decType, comparedDecType)) {
+            TypeMirror comparedDecType = elements.getTypeElement(refinedRoot).asType();
+            if (this.types.isSubtype(decType, comparedDecType)) {
                 return false;
-            } else if (typeHierarchy.isSubtype(comparedDecType, decType)) {
+            } else if (this.types.isSubtype(comparedDecType, decType)) {
                 return true;
             }
         }
