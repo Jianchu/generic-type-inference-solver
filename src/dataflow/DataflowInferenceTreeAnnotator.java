@@ -44,7 +44,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
     @Override
     public Void visitLiteral(final LiteralTree literalTree, final AnnotatedTypeMirror atm) {
-        AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(literalTree, atm, this.realTypeFactory.getProcessingEnv());
+        AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(literalTree, this.realTypeFactory.getProcessingEnv());
         variableAnnotator.createConstant(anno, literalTree);
         variableAnnotator.visit(atm, literalTree);
         return null;

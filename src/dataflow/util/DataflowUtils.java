@@ -120,10 +120,15 @@ public class DataflowUtils {
         return dataFlowType;
     }
 
+    public static AnnotationMirror generateDataflowAnnoFromLiteral(AnnotatedTypeMirror type, ProcessingEnvironment processingEnv) {
+        String datatypeInArray[] = convert(type.getUnderlyingType().toString());
+        // System.out.println(type);
+        AnnotationMirror dataFlowType = createDataflowAnnotation(datatypeInArray, processingEnv);
+        return dataFlowType;
+    }
+    
     // TODO :doc
-    public static AnnotationMirror generateDataflowAnnoFromLiteral(
-            LiteralTree node, AnnotatedTypeMirror type,
-            ProcessingEnvironment processingEnv) {
+    public static AnnotationMirror generateDataflowAnnoFromLiteral(LiteralTree node, ProcessingEnvironment processingEnv) {
         String datatypeInArray[] = { "" };
         // String datatypeInArray[] = null;
         switch (node.getKind()) {

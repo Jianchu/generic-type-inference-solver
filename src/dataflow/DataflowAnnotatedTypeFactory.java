@@ -3,6 +3,7 @@ package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
+import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedPrimitiveType;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
@@ -164,7 +165,14 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
-            AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(node, type, processingEnv);
+            AnnotatedTypeMirror annoType = type;
+
+            if (type instanceof AnnotatedPrimitiveType) {
+                AnnotatedPrimitiveType priType = (AnnotatedPrimitiveType) type;
+                annoType = atypeFactory.getBoxedType(priType);
+            }
+            AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(annoType,
+                    processingEnv);
             type.replaceAnnotation(dataFlowType);
 
             return super.visitLiteral(node, type);
