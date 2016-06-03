@@ -66,7 +66,7 @@ public class DataflowUtils {
         return builder.build();
     }
 
-    private static String[] convert(String... typeName) {
+    public static String[] convert(String... typeName) {
         return typeName;
     }
 

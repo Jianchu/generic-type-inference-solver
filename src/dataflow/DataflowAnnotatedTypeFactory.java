@@ -51,7 +51,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     public DataflowAnnotatedTypeFactory(BaseTypeChecker checker) {
         super(checker);
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
-        DATAFLOWBOTTOM = createDataflowAnnotation(convert(""));
+        DATAFLOWBOTTOM = createDataflowAnnotation(DataflowUtils.convert(""));
         DATAFLOWTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
         postInit();
     }
@@ -84,10 +84,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             new AnnotationBuilder(processingEnv, DataFlow.class);
         builder.setValue("typeNames", dataType);
         return builder.build();
-    }
-
-    private String[] convert(String... typeName) {
-        return typeName;
     }
 
     private final class DataFlowQualifierHierarchy extends GraphQualifierHierarchy {
