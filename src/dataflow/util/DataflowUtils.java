@@ -12,14 +12,12 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.NewClassTree;
 
 import dataflow.qual.DataFlow;
 
 public class DataflowUtils {
 
-    public static String[] getDataflowValue(AnnotationMirror type, String valueName) {
+    private static String[] getDataflowValue(AnnotationMirror type, String valueName) {
         List<String> allTypesList = AnnotationUtils.getElementValueArray(type,valueName, String.class, true);
         //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
         String[] allTypesInArray = new String[allTypesList.size()];
@@ -103,8 +101,7 @@ public class DataflowUtils {
         return builder.build();
     }
 
-    public static AnnotationMirror genereateDataflowAnnoFromNewClass(
-            NewClassTree node, AnnotatedTypeMirror type,
+    public static AnnotationMirror genereateDataflowAnnoFromNewClass(AnnotatedTypeMirror type,
             ProcessingEnvironment processingEnv) {
         TypeMirror tm = type.getUnderlyingType();
         String className = tm.toString();
@@ -113,8 +110,8 @@ public class DataflowUtils {
         return dataFlowType;
     }
 
-    public static AnnotationMirror genereateDataflowAnnoFromByteCode(MethodInvocationTree node,
-            AnnotatedTypeMirror type, ProcessingEnvironment processingEnv) {
+    public static AnnotationMirror genereateDataflowAnnoFromByteCode(AnnotatedTypeMirror type,
+            ProcessingEnvironment processingEnv) {
         TypeMirror tm = type.getUnderlyingType();
         String className = tm.toString();
         AnnotationMirror dataFlowType = createDataflowAnnotationForByte(convert(className), processingEnv);
@@ -123,7 +120,6 @@ public class DataflowUtils {
 
     public static AnnotationMirror generateDataflowAnnoFromLiteral(AnnotatedTypeMirror type, ProcessingEnvironment processingEnv) {
         String datatypeInArray[] = convert(type.getUnderlyingType().toString());
-        // System.out.println(type);
         AnnotationMirror dataFlowType = createDataflowAnnotation(datatypeInArray, processingEnv);
         return dataFlowType;
     }

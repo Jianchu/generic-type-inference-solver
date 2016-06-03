@@ -146,7 +146,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
-            AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(node, type, processingEnv);
+            AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(type,
+                    processingEnv);
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
         }
@@ -171,8 +172,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             ExecutableElement methodElement = TreeUtils.elementFromUse(node);
             boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement);
             if (isBytecode) {
-                AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(node,
-                        type, processingEnv);
+                AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(type,
+                        processingEnv);
                 type.replaceAnnotation(dataFlowType);
             }
             return super.visitMethodInvocation(node, type);
