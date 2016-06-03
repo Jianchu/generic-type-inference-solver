@@ -53,7 +53,8 @@ public class DataflowUtils {
         return createDataflowAnnotationWithRoots(datatypes, datatypesRoots, builder);
     }
 
-    private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
+    public static AnnotationMirror createDataflowAnnotation(String[] dataType,
+            ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
         builder.setValue("typeNames", dataType);
         return builder.build();

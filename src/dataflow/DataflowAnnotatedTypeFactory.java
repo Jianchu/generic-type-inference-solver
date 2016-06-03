@@ -8,7 +8,6 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
-import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
@@ -51,7 +50,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     public DataflowAnnotatedTypeFactory(BaseTypeChecker checker) {
         super(checker);
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
-        DATAFLOWBOTTOM = createDataflowAnnotation(DataflowUtils.convert(""));
+        DATAFLOWBOTTOM = DataflowUtils.createDataflowAnnotation(DataflowUtils.convert(""), processingEnv);
         DATAFLOWTOP = AnnotationUtils.fromClass(elements, DataFlowTop.class);
         postInit();
     }
@@ -77,13 +76,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
         return new DataFlowQualifierHierarchy(factory, DATAFLOWBOTTOM);
-    }
-
-    private AnnotationMirror createDataflowAnnotation(String[] dataType) {
-        AnnotationBuilder builder =
-            new AnnotationBuilder(processingEnv, DataFlow.class);
-        builder.setValue("typeNames", dataType);
-        return builder.build();
     }
 
     private final class DataFlowQualifierHierarchy extends GraphQualifierHierarchy {
