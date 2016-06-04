@@ -3,7 +3,6 @@ package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
-import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedPrimitiveType;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
@@ -155,11 +154,10 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
             AnnotatedTypeMirror annoType = type;
-
-            if (type instanceof AnnotatedPrimitiveType) {
-                AnnotatedPrimitiveType priType = (AnnotatedPrimitiveType) type;
-                annoType = atypeFactory.getBoxedType(priType);
-            }
+            // if (type instanceof AnnotatedPrimitiveType) {
+            // AnnotatedPrimitiveType priType = (AnnotatedPrimitiveType) type;
+            // annoType = atypeFactory.getBoxedType(priType);
+            // }
             AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(annoType,
                     processingEnv);
             type.replaceAnnotation(dataFlowType);
@@ -191,7 +189,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         } else {
             List<String> rootsList = new ArrayList<String>(Arrays.asList(typeNameRoots));
             while (rootsList.size() != 0) {
-                TypeMirror decType = elements.getTypeElement(rootsList.get(0)).asType();
+                TypeMirror decType = elements.getTypeElement(convertToReferenceType(rootsList.get(0)))
+                        .asType();
                 if (!isComparable(decType, rootsList)) {
                     refinedRoots.add(rootsList.get(0));
                     rootsList.remove(0);
@@ -207,7 +206,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             return DataflowUtils.createDataflowAnnotation(refinedtypeNames, processingEnv);
         } else {
             for (String typeName : typeNames) {
-                TypeMirror decType = elements.getTypeElement(typeName).asType();
+                TypeMirror decType = elements.getTypeElement(convertToReferenceType(typeName)).asType();
                 if (shouldPresent(decType, refinedRoots)) {
                     refinedtypeNames.add(typeName);
                 }
@@ -219,7 +218,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
     private boolean isComparable(TypeMirror decType, List<String> rootsList) {
         for (int i = 1; i < rootsList.size(); i++) {
-            TypeMirror comparedDecType = elements.getTypeElement(rootsList.get(i)).asType();
+            TypeMirror comparedDecType = elements.getTypeElement(
+                    convertToReferenceType(rootsList.get(i))).asType();
             if (this.types.isSubtype(comparedDecType, decType)) {
                 rootsList.remove(i);
                 return true;
@@ -234,7 +234,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     
     private boolean shouldPresent(TypeMirror decType, Set<String> refinedRoots) {
         for (String refinedRoot : refinedRoots) {
-            TypeMirror comparedDecType = elements.getTypeElement(refinedRoot).asType();
+            TypeMirror comparedDecType = elements.getTypeElement(convertToReferenceType(refinedRoot))
+                    .asType();
             if (this.types.isSubtype(decType, comparedDecType)) {
                 return false;
             } else if (this.types.isSubtype(comparedDecType, decType)) {
@@ -242,5 +243,26 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             }
         }
         return true;
+    }
+
+    private String convertToReferenceType(String typeName) {
+        switch (typeName) {
+        case "int":
+            return "java.lang.Integer";
+        case "short":
+            return "java.lang.Short";
+        case "byte":
+            return "java.lang.Byte";
+        case "long":
+            return "java.lang.Long";
+        case "char":
+            return "java.lang.Character";
+        case "float":
+            return "java.lang.Float";
+        case "double":
+            return "java.lang.Double";
+        default:
+            return typeName;
+        }
     }
 }
