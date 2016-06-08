@@ -275,4 +275,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             return typeName;
         }
     }
+
+    public Map<String, TypeMirror> getTypeNameMap() {
+        return this.typeNamesMap;
+    }
 }

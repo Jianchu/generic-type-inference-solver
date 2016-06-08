@@ -12,6 +12,7 @@ import javax.lang.model.element.AnnotationMirror;
 
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
+import dataflow.DataflowAnnotatedTypeFactory;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSolution implements InferenceSolution {
@@ -19,15 +20,17 @@ public class DataflowSolution implements InferenceSolution {
     private final Map<Integer, Set<String>> typeRootResults;
     private final Map<Integer, Boolean> idToExistance;
     private final Map<Integer, AnnotationMirror> annotationResults;
+    private final DataflowAnnotatedTypeFactory realTypeFactory;
 
     public DataflowSolution(Collection<DatatypeSolution> solutions, ProcessingEnvironment processingEnv) {
         this.typeNameResults = new HashMap<>();
         this.typeRootResults = new HashMap<>();
         this.idToExistance = new HashMap<>();
         this.annotationResults = new HashMap<>();
-
+        this.realTypeFactory = (DataflowAnnotatedTypeFactory)InferenceMain.getInstance().getRealTypeFactory();
         merge(solutions);
         createAnnotations(processingEnv);
+        simplifyAnnotation();
 
         System.out.println("FINAL RESULT FROM DATAFLOWSOVLER: " + annotationResults.toString());
     }
@@ -95,6 +98,12 @@ public class DataflowSolution implements InferenceSolution {
 
     }
 
+    private void simplifyAnnotation() {
+        for (Map.Entry<Integer, AnnotationMirror> entry : annotationResults.entrySet()) {
+            AnnotationMirror refinedDataflow = this.realTypeFactory.refineDataflow(entry.getValue());
+            entry.setValue(refinedDataflow);
+        }
+    }
 
     private void mergeIdToExistance(DatatypeSolution solution) {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {
