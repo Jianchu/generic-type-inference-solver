@@ -23,7 +23,6 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
@@ -151,9 +150,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
             AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(type,
                     processingEnv);
-            String typeName = type.getUnderlyingType().toString();
-            TypeElement comparedDecType = elements.getTypeElement(typeName);
-            System.out.println(comparedDecType);
+            TypeMirror tm = type.getUnderlyingType();
+            typeNamesMap.put(tm.toString(), tm);
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
         }
@@ -196,8 +194,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         } else {
             List<String> rootsList = new ArrayList<String>(Arrays.asList(typeNameRoots));
             while (rootsList.size() != 0) {
-                TypeMirror decType = elements.getTypeElement(convertToReferenceType(rootsList.get(0)))
-                        .asType();
+                TypeMirror decType = getTypeMirror(rootsList.get(0));
                 if (!isComparable(decType, rootsList)) {
                     refinedRoots.add(rootsList.get(0));
                     rootsList.remove(0);
@@ -213,7 +210,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             return DataflowUtils.createDataflowAnnotation(refinedtypeNames, processingEnv);
         } else {
             for (String typeName : typeNames) {
-                TypeMirror decType = elements.getTypeElement(convertToReferenceType(typeName)).asType();
+                TypeMirror decType = getTypeMirror(typeName);
                 if (shouldPresent(decType, refinedRoots)) {
                     refinedtypeNames.add(typeName);
                 }
@@ -225,8 +222,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
     private boolean isComparable(TypeMirror decType, List<String> rootsList) {
         for (int i = 1; i < rootsList.size(); i++) {
-            TypeMirror comparedDecType = elements.getTypeElement(
-                    convertToReferenceType(rootsList.get(i))).asType();
+            TypeMirror comparedDecType = getTypeMirror(rootsList.get(i));
             if (this.types.isSubtype(comparedDecType, decType)) {
                 rootsList.remove(i);
                 return true;
@@ -241,8 +237,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     
     private boolean shouldPresent(TypeMirror decType, Set<String> refinedRoots) {
         for (String refinedRoot : refinedRoots) {
-            TypeMirror comparedDecType = elements.getTypeElement(convertToReferenceType(refinedRoot))
-                    .asType();
+            TypeMirror comparedDecType = getTypeMirror(refinedRoot);
             if (this.types.isSubtype(decType, comparedDecType)) {
                 return false;
             } else if (this.types.isSubtype(comparedDecType, decType)) {
@@ -250,6 +245,14 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             }
         }
         return true;
+    }
+
+    private TypeMirror getTypeMirror(String typeName) {
+        if (this.typeNamesMap.keySet().contains(typeName)) {
+            return this.typeNamesMap.get(typeName);
+        } else {
+            return elements.getTypeElement(convertToReferenceType(typeName)).asType();
+        }
     }
 
     private String convertToReferenceType(String typeName) {
