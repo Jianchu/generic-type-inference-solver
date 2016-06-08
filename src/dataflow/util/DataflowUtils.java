@@ -59,11 +59,31 @@ public class DataflowUtils {
         return builder.build();
     }
 
+    private static AnnotationMirror createDataflowAnnotationWithoutName(final Set<String> roots,
+            final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[roots.size()];
+        int i = 0;
+        for (String datatype : roots) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+        builder.setValue("typeNameRoots", datatypesInArray);
+        return builder.build();
+    }
+
     public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes,
             ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
 
         return createDataflowAnnotation(datatypes, builder);
+    }
+
+    public static AnnotationMirror createDataflowAnnotationWithoutName(Set<String> roots,
+            ProcessingEnvironment processingEnv) {
+
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+        return createDataflowAnnotationWithoutName(roots, builder);
+
     }
 
     public static AnnotationMirror createDataflowAnnotation(String[] dataType,

@@ -87,7 +87,8 @@ DataflowUtils.getTypeNames(logic.getLattice().top)[0],
                         }*/
                     }
                 }
-                Datatypesolutions.add(new DatatypeSolution(result, fileEntry.getName().toString()));
+                Datatypesolutions
+                        .add(new DatatypeSolution(result, fileEntry.getName().toString(), false));
             }
         }
         return Datatypesolutions;

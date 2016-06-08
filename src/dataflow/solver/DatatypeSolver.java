@@ -86,12 +86,10 @@ public class DatatypeSolver {
 
             if (hasSolution) {
 
-                //**** Remove exatential vars from solution
+                // **** Remove exatential vars from solution
                 final Map<Integer, Integer> existentialToPotentialIds = serializer.getExistentialToPotentialVar();
                 int[] solution = solver.model();
                 for (Integer var : solution) {
-                    // System.out.println("This slot's value: " +
-                    // var.intValue());
                     boolean varIsTrue = var > 0;
                     //Need postive var
                     var = Math.abs(var);
@@ -110,7 +108,7 @@ public class DatatypeSolver {
                     }
                 }
                 // System.out.println("*******************************");
-                return new DatatypeSolution(result, datatype);
+                return new DatatypeSolution(result, datatype, this.serializer.isRoot());
             }
 
         } catch (Throwable th) {

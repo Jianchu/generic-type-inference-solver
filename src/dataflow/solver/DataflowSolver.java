@@ -51,10 +51,15 @@ public class DataflowSolver implements InferenceSolver {
         // Configure datatype solvers
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
+            System.out.println(anno);
             if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
                 String[] dataflowValues = DataflowUtils.getTypeNames(anno);
+                String[] dataflowRoots = DataflowUtils.getTypeNameRoots(anno);
                 if (dataflowValues.length == 1) {
-                    DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(), getSerializer(dataflowValues[0]));
+                    DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(),getSerializer(dataflowValues[0], false));
+                    dataflowSolvers.add(solver);
+                } else if (dataflowRoots.length == 1) {
+                    DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(),getSerializer(dataflowValues[0], true));
                     dataflowSolvers.add(solver);
                 }
             }
@@ -64,10 +69,11 @@ public class DataflowSolver implements InferenceSolver {
         // for (DatatypeSolver solver : dataflowSolvers) {
         // solutions.add(solver.solve());
         // }
-
         List<DatatypeSolution> solutions = new ArrayList<>();
         try {
-            solutions = solveInparallel(dataflowSolvers);
+            if (dataflowSolvers.size() > 0) {
+                solutions = solveInparallel(dataflowSolvers);
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -116,8 +122,8 @@ public class DataflowSolver implements InferenceSolver {
         return types;
     }
 
-    protected DataflowSerializer getSerializer(String datatype) {
-        return new DataflowSerializer(datatype);
+    protected DataflowSerializer getSerializer(String datatype, boolean isRoot) {
+        return new DataflowSerializer(datatype, isRoot);
     }
 
     protected InferenceSolution getMergedSolution(ProcessingEnvironment processingEnvironment,

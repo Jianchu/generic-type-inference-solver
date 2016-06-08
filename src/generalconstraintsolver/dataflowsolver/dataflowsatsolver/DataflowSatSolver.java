@@ -45,7 +45,7 @@ public class DataflowSatSolver extends DataflowGeneralSolver {
             datatypeSolutions
                     .add(new DatatypeSolution(result,
  DataflowUtils.getTypeNames(logic
-                    .getLattice().top)[0]));
+                    .getLattice().top)[0], false));
         }
         return datatypeSolutions;
 

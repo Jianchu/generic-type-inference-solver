@@ -19,14 +19,14 @@ import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSerializer extends CnfVecIntSerializer {
-    // private SlotManager slotManager;
     protected final String datatype;
     private final Set<Integer> touchedSlots = new HashSet<Integer>();
+    private boolean isRoot = false;
 
-    public DataflowSerializer(String datatype) {
+    public DataflowSerializer(String datatype, boolean isRoot) {
         super(InferenceMain.getInstance().getSlotManager());
-        // this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.datatype = datatype;
+        this.isRoot = isRoot;
         // System.out.println(datatype);
     }
 
@@ -40,7 +40,13 @@ public class DataflowSerializer extends CnfVecIntSerializer {
         if (AnnotationUtils.areSameByClass(anno, DataFlowTop.class)) {
             return true;
         }
-        String[] datatypes = DataflowUtils.getTypeNames(anno);
+        String[] datatypes;
+        if (this.isRoot) {
+            datatypes = DataflowUtils.getTypeNameRoots(anno);
+        } else {
+            datatypes = DataflowUtils.getTypeNames(anno);
+        }
+
         return Arrays.asList(datatypes).contains(datatype);
     }
 
@@ -55,5 +61,9 @@ public class DataflowSerializer extends CnfVecIntSerializer {
             }
         }
         return results;
+    }
+
+    public boolean isRoot() {
+        return this.isRoot;
     }
 }
