@@ -28,10 +28,8 @@ import dataflow.util.DataflowUtils;
 
 public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
-    // private final SlotManager slotManager;
     private final VariableAnnotator variableAnnotator;
     private final AnnotatedTypeFactory realTypeFactory;
-    // private final InferrableChecker realChecker;
 
     public DataflowInferenceTreeAnnotator(
             InferenceAnnotatedTypeFactory atypeFactory,
@@ -41,10 +39,8 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         super(atypeFactory, realChecker, realAnnotatedTypeFactory,
                 variableAnnotator, slotManager);
 
-        // this.slotManager = slotManager;
         this.variableAnnotator = variableAnnotator;
         this.realTypeFactory = realAnnotatedTypeFactory;
-        // this.realChecker = realChecker;
     }
 
     @Override
@@ -57,7 +53,6 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
     @Override
     public Void visitNewClass(final NewClassTree newClassTree, final AnnotatedTypeMirror atm) {
-        // System.out.println("New class Tree: " + newClassTree.toString());
         TypeMirror tm = atm.getUnderlyingType();
         ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
         AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm, this.realTypeFactory.getProcessingEnv());
