@@ -2,6 +2,10 @@ package generalconstraintsolver.dataflowsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
+import generalconstraintsolver.GeneralEncodingSerializer;
+import generalconstraintsolver.ImpliesLogic;
+import generalconstraintsolver.LatticeGenerator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,9 +32,6 @@ import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
 import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
-import generalconstraintsolver.GeneralEncodingSerializer;
-import generalconstraintsolver.ImpliesLogic;
-import generalconstraintsolver.LatticeGenerator;
 
 // JLTODO: put more of the computations into helper functions to reduce duplication
 public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
@@ -51,8 +52,8 @@ public class DataflowGeneralSerializer extends GeneralEncodingSerializer {
         if (AnnotationUtils.areSameByClass(anno, DataFlowTop.class)) {
             return true;
         }
-        String[] datatypes = DataflowUtils.getDataflowValue(anno);
-        String[] datatype = DataflowUtils.getDataflowValue(this.lattice.top);
+        String[] datatypes = DataflowUtils.getTypeNames(anno);
+        String[] datatype = DataflowUtils.getTypeNames(this.lattice.top);
         return Arrays.asList(datatypes).contains(datatype[0]);
     }
 

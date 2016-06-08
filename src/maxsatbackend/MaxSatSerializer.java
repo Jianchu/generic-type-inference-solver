@@ -98,7 +98,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                         resultList.add(VectorUtils.asVec(getMaybe(type, subtype, supertype,
                                 Lattice.superType.get(type))));
                     }
-                    
+
                     // if we know supertype
                     if (!ConstantUtils.areSameType(type, Lattice.bottom)) {
                         resultList.add(VectorUtils.asVec(getMaybe(type, supertype, subtype,
@@ -110,7 +110,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 VecInt[] result = resultList.toArray(new VecInt[resultList.size()]);
                 return result;
             }
-            
+
             @Override
             protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, SubtypeConstraint constraint) {
                 if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {

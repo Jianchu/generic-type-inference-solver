@@ -15,12 +15,15 @@ import org.checkerframework.javacutil.TreeUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
@@ -43,6 +46,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 //  private ProcessingEnvironment processingEnv = checker.getProcessingEnvironment();
     private ExecutableElement dataflowValue = TreeUtils.getMethod(
             "dataflow.qual.DataFlow", "typeNames", 0, processingEnv);
+    private final Map<String, TypeMirror> typeNamesMap = new HashMap<String, TypeMirror>();
 
     //cannot use DataFlow.class.toString(), the string would be "interface dataflow.quals.DataFlow"
     //private ExecutableElement dataflowValue = TreeUtils.getMethod(DataFlow.class.toString(), "typeNames", 0, processingEnv);
@@ -147,6 +151,9 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         public Void visitNewClass(NewClassTree node, AnnotatedTypeMirror type) {
             AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(type,
                     processingEnv);
+            String typeName = type.getUnderlyingType().toString();
+            TypeElement comparedDecType = elements.getTypeElement(typeName);
+            System.out.println(comparedDecType);
             type.replaceAnnotation(dataFlowType);
             return super.visitNewClass(node, type);
         }

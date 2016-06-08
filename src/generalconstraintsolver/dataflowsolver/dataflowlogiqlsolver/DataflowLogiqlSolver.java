@@ -1,5 +1,9 @@
 package generalconstraintsolver.dataflowsolver.dataflowlogiqlsolver;
 
+import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+import generalconstraintsolver.logiqlsubsolver.LogiqlPredicateGenerator;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,9 +14,6 @@ import java.util.Map;
 
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
-import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
-import generalconstraintsolver.logiqlsubsolver.LogiqlPredicateGenerator;
 
 public class DataflowLogiqlSolver extends DataflowGeneralSolver {
     // private DataflowGeneralSerializer serializer;
@@ -42,7 +43,7 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
                     logic, path + "/data");
             LogiqlData.generateData();
             fileName_logic.put(
-                    DataflowUtils.getDataflowValue(logic.getLattice().top)[0],
+DataflowUtils.getTypeNames(logic.getLattice().top)[0],
                     logic);
         }
         runLogicBlox(path);
@@ -76,7 +77,7 @@ public class DataflowLogiqlSolver extends DataflowGeneralSolver {
                 }
                 for (Integer i : decoder.result.keySet()) {
                     String[] datatype = DataflowUtils
-                            .getDataflowValue(decoder.result.get(i));
+.getTypeNames(decoder.result.get(i));
                     if (datatype[0].equals(fileEntry.getName().toString())) {
                         result.put(i.intValue(), true);
                         /*
