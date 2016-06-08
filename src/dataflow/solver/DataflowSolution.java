@@ -86,7 +86,7 @@ public class DataflowSolution implements InferenceSolution {
         for (Map.Entry<Integer, Set<String>> entry : typeRootResults.entrySet()) {
             int slotId = entry.getKey();
             Set<String> roots = entry.getValue();
-            Set<String> typeNames = typeRootResults.get(slotId);
+            Set<String> typeNames = typeNameResults.get(slotId);
             if (typeNames == null) {
                 AnnotationMirror anno = DataflowUtils.createDataflowAnnotationWithoutName(roots, processingEnv);
                 annotationResults.put(slotId, anno);
