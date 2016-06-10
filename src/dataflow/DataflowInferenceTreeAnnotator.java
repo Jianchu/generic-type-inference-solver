@@ -80,6 +80,8 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         ExecutableElement methodElement = TreeUtils.elementFromUse(methodInvocationTree);
         boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement);
         if (isBytecode) {
+            TypeMirror tm = atm.getUnderlyingType();
+            ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
             AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromByteCode(atm, this.realTypeFactory.getProcessingEnv());
             ConstantSlot cs = variableAnnotator.createConstant(anno, methodInvocationTree);
             atm.replaceAnnotation(cs.getValue());

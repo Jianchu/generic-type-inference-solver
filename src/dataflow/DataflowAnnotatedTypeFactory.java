@@ -177,6 +177,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
             if (isBytecode) {
                 AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromByteCode(type,
                         processingEnv);
+                TypeMirror tm = type.getUnderlyingType();
+                typeNamesMap.put(tm.toString(), tm);
                 type.replaceAnnotation(dataFlowType);
             }
             return super.visitMethodInvocation(node, type);
