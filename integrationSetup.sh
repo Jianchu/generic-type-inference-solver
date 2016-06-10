@@ -17,6 +17,7 @@ ln -s $MYDIR/src/maxsatbackend $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/util $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/constraintsolver $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/logiqlbackend $MYDIR/../checker-framework-inference/src
+ln -s $MYDIR/src/constraintgraph $MYDIR/../checker-framework-inference/src
 
 ln -s $MYDIR/testing/tests/DataflowTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
 ln -s $MYDIR/testing/tests/OntologyTest.java $MYDIR/../checker-framework-inference/tests/checkers/inference
