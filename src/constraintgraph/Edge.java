@@ -1,4 +1,4 @@
-package parameterizedtypesystem.constraintgraph;
+package constraintgraph;
 
 import checkers.inference.model.Constraint;
 

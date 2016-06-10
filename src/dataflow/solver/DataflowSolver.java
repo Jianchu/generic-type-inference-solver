@@ -19,14 +19,14 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.util.Elements;
 
-import parameterizedtypesystem.constraintgraph.ConstraintGraph;
-import parameterizedtypesystem.constraintgraph.GraphBuilder;
-import parameterizedtypesystem.constraintgraph.Vertex;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
+import constraintgraph.ConstraintGraph;
+import constraintgraph.GraphBuilder;
+import constraintgraph.Vertex;
 import dataflow.qual.DataFlow;
 import dataflow.util.DataflowUtils;
 

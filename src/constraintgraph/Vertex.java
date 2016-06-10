@@ -1,4 +1,4 @@
-package parameterizedtypesystem.constraintgraph;
+package constraintgraph;
 
 import java.util.ArrayList;
 import java.util.List;
