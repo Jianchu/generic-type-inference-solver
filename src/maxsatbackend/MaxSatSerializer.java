@@ -342,7 +342,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
         return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue()));
     }
 
-    public static final VecInt[] emptyClauses = new VecInt[0];
+    protected static final VecInt[] emptyClauses = new VecInt[0];
 
 }
 
