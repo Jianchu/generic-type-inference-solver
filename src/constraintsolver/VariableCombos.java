@@ -8,7 +8,7 @@ import checkers.inference.model.VariableSlot;
 
 public class VariableCombos<T extends Constraint, S> {
 
-    S emptyValue;
+    private final S emptyValue;
 
     public VariableCombos(S emptyValue) {
         this.emptyValue = emptyValue;
