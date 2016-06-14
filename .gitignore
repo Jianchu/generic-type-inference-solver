@@ -15,3 +15,6 @@ scripts/annotated/
 scripts/*.java
 scripts/ontology/roundtripOntologyMaxSat.sh
 scripts/ontology/runOntologyGe.sh
+**/logiqldata/
+**/CNFfiles/
+**/annotated/

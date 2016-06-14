@@ -2,6 +2,9 @@ package generalconstraintsolver.dataflowsolver;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 
+import generalconstraintsolver.GeneralConstrainsSolver;
+import generalconstraintsolver.LatticeGenerator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,8 +23,6 @@ import dataflow.qual.DataFlow;
 import dataflow.solver.DataflowSolution;
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
-import generalconstraintsolver.GeneralConstrainsSolver;
-import generalconstraintsolver.LatticeGenerator;
 
 public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
 
@@ -56,7 +57,7 @@ public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-                    String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
+                    String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                     for (String dataflowValue : dataflowValues) {
                         types.add(dataflowValue);
                     }

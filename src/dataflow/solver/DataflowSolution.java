@@ -12,20 +12,25 @@ import javax.lang.model.element.AnnotationMirror;
 
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
+import dataflow.DataflowAnnotatedTypeFactory;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSolution implements InferenceSolution {
-    private final Map<Integer, Set<String>> results;
+    private final Map<Integer, Set<String>> typeNameResults;
+    private final Map<Integer, Set<String>> typeRootResults;
     private final Map<Integer, Boolean> idToExistance;
     private final Map<Integer, AnnotationMirror> annotationResults;
+    private final DataflowAnnotatedTypeFactory realTypeFactory;
 
     public DataflowSolution(Collection<DatatypeSolution> solutions, ProcessingEnvironment processingEnv) {
-        this.results = new HashMap<>();
+        this.typeNameResults = new HashMap<>();
+        this.typeRootResults = new HashMap<>();
         this.idToExistance = new HashMap<>();
         this.annotationResults = new HashMap<>();
-
+        this.realTypeFactory = (DataflowAnnotatedTypeFactory)InferenceMain.getInstance().getRealTypeFactory();
         merge(solutions);
         createAnnotations(processingEnv);
+        simplifyAnnotation();
 
         System.out.println("FINAL RESULT FROM DATAFLOWSOVLER: " + annotationResults.toString());
     }
@@ -41,15 +46,24 @@ public class DataflowSolution implements InferenceSolution {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {
             boolean shouldContainDatatype = shouldContainDatatype(entry);
             String datatype = solution.getDatatype();
-
-            Set<String> datatypes = results.get(entry.getKey());
-            if (datatypes == null) {
-                datatypes = new TreeSet<>();
-                results.put(entry.getKey(), datatypes);
-            }
-
-            if (shouldContainDatatype) {
-                datatypes.add(datatype);
+            if (solution.isRoot()) {
+                Set<String> dataRoots = typeRootResults.get(entry.getKey());
+                if (dataRoots == null) {
+                    dataRoots = new TreeSet<>();
+                    typeRootResults.put(entry.getKey(), dataRoots);
+                }
+                if (shouldContainDatatype) {
+                    dataRoots.add(datatype);
+                }
+            } else {
+                Set<String> datatypes = typeNameResults.get(entry.getKey());
+                if (datatypes == null) {
+                    datatypes = new TreeSet<>();
+                    typeNameResults.put(entry.getKey(), datatypes);
+                }
+                if (shouldContainDatatype) {
+                    datatypes.add(datatype);
+                }
             }
         }
     }
@@ -59,19 +73,37 @@ public class DataflowSolution implements InferenceSolution {
     }
 
     private void createAnnotations(ProcessingEnvironment processingEnv) {
-        for (Map.Entry<Integer, Set<String>> entry : results.entrySet()) {
+        for (Map.Entry<Integer, Set<String>> entry : typeNameResults.entrySet()) {
             int slotId = entry.getKey();
             Set<String> datatypes = entry.getValue();
-            AnnotationMirror anno = createAnnotationFromDatatypes(processingEnv, datatypes);
+            Set<String> roots = typeRootResults.get(slotId);
+            AnnotationMirror anno;
+            if (roots != null) {
+                anno = DataflowUtils.createDataflowAnnotationWithRoots(datatypes, typeRootResults.get(slotId), processingEnv);
+            } else {
+                anno = DataflowUtils.createDataflowAnnotation(datatypes, processingEnv);
+            }
             annotationResults.put(slotId, anno);
         }
+        
+        for (Map.Entry<Integer, Set<String>> entry : typeRootResults.entrySet()) {
+            int slotId = entry.getKey();
+            Set<String> roots = entry.getValue();
+            Set<String> typeNames = typeNameResults.get(slotId);
+            if (typeNames == null) {
+                AnnotationMirror anno = DataflowUtils.createDataflowAnnotationWithoutName(roots, processingEnv);
+                annotationResults.put(slotId, anno);
+            }
+        }
+
     }
 
-    protected AnnotationMirror createAnnotationFromDatatypes(ProcessingEnvironment processingEnv,
-            Set<String> datatypes) {
-        return DataflowUtils.createDataflowAnnotation(datatypes, processingEnv);
+    private void simplifyAnnotation() {
+        for (Map.Entry<Integer, AnnotationMirror> entry : annotationResults.entrySet()) {
+            AnnotationMirror refinedDataflow = this.realTypeFactory.refineDataflow(entry.getValue());
+            entry.setValue(refinedDataflow);
+        }
     }
-
 
     private void mergeIdToExistance(DatatypeSolution solution) {
         for (Map.Entry<Integer, Boolean> entry : solution.getResult().entrySet()) {

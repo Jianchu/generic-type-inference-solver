@@ -23,7 +23,7 @@ public class LogiqlDataflowDataGenerator extends LogiqlDataGenerator {
     protected void writeFile(String output) {
         try {
             String writePath = path + "/"
-                    + DataflowUtils.getDataflowValue(logic.getLattice().top)[0]
+                    + DataflowUtils.getTypeNames(logic.getLattice().top)[0]
                     + ".logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);

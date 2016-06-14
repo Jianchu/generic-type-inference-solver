@@ -1,5 +1,8 @@
 package generalconstraintsolver.dataflowsolver.dataflowsatsolver;
 
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+import generalconstraintsolver.satsubsolver.SatSubSolver;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,8 +18,6 @@ import org.sat4j.core.VecInt;
 
 import checkers.inference.SlotManager;
 import dataflow.util.DataflowUtils;
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
-import generalconstraintsolver.satsubsolver.SatSubSolver;
 
 public class DatatypeLingelingSatSolver extends SatSubSolver {
     private DataflowImpliesLogic logic;
@@ -44,7 +45,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
     }
 
     private void buildInputString(List<VecInt> clauses) {
-        String datatype = DataflowUtils.getDataflowValue(logic.getLattice().top)[0];
+        String datatype = DataflowUtils.getTypeNames(logic.getLattice().top)[0];
         sb.append("c This is the input for ");
         sb.append(datatype + "\n");
         final int totalVars = (slotManager.nextId() * lattice.numModifiers);

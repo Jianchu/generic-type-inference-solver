@@ -1,4 +1,4 @@
-package dataflow.solver;
+package ontology.solver;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -14,18 +14,18 @@ import checkers.inference.InferenceMain;
 import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
 
-public class DatatypeSolver {
+public class SequenceSolver {
     private final SlotManager slotManager;
-    private final String datatype;
-    private final DataflowSerializer serializer;
+    private final String value;
+    private final OntologySerializer serializer;
     private final List<VecInt> clauses;
 
-    public DatatypeSolver(String datatype, Collection<Constraint> constraints, DataflowSerializer serializer) {
-        this.datatype = datatype;
+    public SequenceSolver(String value, Collection<Constraint> constraints, OntologySerializer serializer) {
+        this.value = value;
         this.serializer = serializer;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.clauses = convertToCNF(constraints);
-        writeCNF();
+        // writeCNF();
     }
 
     private void writeCNF() {
@@ -36,8 +36,8 @@ public class DatatypeSolver {
         newdir.mkdir();
         String base = file.toString();
         String path = base + "/CNFfiles";
-        String writePath = path + "/CNFResultFor-" + datatype + ".txt";
-        sb.append("CNF for type " + datatype + ":" + "\n");
+        String writePath = path + "/CNFResultFor-" + value + ".txt";
+        sb.append("CNF for type " + value + ":" + "\n");
 
         for (VecInt clause : clauses) {
             sb.append("(");
@@ -59,7 +59,7 @@ public class DatatypeSolver {
         return serializer.convertAll(constraints);
     }
 
-    public DatatypeSolution solve() {
+    public SequenceSolution solve() {
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
 
@@ -67,10 +67,7 @@ public class DatatypeSolver {
         final int totalClauses = clauses.size();
 
         try {
-            //**** Prep Solver ****
-            //org.sat4j.pb.SolverFactory.newBoth() Runs both of sat4j solves and uses the result of the first to finish
-            // JLTODO: why is this a weighted max-sat solver? Isn't this only
-            // creating sat constraints?
+
             final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
 
             solver.newVar(totalVars);
@@ -81,34 +78,23 @@ public class DatatypeSolver {
                 solver.addSoftClause(clause);
             }
 
-            //**** Solve ****
             boolean hasSolution = solver.isSatisfiable();
 
             if (hasSolution) {
 
-                // **** Remove exatential vars from solution
                 final Map<Integer, Integer> existentialToPotentialIds = serializer.getExistentialToPotentialVar();
                 int[] solution = solver.model();
                 for (Integer var : solution) {
                     boolean varIsTrue = var > 0;
-                    //Need postive var
                     var = Math.abs(var);
                     Integer potential = existentialToPotentialIds.get(var);
                     if (potential != null) {
                         idToExistence.put(potential, varIsTrue);
                     } else {
-                        // Logic is same as sparta.SourceSolution, but for easy
-                        // to understand, I just set True for each top, which
-                        // means this top(type) should present:
-                        // If the solution is false, that means top was
-                        // inferred.
-                        // For dataflow, that means that the annotation should
-                        // have the type.
                         result.put(var, !varIsTrue);
                     }
                 }
-                // System.out.println("*******************************");
-                return new DatatypeSolution(result, datatype, this.serializer.isRoot());
+                return new SequenceSolution(result, value);
             }
 
         } catch (Throwable th) {
@@ -116,6 +102,6 @@ public class DatatypeSolver {
             throw new RuntimeException("Error MAX-SAT solving! " + lastClause, th);
         }
 
-        return DatatypeSolution.noSolution(datatype);
+        return SequenceSolution.noSolution(value);
     }
 }

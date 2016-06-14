@@ -13,4 +13,6 @@ import java.lang.annotation.Target;
 
 public @interface DataFlow {
     String[] typeNames() default {};
+
+    String[] typeNameRoots() default {};
 }

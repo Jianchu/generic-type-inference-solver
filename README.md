@@ -42,12 +42,12 @@ Building
   ```
 
 2. In the `$JSR308` directory, run
-`bash generic-type-inference-solver/dataflowSetup.sh`. This bash script will set everything
+`bash generic-type-inference-solver/integrationSetup.sh`. This bash script will set everything
 up, recompile `checker-framework-inference`, and put the
 `DataflowExample` directory into the `$JSR308` directory.
 
   ```
-  bash generic-type-inference-solver/dataflowSetup.sh
+  bash generic-type-inference-solver/integrationSetup.sh
   ```
 
 3. Now you can use `checker-framework-inference` to invoke the

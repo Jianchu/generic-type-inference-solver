@@ -12,14 +12,13 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.NewClassTree;
 
 import dataflow.qual.DataFlow;
 
 public class DataflowUtils {
 
-    public static String[] getDataflowValue(AnnotationMirror type) {
-        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,"typeNames", String.class, true);
+    private static String[] getDataflowValue(AnnotationMirror type, String valueName) {
+        List<String> allTypesList = AnnotationUtils.getElementValueArray(type,valueName, String.class, true);
         //types in this list is org.checkerframework.framework.util.AnnotationBuilder.
         String[] allTypesInArray = new String[allTypesList.size()];
         int i = 0;
@@ -30,31 +29,26 @@ public class DataflowUtils {
         return allTypesInArray;
     }
 
-    public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes, ProcessingEnvironment processingEnv) {
-        AnnotationBuilder builder =
-            new AnnotationBuilder(processingEnv, DataFlow.class);
-
-        return createDataflowAnnotation(datatypes,builder);
+    public static String[] getTypeNames(AnnotationMirror type) {
+        return getDataflowValue(type, "typeNames");
     }
 
-    private static AnnotationMirror createDataflowAnnotation(String[] dataType, ProcessingEnvironment processingEnv) {
-        AnnotationBuilder builder =
-            new AnnotationBuilder(processingEnv, DataFlow.class);
-        // System.out.println("ddddddddddddddddddddddddddddddddddddddddddddd"
-        // + Arrays.toString(dataType));
-        // if (Arrays.toString(dataType) != null) {
-        // builder.setValue("typeNames", dataType);
-        // }
-        builder.setValue("typeNames", dataType);
+    public static String[] getTypeNameRoots(AnnotationMirror type) {
+        return getDataflowValue(type, "typeNameRoots");
+    }
+
+    private static AnnotationMirror createDataflowAnnotationForByte(String[] dataType,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+        builder.setValue("typeNameRoots", dataType);
         return builder.build();
     }
 
-    private static String[] convert(String... typeName) {
+    public static String[] convert(String... typeName) {
         return typeName;
     }
 
-    private static AnnotationMirror createDataflowAnnotation(
-            final Set<String> datatypes, final AnnotationBuilder builder) {
+    private static AnnotationMirror createDataflowAnnotation(final Set<String> datatypes, final AnnotationBuilder builder) {
         String[] datatypesInArray = new String[datatypes.size()];
         int i = 0;
         for (String datatype : datatypes) {
@@ -65,8 +59,68 @@ public class DataflowUtils {
         return builder.build();
     }
 
-    public static AnnotationMirror genereateDataflowAnnoFromNewClass(
-            NewClassTree node, AnnotatedTypeMirror type,
+    private static AnnotationMirror createDataflowAnnotationWithoutName(final Set<String> roots,
+            final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[roots.size()];
+        int i = 0;
+        for (String datatype : roots) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+        builder.setValue("typeNameRoots", datatypesInArray);
+        return builder.build();
+    }
+
+    public static AnnotationMirror createDataflowAnnotation(Set<String> datatypes,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+
+        return createDataflowAnnotation(datatypes, builder);
+    }
+
+    public static AnnotationMirror createDataflowAnnotationWithoutName(Set<String> roots,
+            ProcessingEnvironment processingEnv) {
+
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+        return createDataflowAnnotationWithoutName(roots, builder);
+
+    }
+
+    public static AnnotationMirror createDataflowAnnotation(String[] dataType,
+            ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+        builder.setValue("typeNames", dataType);
+        return builder.build();
+    }
+
+    public static AnnotationMirror createDataflowAnnotationWithRoots(Set<String> datatypes,
+            Set<String> datatypesRoots, ProcessingEnvironment processingEnv) {
+        AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
+
+        return createDataflowAnnotationWithRoots(datatypes, datatypesRoots, builder);
+    }
+
+    private static AnnotationMirror createDataflowAnnotationWithRoots(final Set<String> datatypes,
+            final Set<String> datatypesRoots, final AnnotationBuilder builder) {
+        String[] datatypesInArray = new String[datatypes.size()];
+        int i = 0;
+        for (String datatype : datatypes) {
+            datatypesInArray[i] = datatype.toString();
+            i++;
+        }
+
+        String[] datatypesRootInArray = new String[datatypesRoots.size()];
+        int j = 0;
+        for (String datatypesRoot : datatypesRoots) {
+            datatypesRootInArray[j] = datatypesRoot.toString();
+            j++;
+        }
+        builder.setValue("typeNameRoots", datatypesRootInArray);
+        builder.setValue("typeNames", datatypesInArray);
+        return builder.build();
+    }
+
+    public static AnnotationMirror genereateDataflowAnnoFromNewClass(AnnotatedTypeMirror type,
             ProcessingEnvironment processingEnv) {
         TypeMirror tm = type.getUnderlyingType();
         String className = tm.toString();
@@ -75,10 +129,22 @@ public class DataflowUtils {
         return dataFlowType;
     }
 
-    // TODO :doc
-    public static AnnotationMirror generateDataflowAnnoFromLiteral(
-            LiteralTree node, AnnotatedTypeMirror type,
+    public static AnnotationMirror genereateDataflowAnnoFromByteCode(AnnotatedTypeMirror type,
             ProcessingEnvironment processingEnv) {
+        TypeMirror tm = type.getUnderlyingType();
+        String className = tm.toString();
+        AnnotationMirror dataFlowType = createDataflowAnnotationForByte(convert(className), processingEnv);
+        return dataFlowType;
+    }
+
+    public static AnnotationMirror generateDataflowAnnoFromLiteral(AnnotatedTypeMirror type, ProcessingEnvironment processingEnv) {
+        String datatypeInArray[] = convert(type.getUnderlyingType().toString());
+        AnnotationMirror dataFlowType = createDataflowAnnotation(datatypeInArray, processingEnv);
+        return dataFlowType;
+    }
+    
+    // TODO :doc
+    public static AnnotationMirror generateDataflowAnnoFromLiteral(LiteralTree node, ProcessingEnvironment processingEnv) {
         String datatypeInArray[] = { "" };
         // String datatypeInArray[] = null;
         switch (node.getKind()) {

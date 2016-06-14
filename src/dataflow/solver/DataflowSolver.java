@@ -24,6 +24,9 @@ import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
+import constraintgraph.ConstraintGraph;
+import constraintgraph.GraphBuilder;
+import constraintgraph.Vertex;
 import dataflow.qual.DataFlow;
 import dataflow.util.DataflowUtils;
 
@@ -39,24 +42,37 @@ public class DataflowSolver implements InferenceSolver {
 
         Elements elements = processingEnvironment.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
 
         Collection<String> datatypesUsed = getDatatypesUsed(slots);
         List<DatatypeSolver> dataflowSolvers = new ArrayList<>();
 
         // Configure datatype solvers
-        for (String datatype : datatypesUsed) {
-            DatatypeSolver solver = new DatatypeSolver(datatype, constraints, getSerializer(datatype));
-            dataflowSolvers.add(solver);
+        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
+            AnnotationMirror anno = entry.getKey().getValue();
+            if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
+                String[] dataflowValues = DataflowUtils.getTypeNames(anno);
+                String[] dataflowRoots = DataflowUtils.getTypeNameRoots(anno);
+                if (dataflowValues.length == 1) {
+                    DatatypeSolver solver = new DatatypeSolver(dataflowValues[0], entry.getValue(),getSerializer(dataflowValues[0], false));
+                    dataflowSolvers.add(solver);
+                } else if (dataflowRoots.length == 1) {
+                    DatatypeSolver solver = new DatatypeSolver(dataflowRoots[0], entry.getValue(),getSerializer(dataflowRoots[0], true));
+                    dataflowSolvers.add(solver);
+                }
+            }
         }
 
         // List<DatatypeSolution> solutions = new ArrayList<>();
         // for (DatatypeSolver solver : dataflowSolvers) {
         // solutions.add(solver.solve());
         // }
-
         List<DatatypeSolution> solutions = new ArrayList<>();
         try {
-            solutions = solveInparallel(dataflowSolvers);
+            if (dataflowSolvers.size() > 0) {
+                solutions = solveInparallel(dataflowSolvers);
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -95,7 +111,7 @@ public class DataflowSolver implements InferenceSolver {
                 ConstantSlot constantSlot = (ConstantSlot) slot;
                 AnnotationMirror anno = constantSlot.getValue();
                 if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
-                    String[] dataflowValues = DataflowUtils.getDataflowValue(anno);
+                    String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                     for (String dataflowValue : dataflowValues) {
                         types.add(dataflowValue);
                     }
@@ -105,8 +121,8 @@ public class DataflowSolver implements InferenceSolver {
         return types;
     }
 
-    protected DataflowSerializer getSerializer(String datatype) {
-        return new DataflowSerializer(datatype);
+    protected DataflowSerializer getSerializer(String datatype, boolean isRoot) {
+        return new DataflowSerializer(datatype, isRoot);
     }
 
     protected InferenceSolution getMergedSolution(ProcessingEnvironment processingEnvironment,

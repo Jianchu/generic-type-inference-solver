@@ -16,6 +16,9 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
+import util.PrintUtils;
+import util.MathUtils;
+import util.VectorUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
@@ -26,8 +29,6 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.BackEnd;
 import constraintsolver.Lattice;
-import util.MathUtils;
-import util.VectorUtils;
 
 /**
  * @author jianchu MaxSat back end converts constraints to VecInt, and solves
@@ -129,7 +130,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
             if (solver.isSatisfiable()) {
                 result = decode(solver.model());
-                printResult(result);
+                PrintUtils.printResult(result);
             } else {
                 System.out.println("Not solvable!");
             }
@@ -168,19 +169,5 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         for (VecInt softClause : softClauses) {
             System.out.println(softClause);
         }
-    }
-
-    /**
-     * print result from sat solver for testing.
-     *
-     * @param result
-     */
-    private void printResult(Map<Integer, AnnotationMirror> result) {
-        System.out.println("/***********************result*****************************/");
-        for (Integer j : result.keySet()) {
-            System.out.println("SlotID: " + j + "  " + "Annotation: " + result.get(j).toString());
-        }
-        System.out.flush();
-        System.out.println("/**********************************************************/");
     }
 }

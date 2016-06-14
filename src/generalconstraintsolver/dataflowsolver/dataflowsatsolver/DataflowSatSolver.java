@@ -1,5 +1,9 @@
 package generalconstraintsolver.dataflowsolver.dataflowsatsolver;
 
+import generalconstraintsolver.DecodingTool;
+import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
+import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,9 +11,6 @@ import java.util.Map;
 
 import dataflow.solver.DatatypeSolution;
 import dataflow.util.DataflowUtils;
-import generalconstraintsolver.DecodingTool;
-import generalconstraintsolver.dataflowsolver.DataflowGeneralSolver;
-import generalconstraintsolver.dataflowsolver.DataflowImpliesLogic;
 
 public class DataflowSatSolver extends DataflowGeneralSolver {
     // private DataflowGeneralSerializer serializer;
@@ -32,8 +33,8 @@ public class DataflowSatSolver extends DataflowGeneralSolver {
             DecodingTool decoder = new DecodingTool(solver.dataflowsatSolve(),
                     logic.getLattice());
             for (Integer i : decoder.result.keySet()) {
-                String[] datatype = DataflowUtils.getDataflowValue(decoder.result.get(i));
-                if (datatype[0].equals(DataflowUtils.getDataflowValue(logic.getLattice().top)[0])) {
+                String[] datatype = DataflowUtils.getTypeNames(decoder.result.get(i));
+                if (datatype[0].equals(DataflowUtils.getTypeNames(logic.getLattice().top)[0])) {
                     result.put(i, true);
                     /*Integer potential = existentialToPotentialIds.get(i.intValue());
                     if (potential != null) {
@@ -43,7 +44,8 @@ public class DataflowSatSolver extends DataflowGeneralSolver {
             }
             datatypeSolutions
                     .add(new DatatypeSolution(result,
-                    DataflowUtils.getDataflowValue(logic.getLattice().top)[0]));
+ DataflowUtils.getTypeNames(logic
+                    .getLattice().top)[0], false));
         }
         return datatypeSolutions;
 

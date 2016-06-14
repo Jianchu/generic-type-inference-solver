@@ -1,4 +1,4 @@
-package logicsolver;
+package logiqlbackend;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +32,7 @@ public class LogicBloxRunner {
     public void runLogicBlox() {
         String[] command = new String[7];
         command[0] = "lb create pltest";
-        command[1] = "lb addblock pltest -f" + path + "/LogiqlEncoding.logic";
+        command[1] = "lb addblock pltest -f" + path + "/logiqlEncoding.logic";
         command[2] = "lb exec pltest -f" + path + "/data.logic";
         command[3] = "lb print pltest orderedAnnotationOf";
         command[4] = "lb delete pltest";
