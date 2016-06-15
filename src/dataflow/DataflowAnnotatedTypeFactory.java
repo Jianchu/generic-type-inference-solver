@@ -26,6 +26,7 @@ import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 
 import dataflow.qual.DataFlow;
@@ -126,6 +127,14 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     public class DataflowTreeAnnotator extends TreeAnnotator {
         public DataflowTreeAnnotator() {
             super(DataflowAnnotatedTypeFactory.this);
+        }
+
+        @Override
+        public Void visitNewArray(final NewArrayTree node, final AnnotatedTypeMirror type) {
+            AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(type,
+                    processingEnv);
+            type.replaceAnnotation(dataFlowType);
+            return super.visitNewArray(node, type);
         }
 
         @Override

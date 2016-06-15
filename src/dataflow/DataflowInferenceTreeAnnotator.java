@@ -18,6 +18,7 @@ import checkers.inference.model.ConstantSlot;
 
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.Tree;
@@ -58,7 +59,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm, this.realTypeFactory.getProcessingEnv());
         ConstantSlot cs = variableAnnotator.createConstant(anno, newClassTree);
         // atm.replaceAnnotation(InferenceMain.getInstance().getSlotManager().getAnnotation(cs));
-        atm.addAnnotation(cs.getValue());
+        atm.replaceAnnotation(cs.getValue());
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
         return null;
     }
@@ -76,6 +77,16 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         return null;
     }
     
+    @Override
+    public Void visitNewArray(final NewArrayTree newArrayTree, final AnnotatedTypeMirror atm) {
+        AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
+                realTypeFactory.getProcessingEnv());
+        ConstantSlot cs = variableAnnotator.createConstant(anno, newArrayTree);
+        atm.addAnnotation(cs.getValue());
+        variableAnnotator.visit(atm, newArrayTree);
+        return null;
+    }
+
     @Override
     public Void visitMethodInvocation(MethodInvocationTree methodInvocationTree, final AnnotatedTypeMirror atm) {
         ExecutableElement methodElement = TreeUtils.elementFromUse(methodInvocationTree);
