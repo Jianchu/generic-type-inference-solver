@@ -46,23 +46,10 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
         TypeElement typeElt = types.boxedClass(type.getUnderlyingType());
         AnnotationMirror am = createDataflow(typeElt.asType().toString(), this.processingEnv);
         AnnotatedDeclaredType dt = fromElement(typeElt);
-        // dt.replaceAnnotation(am);
-        // System.out.println("type:" + type.getAnnotations());
-        // System.out.println("dt:" + dt.getAnnotations());
-
-        // dt.addAnnotations(type.getAnnotations());
         ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
         InferenceMain.getInstance().getSlotManager().addVariable(cs);
         dt.addAnnotation(InferenceMain.getInstance().getSlotManager().getAnnotation(cs));
         dt.addAnnotation(cs.getValue());
-        // AnnotationBuilder ab = new AnnotationBuilder(this.processingEnv,
-        // VarAnnot.class);
-        // ab.setValue("value",
-        // InferenceMain.getInstance().getSlotManager().nextId());
-        // dt.addAnnotation(ab.build());
-        // dt.addAnnotation(am);
-        // dt.addAnnotation(cs.getValue());
-        // dt.addAnnotation(am);
         return dt;
     }
 
@@ -77,8 +64,6 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
         InferenceMain.getInstance().getSlotManager().addVariable(cs);
         pt.addAnnotation(InferenceMain.getInstance().getSlotManager().getAnnotation(cs));
         pt.addAnnotation(cs.getValue());
-        // pt.addAnnotation(am);
-        // pt.addAnnotations(type.getAnnotations());
         return pt;
     }
 
