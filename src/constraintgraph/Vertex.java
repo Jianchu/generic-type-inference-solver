@@ -11,14 +11,17 @@ import checkers.inference.model.VariableSlot;
 
 public class Vertex {
 
-    private List<Edge> edges;
+    private List<Edge> incomingEdges;
+    private List<Edge> outgoingEdges;
     private Slot slot;
     private int id;
     private AnnotationMirror value;
 
     public Vertex(Slot slot) {
-        this.edges = new ArrayList<Edge>();
+        this.incomingEdges = new ArrayList<Edge>();
+        this.outgoingEdges = new ArrayList<Edge>();
         this.slot = slot;
+
         if (slot instanceof VariableSlot) {
             VariableSlot vs = (VariableSlot) slot;
             this.id = vs.getId();
@@ -35,9 +38,15 @@ public class Vertex {
         return (this.slot instanceof ConstantSlot);
     }
 
-    public void addEdge(Edge edge) {
-        if (!edges.contains(edge)) {
-            edges.add(edge);
+    public void addIncomingEdge(Edge incomingEdge) {
+        if (!incomingEdges.contains(incomingEdge)) {
+            incomingEdges.add(incomingEdge);
+        }
+    }
+
+    public void addOutgoingEdge(Edge outgoingEdge) {
+        if (!outgoingEdges.contains(outgoingEdge)) {
+            outgoingEdges.add(outgoingEdge);
         }
     }
 
@@ -49,8 +58,12 @@ public class Vertex {
         return this.id;
     }
 
-    public List<Edge> getEdges() {
-        return this.edges;
+    public List<Edge> getIncomingEdges() {
+        return this.incomingEdges;
+    }
+
+    public List<Edge> getOutgoingEdge() {
+        return this.outgoingEdges;
     }
 
     public AnnotationMirror getValue() {
