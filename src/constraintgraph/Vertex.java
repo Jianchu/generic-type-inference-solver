@@ -9,6 +9,12 @@ import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Slot;
 import checkers.inference.model.VariableSlot;
 
+/**
+ * Vertex in ConstraintGraph
+ * 
+ * @author jianchu
+ *
+ */
 public class Vertex {
 
     private List<Edge> incomingEdges;

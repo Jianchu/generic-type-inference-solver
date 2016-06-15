@@ -13,6 +13,12 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 
+/**
+ * ConstraintGraph Builder
+ * 
+ * @author jianchu
+ *
+ */
 public class GraphBuilder {
 
     private final Collection<Slot> slots;

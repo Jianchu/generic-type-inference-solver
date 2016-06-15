@@ -2,6 +2,12 @@ package constraintgraph;
 
 import checkers.inference.model.Constraint;
 
+/**
+ * Edge in ConstraintGraph
+ * 
+ * @author jianchu
+ *
+ */
 public class Edge {
 
     private Vertex from;

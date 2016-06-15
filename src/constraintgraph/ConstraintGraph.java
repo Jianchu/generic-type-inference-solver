@@ -8,6 +8,12 @@ import java.util.Set;
 
 import checkers.inference.model.Constraint;
 
+/**
+ * A graph representation for constants.
+ * 
+ * @author jianchu
+ *
+ */
 public class ConstraintGraph {
 
     private List<Vertex> verticies;
