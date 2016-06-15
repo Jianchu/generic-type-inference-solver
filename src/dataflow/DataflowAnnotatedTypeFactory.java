@@ -133,6 +133,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         public Void visitNewArray(final NewArrayTree node, final AnnotatedTypeMirror type) {
             AnnotationMirror dataFlowType = DataflowUtils.genereateDataflowAnnoFromNewClass(type,
                     processingEnv);
+            TypeMirror tm = type.getUnderlyingType();
+            typeNamesMap.put(tm.toString(), tm);
             type.replaceAnnotation(dataFlowType);
             return super.visitNewArray(node, type);
         }

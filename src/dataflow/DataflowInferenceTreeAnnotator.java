@@ -79,6 +79,8 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     
     @Override
     public Void visitNewArray(final NewArrayTree newArrayTree, final AnnotatedTypeMirror atm) {
+        TypeMirror tm = atm.getUnderlyingType();
+        ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
         AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
                 realTypeFactory.getProcessingEnv());
         ConstantSlot cs = variableAnnotator.createConstant(anno, newArrayTree);
