@@ -25,7 +25,7 @@ public class DatatypeSolver {
         this.serializer = serializer;
         this.slotManager = InferenceMain.getInstance().getSlotManager();
         this.clauses = convertToCNF(constraints);
-        writeCNF();
+        // writeCNF();
     }
 
     private void writeCNF() {
