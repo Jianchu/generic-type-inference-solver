@@ -115,8 +115,13 @@ public class DataflowUtils {
             datatypesRootInArray[j] = datatypesRoot.toString();
             j++;
         }
-        builder.setValue("typeNameRoots", datatypesRootInArray);
-        builder.setValue("typeNames", datatypesInArray);
+        if (datatypesRootInArray.length > 0) {
+            builder.setValue("typeNameRoots", datatypesRootInArray);
+        }
+        if (datatypesInArray.length > 0) {
+            builder.setValue("typeNames", datatypesInArray);
+        }
+
         return builder.build();
     }
 
