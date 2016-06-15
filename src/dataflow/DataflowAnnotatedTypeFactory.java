@@ -41,8 +41,8 @@ import dataflow.util.DataflowUtils;
 
 public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
         implements InferrableAnnotatedTypeFactory {
+
     protected final AnnotationMirror DATAFLOW, DATAFLOWBOTTOM, DATAFLOWTOP;
-//  private ProcessingEnvironment processingEnv = checker.getProcessingEnvironment();
     private ExecutableElement dataflowValue = TreeUtils.getMethod(
             "dataflow.qual.DataFlow", "typeNames", 0, processingEnv);
     private final Map<String, TypeMirror> typeNamesMap = new HashMap<String, TypeMirror>();
@@ -158,11 +158,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
 
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
+
             AnnotatedTypeMirror annoType = type;
-            // if (type instanceof AnnotatedPrimitiveType) {
-            // AnnotatedPrimitiveType priType = (AnnotatedPrimitiveType) type;
-            // annoType = atypeFactory.getBoxedType(priType);
-            // }
             AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(annoType,
                     processingEnv);
             type.replaceAnnotation(dataFlowType);
@@ -260,19 +257,19 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
     private String convertToReferenceType(String typeName) {
         switch (typeName) {
         case "int":
-            return "java.lang.Integer";
+            return Integer.class.getName();
         case "short":
-            return "java.lang.Short";
+            return Short.class.getName();
         case "byte":
-            return "java.lang.Byte";
+            return Byte.class.getName();
         case "long":
-            return "java.lang.Long";
+            return Long.class.getName();
         case "char":
-            return "java.lang.Character";
+            return Character.class.getName();
         case "float":
-            return "java.lang.Float";
+            return Float.class.getName();
         case "double":
-            return "java.lang.Double";
+            return Double.class.getName();
         default:
             return typeName;
         }

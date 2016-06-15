@@ -11,7 +11,14 @@ import java.util.Set;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
+import checkers.inference.model.SubtypeConstraint;
 
+/**
+ * ConstraintGraph Builder
+ * 
+ * @author jianchu
+ *
+ */
 public class GraphBuilder {
 
     private final Collection<Slot> slots;
@@ -26,14 +33,18 @@ public class GraphBuilder {
 
     public ConstraintGraph buildGraph() {
         for (Constraint constraint : constraints) {
-            ArrayList<Slot> slots = new ArrayList<Slot>();
-            slots.addAll(constraint.getSlots());
-            addEdges(slots, constraint);
+            if (constraint instanceof SubtypeConstraint) {
+                addSubtypeEdge((SubtypeConstraint) constraint);
+            } else {
+                ArrayList<Slot> slots = new ArrayList<Slot>();
+                slots.addAll(constraint.getSlots());
+                addEdges(slots, constraint);
+            }
         }
         addConstant();
         calculateIndependentPath();
-        return getGraph();
         // printEdges();
+        return getGraph();
     }
     
     private void calculateIndependentPath() {
@@ -51,9 +62,9 @@ public class GraphBuilder {
         while (!queue.isEmpty()) {
             Vertex current = queue.remove();
             visited.add(current);
-            for (Edge edge : current.getEdges()) {
+            for (Edge edge : current.getOutgoingEdge()) {
                 independentConstraints.add(edge.getConstraint());
-                Vertex next = current.equals(edge.getVertex1()) ? edge.getVertex2() : edge.getVertex1();
+                Vertex next = current.equals(edge.getFromVertex()) ? edge.getToVertex() : edge.getFromVertex();
                 if (!visited.contains(next)) {
                     queue.add(next);
                 }
@@ -79,23 +90,53 @@ public class GraphBuilder {
             }
             Vertex vertex1 = new Vertex(first);
             Vertex vertex2 = new Vertex(next);
-            for (Vertex vertex : this.graph.getVerticies()) {
-                if (vertex1.equals(vertex)) {
-                    vertex1 = vertex;
-                } else if (vertex2.equals(vertex)) {
-                    vertex2 = vertex;
-                }
-            }
-            Edge edge = new Edge(vertex1, vertex2, constraint);
-            this.graph.addEdge(edge);
-            addEdges(slots, constraint);
+            createDoubleEdge(vertex1, vertex2, constraint);
         }
     }
     
-    private ConstraintGraph getGraph() {
+    private void addSubtypeEdge(SubtypeConstraint subtypeConstraint) {
+        Slot subtype = subtypeConstraint.getSubtype();
+        Slot supertype = subtypeConstraint.getSupertype();
+        if (subtype instanceof ConstantSlot && supertype instanceof ConstantSlot) {
+            return;
+        }
+        Vertex subtypeVertex = new Vertex(subtype);
+        Vertex supertypeVertex = new Vertex(supertype);
+        createSingleEdge(subtypeVertex, supertypeVertex, subtypeConstraint);
+    }
+
+    private void createSingleEdge(Vertex from, Vertex to, Constraint constraint) {
+
+        for (Vertex vertex : this.graph.getVerticies()) {
+            if (from.equals(vertex)) {
+                from = vertex;
+            } else if (to.equals(vertex)) {
+                to = vertex;
+            }
+        }
+        Edge edge = new Edge(from, to, constraint);
+        this.graph.addEdge(edge);
+    }
+
+    private void createDoubleEdge(Vertex vertex1, Vertex vertex2, Constraint constraint) {
+
+        for (Vertex vertex : this.graph.getVerticies()) {
+            if (vertex1.equals(vertex)) {
+                vertex1 = vertex;
+            } else if (vertex2.equals(vertex)) {
+                vertex2 = vertex;
+            }
+        }
+        Edge edge1 = new Edge(vertex1, vertex2, constraint);
+        Edge edge2 = new Edge(vertex2, vertex1, constraint);
+        this.graph.addEdge(edge1);
+        this.graph.addEdge(edge2);
+    }
+
+    public ConstraintGraph getGraph() {
         return this.graph;
     }
-    
+
     private void printEdges() {
         for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
             System.out.println(entry.getKey().getSlot());
@@ -103,14 +144,15 @@ public class GraphBuilder {
         }
 
         for (Edge edge : graph.getEdges()) {
-            System.out.println(edge.getVertex1().getSlot());
-            System.out.println(edge.getVertex2().getSlot());
+            System.out.println(edge.getFromVertex().getSlot());
+            System.out.println(edge.getToVertex().getSlot());
             System.out.println(edge.getConstraint());
         }
 
         for (Vertex vertex : graph.getVerticies()) {
             System.out.println(vertex.getSlot());
-            System.out.println(vertex.getEdges());
+            System.out.println("incoming edge: " + vertex.getIncomingEdges());
+            System.out.println("outgoing edge: " + vertex.getOutgoingEdge());
         }
     }
 
