@@ -20,11 +20,11 @@ public class Edge {
         to.addIncomingEdge(this);
     }
 
-    public Vertex getVertex1() {
+    public Vertex getFromVertex() {
         return this.from;
     }
 
-    public Vertex getVertex2() {
+    public Vertex getToVertex() {
         return this.to;
     }
 

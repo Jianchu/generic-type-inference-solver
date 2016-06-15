@@ -58,7 +58,7 @@ public class GraphBuilder {
             visited.add(current);
             for (Edge edge : current.getOutgoingEdge()) {
                 independentConstraints.add(edge.getConstraint());
-                Vertex next = current.equals(edge.getVertex1()) ? edge.getVertex2() : edge.getVertex1();
+                Vertex next = current.equals(edge.getFromVertex()) ? edge.getToVertex() : edge.getFromVertex();
                 if (!visited.contains(next)) {
                     queue.add(next);
                 }
@@ -138,8 +138,8 @@ public class GraphBuilder {
         }
 
         for (Edge edge : graph.getEdges()) {
-            System.out.println(edge.getVertex1().getSlot());
-            System.out.println(edge.getVertex2().getSlot());
+            System.out.println(edge.getFromVertex().getSlot());
+            System.out.println(edge.getToVertex().getSlot());
             System.out.println(edge.getConstraint());
         }
 

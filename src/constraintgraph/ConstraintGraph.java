@@ -31,8 +31,8 @@ public class ConstraintGraph {
     public void addEdge(Edge edge) {
         if (!this.edges.contains(edge)) {
             this.edges.add(edge);
-            addVertex(edge.getVertex1());
-            addVertex(edge.getVertex2());
+            addVertex(edge.getFromVertex());
+            addVertex(edge.getToVertex());
         }
     }
 
