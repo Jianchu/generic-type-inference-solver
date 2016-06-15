@@ -4,7 +4,6 @@ import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
@@ -25,12 +24,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 
-import checkers.inference.InferenceAnnotatedTypeFactory;
-import checkers.inference.InferrableAnnotatedTypeFactory;
-import checkers.inference.InferrableChecker;
-import checkers.inference.SlotManager;
-import checkers.inference.VariableAnnotator;
-
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
@@ -39,8 +32,7 @@ import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
-public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
-        implements InferrableAnnotatedTypeFactory {
+public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     protected final AnnotationMirror DATAFLOW, DATAFLOWBOTTOM, DATAFLOWTOP;
     private ExecutableElement dataflowValue = TreeUtils.getMethod(
@@ -63,16 +55,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory
                 super.createTreeAnnotator(),
                 new DataflowTreeAnnotator()
         );
-    }
-
-    @Override
-    public TreeAnnotator getInferenceTreeAnnotator(
-            InferenceAnnotatedTypeFactory atypeFactory,
-            InferrableChecker realChecker,
-            VariableAnnotator variableAnnotator, SlotManager slotManager) {
-        return new ListTreeAnnotator(new ImplicitsTreeAnnotator(this),
-                new DataflowInferenceTreeAnnotator(atypeFactory, realChecker,
-                        this, variableAnnotator, slotManager));
     }
 
     @Override
