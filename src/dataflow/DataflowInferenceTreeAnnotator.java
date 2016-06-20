@@ -59,6 +59,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         TypeMirror tm = atm.getUnderlyingType();
         ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
         replaceATM(atm);
+        variableAnnotator.visit(atm, newClassTree.getIdentifier());
         return null;
     }
 
@@ -83,7 +84,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         return null;
     }
 
-     @Override
+    @Override
     public Void visitMethodInvocation(MethodInvocationTree methodInvocationTree,
             final AnnotatedTypeMirror atm) {
         ExecutableElement methodElement = TreeUtils.elementFromUse(methodInvocationTree);
@@ -91,10 +92,10 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         if (isBytecode) {
             replaceATM(atm);
             return null;
-     } else {
+        } else {
             return super.visitMethodInvocation(methodInvocationTree, atm);
         }
-     }
+    }
 
     private void replaceATM(AnnotatedTypeMirror atm) {
         AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
