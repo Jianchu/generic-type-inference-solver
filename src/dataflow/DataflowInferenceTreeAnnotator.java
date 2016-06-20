@@ -50,7 +50,9 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
     @Override
     public Void visitLiteral(final LiteralTree literalTree, final AnnotatedTypeMirror atm) {
-        replaceATM(atm);
+        AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(literalTree,
+                this.realTypeFactory.getProcessingEnv());
+        replaceATM(atm, anno);
         return null;
     }
 
@@ -58,7 +60,9 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     public Void visitNewClass(final NewClassTree newClassTree, final AnnotatedTypeMirror atm) {
         TypeMirror tm = atm.getUnderlyingType();
         ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
-        replaceATM(atm);
+        AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
+                this.realTypeFactory.getProcessingEnv());
+        replaceATM(atm, anno);
         variableAnnotator.visit(atm, newClassTree.getIdentifier());
         return null;
     }
@@ -80,7 +84,9 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     public Void visitNewArray(final NewArrayTree newArrayTree, final AnnotatedTypeMirror atm) {
         TypeMirror tm = atm.getUnderlyingType();
         ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap().put(tm.toString(), tm);
-        replaceATM(atm);
+        AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
+                this.realTypeFactory.getProcessingEnv());
+        replaceATM(atm, anno);
         return null;
     }
 
@@ -90,23 +96,26 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         ExecutableElement methodElement = TreeUtils.elementFromUse(methodInvocationTree);
         boolean isBytecode = ElementUtils.isElementFromByteCode(methodElement);
         if (isBytecode) {
-            replaceATM(atm);
+            TypeMirror tm = atm.getUnderlyingType();
+            ((DataflowAnnotatedTypeFactory) this.realTypeFactory).getTypeNameMap()
+                    .put(tm.toString(), tm);
+            AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromByteCode(atm,
+                    this.realTypeFactory.getProcessingEnv());
+            replaceATM(atm, anno);
             return null;
         } else {
             return super.visitMethodInvocation(methodInvocationTree, atm);
         }
     }
 
-    private void replaceATM(AnnotatedTypeMirror atm) {
-        AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
-                this.realTypeFactory.getProcessingEnv());
-        final ConstantSlot cs = new ConstantSlot(anno, slotManager.nextId());
+    private void replaceATM(AnnotatedTypeMirror atm, AnnotationMirror dataflowAM) {
+        final ConstantSlot cs = new ConstantSlot(dataflowAM, slotManager.nextId());
         slotManager.addVariable(cs);
         AnnotationBuilder ab = new AnnotationBuilder(realTypeFactory.getProcessingEnv(), VarAnnot.class);
         ab.setValue("value", cs.getId());
         AnnotationMirror varAnno = ab.build();
         atm.replaceAnnotation(varAnno);
-        atm.replaceAnnotation(anno);
+        atm.replaceAnnotation(dataflowAM);
     }
 
 }
