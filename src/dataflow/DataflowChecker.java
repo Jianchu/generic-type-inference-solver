@@ -1,16 +1,16 @@
 package dataflow;
 
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
-import org.checkerframework.framework.flow.CFTransfer;
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.util.Elements;
 
 import checkers.inference.BaseInferrableChecker;
+import checkers.inference.ConstraintManager;
 import checkers.inference.InferenceChecker;
-import checkers.inference.dataflow.InferenceAnalysis;
-import checkers.inference.dataflow.InferenceTransfer;
+import checkers.inference.InferrableChecker;
+import checkers.inference.SlotManager;
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
 
@@ -40,8 +40,12 @@ public class DataflowChecker extends BaseInferrableChecker {
     }
 
     @Override
-    public CFTransfer createInferenceTransferFunction(InferenceAnalysis analysis) {
-        return new InferenceTransfer(analysis);
+    public DataflowInferenceAnnotatedTypeFactory createInferenceATF(InferenceChecker inferenceChecker,
+            InferrableChecker realChecker, BaseAnnotatedTypeFactory realTypeFactory,
+            SlotManager slotManager, ConstraintManager constraintManager) {
+        DataflowInferenceAnnotatedTypeFactory dataflowInferenceTypeFactory = new DataflowInferenceAnnotatedTypeFactory(
+                inferenceChecker, realChecker.withCombineConstraints(), realTypeFactory, realChecker,
+                slotManager, constraintManager);
+        return dataflowInferenceTypeFactory;
     }
-
 }
