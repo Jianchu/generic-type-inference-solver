@@ -263,6 +263,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             return Float.class.getName();
         case "double":
             return Double.class.getName();
+        case "boolean":
+            return Boolean.class.getName();
         default:
             return typeName;
         }
