@@ -50,9 +50,13 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
 
     @Override
     public Void visitLiteral(final LiteralTree literalTree, final AnnotatedTypeMirror atm) {
-        AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(literalTree,
-                this.realTypeFactory.getProcessingEnv());
-        replaceATM(atm, anno);
+        if (!literalTree.getKind().equals(Kind.NULL_LITERAL)) {
+            AnnotationMirror anno = DataflowUtils.generateDataflowAnnoFromLiteral(literalTree,
+                    this.realTypeFactory.getProcessingEnv());
+            replaceATM(atm, anno);
+        } else {
+            super.visitLiteral(literalTree, atm);
+        }
         return null;
     }
 

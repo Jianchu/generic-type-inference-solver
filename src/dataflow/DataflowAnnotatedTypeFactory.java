@@ -28,6 +28,7 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.Tree.Kind;
 
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
@@ -151,12 +152,12 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
         @Override
         public Void visitLiteral(LiteralTree node, AnnotatedTypeMirror type) {
-
-            AnnotatedTypeMirror annoType = type;
-            AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(annoType,
-                    processingEnv);
-            type.replaceAnnotation(dataFlowType);
-
+            if (!node.getKind().equals(Kind.NULL_LITERAL)) {
+                AnnotatedTypeMirror annoType = type;
+                AnnotationMirror dataFlowType = DataflowUtils.generateDataflowAnnoFromLiteral(annoType,
+                        processingEnv);
+                type.replaceAnnotation(dataFlowType);
+            }
             return super.visitLiteral(node, type);
         }
 
