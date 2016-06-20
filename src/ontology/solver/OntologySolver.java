@@ -27,6 +27,10 @@ import checkers.inference.InferenceSolver;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Slot;
+import constraintgraph.ConstraintGraph;
+import constraintgraph.GraphBuilder;
+import constraintgraph.Vertex;
+import dataflow.util.DataflowUtils;
 
 public class OntologySolver implements InferenceSolver {
 
@@ -40,19 +44,35 @@ public class OntologySolver implements InferenceSolver {
 
         Elements elements = processingEnvironment.getElementUtils();
         Ontology = AnnotationUtils.fromClass(elements, Ontology.class);
-
-        Collection<String> datatypesUsed = getDatatypesUsed(slots);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+        
+        //Collection<String> datatypesUsed = getDatatypesUsed(slots);
         List<SequenceSolver> sequenceSolvers = new ArrayList<>();
+        // Configure datatype solvers
+        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
+            AnnotationMirror anno = entry.getKey().getValue();
+            if (AnnotationUtils.areSameIgnoringValues(anno, Ontology)) {
+                String[] dataflowValues = DataflowUtils.getTypeNames(anno);
+                if (dataflowValues.length == 1) {
+                    SequenceSolver solver = new SequenceSolver(dataflowValues[0], entry.getValue(),getSerializer(dataflowValues[0]));
+                    sequenceSolvers.add(solver);
+                }
+            }
+        }
+
 
         // Configure datatype solvers
-        for (String datatype : datatypesUsed) {
-            SequenceSolver solver = new SequenceSolver(datatype, constraints, getSerializer(datatype));
-            sequenceSolvers.add(solver);
-        }
+//        for (String datatype : datatypesUsed) {
+//            SequenceSolver solver = new SequenceSolver(datatype, constraints, getSerializer(datatype));
+//            sequenceSolvers.add(solver);
+//        }
 
         List<SequenceSolution> solutions = new ArrayList<>();
         try {
-            solutions = solveInparallel(sequenceSolvers);
+            if (solutions.size() > 0) {
+                solutions = solveInparallel(sequenceSolvers);
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
