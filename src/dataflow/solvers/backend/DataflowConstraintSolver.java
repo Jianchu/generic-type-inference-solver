@@ -29,10 +29,10 @@ import constraintgraph.Vertex;
 import constraintsolver.ConstraintSerializer;
 import constraintsolver.ConstraintSolver;
 import dataflow.qual.DataFlow;
-import dataflow.solvers.DataflowSerializer;
-import dataflow.solvers.DataflowSolution;
-import dataflow.solvers.DatatypeSolution;
-import dataflow.solvers.DatatypeSolver;
+import dataflow.solvers.classic.DataflowSerializer;
+import dataflow.solvers.classic.DataflowSolution;
+import dataflow.solvers.classic.DatatypeSolution;
+import dataflow.solvers.classic.DatatypeSolver;
 import dataflow.util.DataflowUtils;
 
 public class DataflowConstraintSolver extends ConstraintSolver {
