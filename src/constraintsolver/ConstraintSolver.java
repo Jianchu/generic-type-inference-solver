@@ -72,7 +72,7 @@ public class ConstraintSolver implements InferenceSolver {
             Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
-
+        System.out.println("Using ConstraintGraph!");
         List<BackEnd> backEnds = new ArrayList<BackEnd>();
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
 
