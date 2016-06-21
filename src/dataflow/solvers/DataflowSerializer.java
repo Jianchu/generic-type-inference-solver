@@ -1,4 +1,4 @@
-package dataflow.solvers.classic;
+package dataflow.solvers;
 
 import org.checkerframework.javacutil.AnnotationUtils;
 

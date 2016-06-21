@@ -28,6 +28,10 @@ import constraintgraph.ConstraintGraph;
 import constraintgraph.GraphBuilder;
 import constraintgraph.Vertex;
 import dataflow.qual.DataFlow;
+import dataflow.solvers.DataflowSerializer;
+import dataflow.solvers.DataflowSolution;
+import dataflow.solvers.DatatypeSolution;
+import dataflow.solvers.DatatypeSolver;
 import dataflow.util.DataflowUtils;
 
 public class DataflowSolver implements InferenceSolver {
@@ -64,10 +68,6 @@ public class DataflowSolver implements InferenceSolver {
             }
         }
 
-        // List<DatatypeSolution> solutions = new ArrayList<>();
-        // for (DatatypeSolver solver : dataflowSolvers) {
-        // solutions.add(solver.solve());
-        // }
         List<DatatypeSolution> solutions = new ArrayList<>();
         try {
             if (dataflowSolvers.size() > 0) {

@@ -1,4 +1,4 @@
-package dataflow.solvers.classic;
+package dataflow.solvers;
 
 import java.io.File;
 import java.io.PrintWriter;
