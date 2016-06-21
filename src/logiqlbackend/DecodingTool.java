@@ -74,13 +74,13 @@ public class DecodingTool {
      */
     private void setDefault() {
         for (Integer varSlotId : varSlotIds) {
-            result.put(varSlotId, Lattice.top);
+            result.put(varSlotId, Lattice.getInstance().top);
         }
     }
 
     private Map<String, AnnotationMirror> mapStringToAnnoMirror() {
         Map<String, AnnotationMirror> nameMap = new HashMap<String, AnnotationMirror>();
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : Lattice.getInstance().allTypes) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             nameMap.put(simpleName, annoMirror);
         }

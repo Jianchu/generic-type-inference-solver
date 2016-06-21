@@ -31,13 +31,14 @@ public abstract class BackEnd<S, T> {
     protected final Collection<Slot> slots;
     protected final Collection<Constraint> constraints;
     protected final QualifierHierarchy qualHierarchy;
-    private final ProcessingEnvironment processingEnvironment;
+    protected final ProcessingEnvironment processingEnvironment;
     protected final Serializer<S, T> realSerializer;
     protected final Set<Integer> varSlotIds;
+    protected final Lattice lattice;
 
     public BackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment, Serializer<S, T> realSerializer) {
+            ProcessingEnvironment processingEnvironment, Serializer<S, T> realSerializer, Lattice lattice) {
         this.configuration = configuration;
         this.slots = slots;
         this.constraints = constraints;
@@ -45,6 +46,7 @@ public abstract class BackEnd<S, T> {
         this.processingEnvironment = processingEnvironment;
         this.realSerializer = realSerializer;
         this.varSlotIds = new HashSet<Integer>();
+        this.lattice = lattice;
     }
 
     public abstract InferenceSolution solve();

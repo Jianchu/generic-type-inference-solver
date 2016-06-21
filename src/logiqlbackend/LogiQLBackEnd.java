@@ -11,8 +11,8 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
-import util.PrintUtils;
 import util.NameUtils;
+import util.PrintUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.model.Constraint;
@@ -28,9 +28,10 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     public LogiQLBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment, Serializer<String, String> realSerializer) {
-        super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
-        Lattice.configure(qualHierarchy);
+            ProcessingEnvironment processingEnvironment, Serializer<String, String> realSerializer,
+            Lattice lattice) {
+        super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer,
+                lattice);
         logiqldata.mkdir();
 
     }
@@ -75,7 +76,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     }
 
     private void addConstants() {
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.allTypes) {
             String constant = NameUtils.getSimpleName(annoMirror);
             logiQLText.insert(0, "+constant(c), +hasconstantName[c] = \"" + constant + "\".\n");
         }

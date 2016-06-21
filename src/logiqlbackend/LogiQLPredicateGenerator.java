@@ -22,9 +22,10 @@ public class LogiQLPredicateGenerator {
 
     private final String path;
     private final StringBuilder allEncodings = new StringBuilder();
-
+    private final Lattice lattice;
     public LogiQLPredicateGenerator(String path) {
         this.path = path;
+        this.lattice = Lattice.getInstance();
     }
 
     public void GenerateLogiqlEncoding() {
@@ -43,7 +44,7 @@ public class LogiQLPredicateGenerator {
 
     private String getEqualityConstraintEncoding() {
         StringBuilder equalityEncoding = new StringBuilder();
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.allTypes) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             equalityEncoding.append("is" + simpleName + "[v2] = true <- equalityConstraint(v1, v2), is"
                     + simpleName + "[v1] = true.\n");
@@ -56,7 +57,7 @@ public class LogiQLPredicateGenerator {
     
     private String getInequalityConstraintEncoding() {
         StringBuilder inequalityEncoding = new StringBuilder();
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.allTypes) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             inequalityEncoding.append("is" + simpleName + "[v2] = false <- inequalityConstraint(v1, v2), is"
                     + simpleName + "[v1] = true.\n");
@@ -69,14 +70,14 @@ public class LogiQLPredicateGenerator {
     
     private String getSubTypeConstraintEncoding() {
         StringBuilder subtypeEncoding = new StringBuilder();
-        String topTypeStr = NameUtils.getSimpleName(Lattice.top);
-        String bottomTypeStr = NameUtils.getSimpleName(Lattice.bottom);
+        String topTypeStr = NameUtils.getSimpleName(lattice.top);
+        String bottomTypeStr = NameUtils.getSimpleName(lattice.bottom);
         subtypeEncoding.append("is" + topTypeStr + "[v2] = true <- subtypeConstraint(v1, v2), is" + topTypeStr + "[v1] = true.\n");
         subtypeEncoding.append("is" + topTypeStr+ "[v2] = true <- subtypeConstraintLeftConstant(v1, v2), hasconstantName(v1:\"" + topTypeStr + "\").\n");
         subtypeEncoding.append("is" + bottomTypeStr + "[v1] = true <- subtypeConstraint(v1, v2), is" + bottomTypeStr + "[v2] = true.\n");
         subtypeEncoding.append("is" + bottomTypeStr+ "[v1] = true <- subtypeConstraintRightConstant(v1, v2), hasconstantName(v2:\"" + bottomTypeStr + "\").\n\n");
         
-        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.subType.entrySet()) {
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : lattice.subType.entrySet()) {
             String superTypeName = NameUtils.getSimpleName(entry.getKey());
             for (AnnotationMirror subType : entry.getValue()) {
                 String subTypeName = NameUtils.getSimpleName(subType);
@@ -88,7 +89,7 @@ public class LogiQLPredicateGenerator {
         }
         subtypeEncoding.append("\n");
         // duplicate code for easy understanding
-        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.superType.entrySet()) {
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : lattice.superType.entrySet()) {
             String subTypeName = NameUtils.getSimpleName(entry.getKey());
             for (AnnotationMirror superType : entry.getValue()) {
                 String superTypeName = NameUtils.getSimpleName(superType);
@@ -104,7 +105,7 @@ public class LogiQLPredicateGenerator {
     private String getComparableConstraintEncoding() {
         StringBuilder ComparableEncoding = new StringBuilder();
         // duplicate code for easy understanding
-        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : Lattice.incomparableType.entrySet()) {
+        for (Map.Entry<AnnotationMirror, Collection<AnnotationMirror>> entry : lattice.incomparableType.entrySet()) {
             String incompType1Name = NameUtils.getSimpleName(entry.getKey());
             for (AnnotationMirror incomparableType2 : entry.getValue()) {
                 String incompType2Name = NameUtils.getSimpleName(incomparableType2);
@@ -142,16 +143,16 @@ public class LogiQLPredicateGenerator {
         basicEncoding.append("comparableConstraint(v1,v2) -> variable(v1), variable(v2).\n");
         basicEncoding.append("comparableConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).\n");
         // each type
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.allTypes) {
             basicEncoding.append("is" + NameUtils.getSimpleName(annoMirror)
                     + "[v] = i -> variable(v), boolean(i).\n");
         }
-        for (AnnotationMirror annoMirror : Lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.allTypes) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             basicEncoding.append("AnnotationOf[v] = \"" + simpleName + "\" <- " + "is" + simpleName + "[v] = true.\n");
         }
-        for (AnnotationMirror rightAnnoMirror : Lattice.allTypes) {
-            for (AnnotationMirror leftAnnoMirror : Lattice.allTypes) {
+        for (AnnotationMirror rightAnnoMirror : lattice.allTypes) {
+            for (AnnotationMirror leftAnnoMirror : lattice.allTypes) {
                 String leftAnnoName = NameUtils.getSimpleName(leftAnnoMirror);
                 String rightAnnoName = NameUtils.getSimpleName(rightAnnoMirror);
                 if (!leftAnnoName.equals(rightAnnoName)) {

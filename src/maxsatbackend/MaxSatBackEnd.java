@@ -16,8 +16,8 @@ import javax.lang.model.element.AnnotationMirror;
 import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
-import util.PrintUtils;
 import util.MathUtils;
+import util.PrintUtils;
 import util.VectorUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
@@ -42,10 +42,11 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
-            ProcessingEnvironment processingEnvironment, Serializer<VecInt[], VecInt[]> realSerializer) {
-        super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer);
+            ProcessingEnvironment processingEnvironment, Serializer<VecInt[], VecInt[]> realSerializer,
+            Lattice lattice) {
+        super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer,
+                lattice);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
-        Lattice.configure(qualHierarchy);
     }
 
     /**
@@ -75,14 +76,14 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
      */
     private void generateWellForm(List<VecInt> clauses) {
         for (Integer id : this.varSlotIds) {
-            int[] leastOneIsTrue = new int[Lattice.numTypes];
-            for (Integer i : Lattice.intToType.keySet()) {
+            int[] leastOneIsTrue = new int[lattice.numTypes];
+            for (Integer i : lattice.intToType.keySet()) {
                 leastOneIsTrue[i] = MathUtils.mapIdToMatrixEntry(id, i.intValue());
             }
             clauses.add(VectorUtils.asVec(leastOneIsTrue));
 
-            Iterator<Integer> entries1 = Lattice.intToType.keySet().iterator();
-            Set<Integer> entries2 = Lattice.intToType.keySet();
+            Iterator<Integer> entries1 = lattice.intToType.keySet().iterator();
+            Set<Integer> entries2 = lattice.intToType.keySet();
             while (entries1.hasNext()) {
                 Integer entry1 = entries1.next();
                 for (Integer entry2 : entries2) {
@@ -103,7 +104,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             if (var > 0) {
                 var = var - 1;
                 int slotId = MathUtils.getSlotId(var);
-                AnnotationMirror type = Lattice.intToType.get(MathUtils.getIntRep(var));
+                AnnotationMirror type = lattice.intToType.get(MathUtils.getIntRep(var));
                 result.put(slotId, type);
             }
         }
@@ -148,7 +149,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
      * @param solver
      */
     private void configureSatSolver(WeightedMaxSatDecorator solver) {
-        final int totalVars = (slotManager.nextId() * Lattice.numTypes);
+        final int totalVars = (slotManager.nextId() * lattice.numTypes);
         final int totalClauses = hardClauses.size() + softClauses.size();
 
         solver.newVar(totalVars);

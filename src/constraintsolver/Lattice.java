@@ -22,19 +22,19 @@ import javax.lang.model.element.AnnotationMirror;
  */
 public class Lattice {
 
-    private static QualifierHierarchy qualHierarchy;
-    public static Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils.createAnnotationMap();
-    public static Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
-    public static Map<AnnotationMirror, Collection<AnnotationMirror>> incomparableType = AnnotationUtils.createAnnotationMap();
-    public static Map<AnnotationMirror, Integer> typeToInt = AnnotationUtils.createAnnotationMap();
-    public static Map<Integer,AnnotationMirror> intToType = new HashMap<Integer,AnnotationMirror>();
-    public static Set<? extends AnnotationMirror> allTypes;
-    public static AnnotationMirror top;
-    public static AnnotationMirror bottom;
-    public static int numTypes;
+    protected final QualifierHierarchy qualHierarchy;
+    protected static Lattice latticeInstance;
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils .createAnnotationMap();
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
+    public Map<AnnotationMirror, Collection<AnnotationMirror>> incomparableType = AnnotationUtils.createAnnotationMap();
+    public Map<AnnotationMirror, Integer> typeToInt = AnnotationUtils.createAnnotationMap();
+    public Map<Integer, AnnotationMirror> intToType = new HashMap<Integer, AnnotationMirror>();
+    public Set<? extends AnnotationMirror> allTypes;
+    public AnnotationMirror top;
+    public AnnotationMirror bottom;
+    public int numTypes;
 
-    public static void configure(QualifierHierarchy qualHierarchy) {
-        Lattice.qualHierarchy = qualHierarchy;
+    public void configure() {
         allTypes = qualHierarchy.getTypeQualifiers();
         top = qualHierarchy.getTopAnnotations().iterator().next();
         bottom = qualHierarchy.getBottomAnnotations().iterator().next();
@@ -43,7 +43,12 @@ public class Lattice {
         getIncomparable();
     }
 
-    private static void getSubSupertype() {
+    public Lattice(QualifierHierarchy qualHierarchy) {
+        this.qualHierarchy = qualHierarchy;
+        this.latticeInstance = this;
+    }
+
+    private void getSubSupertype() {
         int num = 0;
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> subtypeOfi = new HashSet<AnnotationMirror>();
@@ -64,7 +69,7 @@ public class Lattice {
         }
     }
 
-    private static void getIncomparable() {
+    private void getIncomparable() {
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> incomparableOfi = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
@@ -76,5 +81,25 @@ public class Lattice {
                 incomparableType.put(i, incomparableOfi);
             }
         }
+    }
+
+    public static Lattice getInstance() {
+        return latticeInstance;
+    }
+
+    public static Map<AnnotationMirror, Integer> getTypeToInt() {
+        return latticeInstance.typeToInt;
+    }
+
+    public static int getNumTypes() {
+        return latticeInstance.numTypes;
+    }
+
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> getSubtype() {
+        return latticeInstance.subType;
+    }
+
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> getIncomparableType() {
+        return latticeInstance.incomparableType;
     }
 }

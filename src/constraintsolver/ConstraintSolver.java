@@ -26,7 +26,7 @@ public class ConstraintSolver implements InferenceSolver {
 
     public BackEnd realBackEnd;
     public String backEndType;
-
+    protected Lattice lattice;
     // public enum BackEndType {
     // SAT, LOGIQL, GENERAL
     // }
@@ -36,6 +36,8 @@ public class ConstraintSolver implements InferenceSolver {
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
         configure(configuration);
+        this.lattice = new Lattice(qualHierarchy);
+        lattice.configure();
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType);
         realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                 processingEnvironment, defaultSerializer);
@@ -67,9 +69,9 @@ public class ConstraintSolver implements InferenceSolver {
             Class<?> backEndClass = Class.forName(backEndType + "BackEnd");
             Constructor<?> cons = backEndClass.getConstructor(Map.class, Collection.class,
                     Collection.class, QualifierHierarchy.class, ProcessingEnvironment.class,
-                    Serializer.class);
+                    Serializer.class, Lattice.class);
             backEnd = (BackEnd) cons.newInstance(configuration, slots, constraints, qualHierarchy,
-                    processingEnvironment, defaultSerializer);
+                    processingEnvironment, defaultSerializer, lattice);
         } catch (Exception e) {
             e.printStackTrace();
             ErrorReporter.errorAbort("back end is not implemented yet.");
@@ -79,7 +81,7 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected Serializer<?, ?> createSerializer(String value) {
-        return new ConstraintSerializer<>(value);
+        return new ConstraintSerializer<>(value, lattice);
     }
 
     protected InferenceSolution solve() {
