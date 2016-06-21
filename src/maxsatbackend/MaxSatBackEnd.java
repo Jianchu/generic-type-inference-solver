@@ -19,9 +19,7 @@ import org.sat4j.maxsat.WeightedMaxSatDecorator;
 import util.MathUtils;
 import util.PrintUtils;
 import util.VectorUtils;
-import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
-import checkers.inference.InferenceSolution;
 import checkers.inference.SlotManager;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.PreferenceConstraint;
@@ -112,7 +110,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     }
 
     @Override
-    public InferenceSolution solve() {
+    public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
         this.convertAll();
@@ -140,7 +138,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             e.printStackTrace();
         }
 
-        return new DefaultInferenceSolution(result);
+        return result;
     }
 
     /**

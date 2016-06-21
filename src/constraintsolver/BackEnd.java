@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 
-import checkers.inference.InferenceSolution;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
@@ -29,7 +29,7 @@ public abstract class BackEnd<S, T> {
 
     protected final Map<String, String> configuration;
     protected final Collection<Slot> slots;
-    protected final Collection<Constraint> constraints;
+    protected Collection<Constraint> constraints;
     protected final QualifierHierarchy qualHierarchy;
     protected final ProcessingEnvironment processingEnvironment;
     protected final Serializer<S, T> realSerializer;
@@ -49,7 +49,7 @@ public abstract class BackEnd<S, T> {
         this.lattice = lattice;
     }
 
-    public abstract InferenceSolution solve();
+    public abstract Map<Integer, AnnotationMirror> solve();
 
     public abstract void convertAll();
 
@@ -76,5 +76,9 @@ public abstract class BackEnd<S, T> {
 
     public ProcessingEnvironment getEnvironment() {
         return this.processingEnvironment;
+    }
+    
+    public void setConstraint(Collection<Constraint> constraints) {
+        this.constraints = constraints;
     }
 }

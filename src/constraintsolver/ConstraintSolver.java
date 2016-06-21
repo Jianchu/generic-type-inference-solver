@@ -5,15 +5,24 @@ import org.checkerframework.javacutil.ErrorReporter;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
 
+import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
+import constraintgraph.ConstraintGraph;
+import constraintgraph.GraphBuilder;
+import constraintgraph.Vertex;
 
 /**
  * The default solver that could be called if there is no view adaptation
@@ -26,6 +35,7 @@ public class ConstraintSolver implements InferenceSolver {
 
     public BackEnd realBackEnd;
     public String backEndType;
+    public boolean useGraph;
     protected Lattice lattice;
     // public enum BackEndType {
     // SAT, LOGIQL, GENERAL
@@ -39,13 +49,47 @@ public class ConstraintSolver implements InferenceSolver {
         this.lattice = new Lattice(qualHierarchy);
         lattice.configure();
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType);
-        realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
-                processingEnvironment, defaultSerializer);
-        return solve();
+        if (useGraph) {
+            GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+            ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+            return graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
+                    processingEnvironment, defaultSerializer);
+        } else {
+            realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
+                    processingEnvironment, defaultSerializer);
+            return solve();
+        }
+    }
+
+    protected InferenceSolution graphSolve(ConstraintGraph constraintGraph,
+            Map<String, String> configuration, Collection<Slot> slots,
+            Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
+            ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
+        System.out.println("graph!!!!!");
+        List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
+        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
+            if (realBackEnd == null) {
+                realBackEnd = createBackEnd(backEndType, configuration, slots, entry.getValue(),
+                        qualHierarchy, processingEnvironment, defaultSerializer);
+            } else {
+                realBackEnd.setConstraint(entry.getValue());
+            }
+            inferenceSolutionMaps.add(realBackEnd.solve());
+        }
+        return mergeSolution(inferenceSolutionMaps);
+    }
+
+    protected InferenceSolution mergeSolution(List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps) {
+        Map<Integer, AnnotationMirror> result = new HashMap<>();
+        for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
+            result.putAll(inferenceSolutionMap);
+        }
+        return new DefaultInferenceSolution(result);
     }
 
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
+        String useGraph = configuration.get("useGraph");
         if (backEndName == null) {
             this.backEndType = "maxsatbackend.MaxSat";
             // TODO: warning
@@ -57,6 +101,12 @@ public class ConstraintSolver implements InferenceSolver {
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");
             }
+        }
+
+        if (useGraph == null || useGraph.equals("true")) {
+            this.useGraph = true;
+        } else {
+            this.useGraph = false;
         }
     }
 
@@ -85,6 +135,6 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected InferenceSolution solve() {
-        return realBackEnd.solve();
+        return new DefaultInferenceSolution(realBackEnd.solve());
     }
 }

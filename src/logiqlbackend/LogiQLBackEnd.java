@@ -13,8 +13,6 @@ import javax.lang.model.element.AnnotationMirror;
 
 import util.NameUtils;
 import util.PrintUtils;
-import checkers.inference.DefaultInferenceSolution;
-import checkers.inference.InferenceSolution;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
@@ -37,7 +35,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     }
 
     @Override
-    public InferenceSolution solve() {
+    public Map<Integer, AnnotationMirror> solve() {
         String logiqldataPath = logiqldata.getAbsolutePath();
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         /**
@@ -61,7 +59,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         result = DecodeTool.decodeResult();
         PrintUtils.printResult(result);
 
-        return new DefaultInferenceSolution(result);
+        return result;
     }
 
     @Override
