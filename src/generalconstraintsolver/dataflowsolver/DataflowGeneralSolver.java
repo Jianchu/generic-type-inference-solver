@@ -20,8 +20,8 @@ import checkers.inference.InferenceSolution;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Slot;
 import dataflow.qual.DataFlow;
-import dataflow.solver.DataflowSolution;
-import dataflow.solver.DatatypeSolution;
+import dataflow.solvers.classic.DataflowSolution;
+import dataflow.solvers.classic.DatatypeSolution;
 import dataflow.util.DataflowUtils;
 
 public abstract class DataflowGeneralSolver extends GeneralConstrainsSolver {

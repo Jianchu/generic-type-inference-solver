@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import dataflow.solver.DatatypeSolution;
+import dataflow.solvers.classic.DatatypeSolution;
 import dataflow.util.DataflowUtils;
 
 public class DataflowLogiqlSolver extends DataflowGeneralSolver {

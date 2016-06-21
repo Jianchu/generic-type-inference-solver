@@ -1,8 +1,10 @@
 package constraintsolver;
 
-public class TwoQualifiersLattice {
+import org.checkerframework.framework.type.QualifierHierarchy;
 
-    public TwoQualifiersLattice() {
+public class TwoQualifiersLattice extends Lattice {
 
+    public TwoQualifiersLattice(QualifierHierarchy qualHierarchy) {
+        super(qualHierarchy);
     }
 }

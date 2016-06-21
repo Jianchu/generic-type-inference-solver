@@ -1,4 +1,4 @@
-package dataflow.solver;
+package dataflow.solvers.classic;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;
