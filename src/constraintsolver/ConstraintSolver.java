@@ -4,12 +4,18 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.ErrorReporter;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -66,17 +72,48 @@ public class ConstraintSolver implements InferenceSolver {
             Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
+
+        List<BackEnd> backEnds = new ArrayList<BackEnd>();
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
+
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
-            if (realBackEnd == null) {
-                realBackEnd = createBackEnd(backEndType, configuration, slots, entry.getValue(),
-                        qualHierarchy, processingEnvironment, defaultSerializer);
-            } else {
-                realBackEnd.setConstraint(entry.getValue());
-            }
-            inferenceSolutionMaps.add(realBackEnd.solve());
+            backEnds.add(createBackEnd(backEndType, configuration, slots, entry.getValue(),
+                    qualHierarchy, processingEnvironment, defaultSerializer));
         }
+        try {
+            if (backEnds.size() > 0) {
+                inferenceSolutionMaps = solveInparallel(backEnds);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
         return mergeSolution(inferenceSolutionMaps);
+    }
+
+    private List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd> backEnds)
+            throws InterruptedException, ExecutionException {
+
+        ExecutorService service = Executors.newFixedThreadPool(backEnds.size());
+
+        List<Future<Map<Integer, AnnotationMirror>>> futures = new ArrayList<Future<Map<Integer, AnnotationMirror>>>();
+
+        for (final BackEnd backEnd : backEnds) {
+            Callable<Map<Integer, AnnotationMirror>> callable = new Callable<Map<Integer, AnnotationMirror>>() {
+                @Override
+                public Map<Integer, AnnotationMirror> call() throws Exception {
+                    return backEnd.solve();
+                }
+            };
+            futures.add(service.submit(callable));
+        }
+        service.shutdown();
+
+        List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
+        for (Future<Map<Integer, AnnotationMirror>> future : futures) {
+            solutions.add(future.get());
+        }
+        return solutions;
     }
 
     protected InferenceSolution mergeSolution(List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps) {
