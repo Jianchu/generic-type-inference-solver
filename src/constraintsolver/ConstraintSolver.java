@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
+import util.PrintUtils;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
@@ -65,7 +66,6 @@ public class ConstraintSolver implements InferenceSolver {
             Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
-        System.out.println("graph!!!!!");
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             if (realBackEnd == null) {
@@ -84,6 +84,7 @@ public class ConstraintSolver implements InferenceSolver {
         for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
             result.putAll(inferenceSolutionMap);
         }
+        PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
     }
 
@@ -135,6 +136,7 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected InferenceSolution solve() {
+        PrintUtils.printResult(realBackEnd.solve());
         return new DefaultInferenceSolution(realBackEnd.solve());
     }
 }

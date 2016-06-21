@@ -17,7 +17,6 @@ import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
 import util.MathUtils;
-import util.PrintUtils;
 import util.VectorUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.SlotManager;
@@ -129,7 +128,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
             if (solver.isSatisfiable()) {
                 result = decode(solver.model());
-                PrintUtils.printResult(result);
+                // PrintUtils.printResult(result);
             } else {
                 System.out.println("Not solvable!");
             }

@@ -12,7 +12,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
 import util.NameUtils;
-import util.PrintUtils;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
@@ -57,7 +56,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         runLogicBlox.runLogicBlox();
         DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath);
         result = DecodeTool.decodeResult();
-        PrintUtils.printResult(result);
+        // PrintUtils.printResult(result);
 
         return result;
     }
