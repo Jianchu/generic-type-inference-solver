@@ -9,7 +9,6 @@ import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.framework.util.GraphQualifierHierarchy;
@@ -27,7 +26,6 @@ import javax.lang.model.element.ExecutableElement;
 
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceTreeAnnotator;
-import checkers.inference.InferrableAnnotatedTypeFactory;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.VariableAnnotator;
@@ -40,8 +38,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 
-public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory implements
-        InferrableAnnotatedTypeFactory {
+public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     protected final AnnotationMirror ONTOLOGY, ONTOLOGYBOTTOM, ONTOLOGYTOP;
     private ExecutableElement ontologyValue = TreeUtils.getMethod("ontology.qual.Ontology", "values",
@@ -63,16 +60,6 @@ public class OntologyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory imple
     @Override
     public TreeAnnotator createTreeAnnotator() {
         return new ListTreeAnnotator(super.createTreeAnnotator(), new OntologyTreeAnnotator());
-    }
-
-    @Override
-    public TreeAnnotator getInferenceTreeAnnotator(
-            InferenceAnnotatedTypeFactory atypeFactory,
-            InferrableChecker realChecker,
-            VariableAnnotator variableAnnotator, SlotManager slotManager) {
-        return new ListTreeAnnotator(new ImplicitsTreeAnnotator(this),
-                new OntologyInferenceTreeAnnotator(atypeFactory, realChecker,
-                        this, variableAnnotator, slotManager));
     }
 
     private final class OntologyQualifierHierarchy extends GraphQualifierHierarchy {
