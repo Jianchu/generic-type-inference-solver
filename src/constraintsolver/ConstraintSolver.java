@@ -44,18 +44,14 @@ public class ConstraintSolver implements InferenceSolver {
     public String backEndType;
     public boolean useGraph;
     protected Lattice lattice;
-    // public enum BackEndType {
-    // SAT, LOGIQL, GENERAL
-    // }
 
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
         configure(configuration);
-        this.lattice = new Lattice(qualHierarchy);
-        lattice.configure();
-        Serializer<?, ?> defaultSerializer = createSerializer(backEndType);
+        configureLattice(qualHierarchy);
+        Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
         if (useGraph) {
             GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
             ConstraintGraph constraintGraph = graphBuilder.buildGraph();
@@ -66,6 +62,11 @@ public class ConstraintSolver implements InferenceSolver {
                     processingEnvironment, defaultSerializer);
             return solve();
         }
+    }
+    
+    protected void configureLattice(QualifierHierarchy qualHierarchy) {
+        this.lattice = new Lattice(qualHierarchy);
+        lattice.configure();
     }
 
     protected InferenceSolution graphSolve(ConstraintGraph constraintGraph,
@@ -91,7 +92,7 @@ public class ConstraintSolver implements InferenceSolver {
         return mergeSolution(inferenceSolutionMaps);
     }
 
-    private List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd> backEnds)
+    protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd> backEnds)
             throws InterruptedException, ExecutionException {
 
         ExecutorService service = Executors.newFixedThreadPool(backEnds.size());
@@ -168,7 +169,7 @@ public class ConstraintSolver implements InferenceSolver {
         return backEnd;
     }
 
-    protected Serializer<?, ?> createSerializer(String value) {
+    protected Serializer<?, ?> createSerializer(String value, Lattice lattice) {
         return new ConstraintSerializer<>(value, lattice);
     }
 

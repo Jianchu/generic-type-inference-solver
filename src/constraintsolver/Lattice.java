@@ -22,7 +22,7 @@ import javax.lang.model.element.AnnotationMirror;
  */
 public class Lattice {
 
-    protected final QualifierHierarchy qualHierarchy;
+    private QualifierHierarchy qualHierarchy;
     protected static Lattice latticeInstance;
     public Map<AnnotationMirror, Collection<AnnotationMirror>> subType = AnnotationUtils .createAnnotationMap();
     public Map<AnnotationMirror, Collection<AnnotationMirror>> superType = AnnotationUtils.createAnnotationMap();
@@ -43,12 +43,15 @@ public class Lattice {
         getIncomparable();
     }
 
+    public Lattice() {
+    }
+
     public Lattice(QualifierHierarchy qualHierarchy) {
         this.qualHierarchy = qualHierarchy;
         this.latticeInstance = this;
     }
 
-    private void getSubSupertype() {
+    protected void getSubSupertype() {
         int num = 0;
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> subtypeOfi = new HashSet<AnnotationMirror>();
@@ -69,7 +72,7 @@ public class Lattice {
         }
     }
 
-    private void getIncomparable() {
+    protected void getIncomparable() {
         for (AnnotationMirror i : allTypes) {
             Set<AnnotationMirror> incomparableOfi = new HashSet<AnnotationMirror>();
             for (AnnotationMirror j : allTypes) {
