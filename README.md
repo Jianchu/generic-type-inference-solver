@@ -26,7 +26,7 @@ I created a shortcut for this tool:
 alias dljc='/the/path/to/do-like-javac/bin/dljc'
 ```
 
-And make sure checking out the `checker` branch.
+And make sure checking out the `checker` branch of `do-like-javac`.
 
 ```
 git checkout checker
@@ -116,3 +116,9 @@ If you compare the original source code with the source code generated
 by the third step, you can find the string field
 `thisIsString` and `thisShouldbeString` are annotated with
 `@DataFlow(typeNames={"java.lang.String"})` in the new source code, although the declared type of `thisShouldbeString` is `Object`.
+
+
+Running On Open Source
+---------------
+
+If you want to infer Dataflow annotations for large open source projects, the steps are same as the above instructions.
