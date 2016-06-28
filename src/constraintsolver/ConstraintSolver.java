@@ -80,7 +80,7 @@ public class ConstraintSolver implements InferenceSolver {
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
         System.out.println("Using ConstraintGraph!");
-        List<BackEnd> backEnds = new ArrayList<BackEnd>();
+        List<BackEnd<?, ?>> backEnds = new ArrayList<BackEnd<?, ?>>();
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
@@ -98,7 +98,7 @@ public class ConstraintSolver implements InferenceSolver {
         return mergeSolution(inferenceSolutionMaps);
     }
 
-    protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd> backEnds)
+    protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd<?, ?>> backEnds)
             throws InterruptedException, ExecutionException {
 
         ExecutorService service = Executors.newFixedThreadPool(backEnds.size());
