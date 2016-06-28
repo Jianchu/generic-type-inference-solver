@@ -1,4 +1,4 @@
-package dataflow.solver;
+package dataflow.solvers.classic;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;
@@ -64,10 +64,6 @@ public class DataflowSolver implements InferenceSolver {
             }
         }
 
-        // List<DatatypeSolution> solutions = new ArrayList<>();
-        // for (DatatypeSolver solver : dataflowSolvers) {
-        // solutions.add(solver.solve());
-        // }
         List<DatatypeSolution> solutions = new ArrayList<>();
         try {
             if (dataflowSolvers.size() > 0) {

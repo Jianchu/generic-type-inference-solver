@@ -37,7 +37,7 @@ public class DataflowUtils {
         return getDataflowValue(type, "typeNameRoots");
     }
 
-    private static AnnotationMirror createDataflowAnnotationForByte(String[] dataType,
+    public static AnnotationMirror createDataflowAnnotationForByte(String[] dataType,
             ProcessingEnvironment processingEnv) {
         AnnotationBuilder builder = new AnnotationBuilder(processingEnv, DataFlow.class);
         builder.setValue("typeNameRoots", dataType);

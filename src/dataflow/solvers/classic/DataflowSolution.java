@@ -1,4 +1,4 @@
-package dataflow.solver;
+package dataflow.solvers.classic;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
+import util.PrintUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
 import dataflow.DataflowAnnotatedTypeFactory;
@@ -31,8 +32,7 @@ public class DataflowSolution implements InferenceSolution {
         merge(solutions);
         createAnnotations(processingEnv);
         simplifyAnnotation();
-
-        System.out.println("FINAL RESULT FROM DATAFLOWSOVLER: " + annotationResults.toString());
+        PrintUtils.printResult(annotationResults);
     }
 
     public void merge(Collection<DatatypeSolution> solutions) {

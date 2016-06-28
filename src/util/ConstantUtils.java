@@ -22,7 +22,7 @@ public class ConstantUtils {
         AnnotationMirror annoMirror2 = constant2.getValue();
 
         if (constraint instanceof SubtypeConstraint) {
-            Collection<AnnotationMirror> subtypeOfConstant2 = Lattice.subType.get(annoMirror2);
+            Collection<AnnotationMirror> subtypeOfConstant2 = Lattice.getSubtype().get(annoMirror2);
             if (!subtypeOfConstant2.contains(annoMirror1)) {
                 return false;
             }
@@ -35,7 +35,8 @@ public class ConstantUtils {
                 return false;
             }
         } else if (constraint instanceof ComparableConstraint) {
-            Collection<AnnotationMirror> incomparableOfConstant2 = Lattice.incomparableType.get(annoMirror2);
+            Collection<AnnotationMirror> incomparableOfConstant2 = Lattice.getIncomparableType()
+                    .get(annoMirror2);
             if (incomparableOfConstant2.contains(annoMirror1)) {
                 return false;
             }
@@ -44,6 +45,6 @@ public class ConstantUtils {
     }
 
     public static boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
-        return AnnotationUtils.areSameIgnoringValues(m1, m2);
+        return AnnotationUtils.areSame(m1, m2);
     }
 }

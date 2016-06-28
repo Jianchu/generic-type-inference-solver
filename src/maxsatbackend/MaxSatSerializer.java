@@ -1,7 +1,5 @@
 package maxsatbackend;
 
-import org.checkerframework.javacutil.ErrorReporter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,8 +39,10 @@ import constraintsolver.VariableCombos;
 
 public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
-    public MaxSatSerializer() {
+    private final Lattice lattice;
 
+    public MaxSatSerializer(Lattice lattice) {
+        this.lattice = lattice;
     }
 
     @Override
@@ -53,13 +53,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
         return new VariableCombos<SubtypeConstraint, VecInt[]>(emptyClauses) {
             @Override
             protected VecInt[] constant_variable(ConstantSlot subtype, VariableSlot supertype, SubtypeConstraint constraint) {
-                if (ConstantUtils.areSameType(subtype.getValue(), Lattice.top)) {
-                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
+                if (ConstantUtils.areSameType(subtype.getValue(), lattice.top)) {
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(supertype.getId(), lattice.top, lattice));
+                }
+                if (lattice.subType.get(subtype.getValue()) != null) {
+                    mustNotBe.addAll(lattice.subType.get(subtype.getValue()));
                 }
 
-                mustNotBe.addAll(Lattice.subType.get(subtype.getValue()));
-                if (Lattice.incomparableType.keySet().contains(subtype.getValue())) {
-                    mustNotBe.addAll(Lattice.incomparableType.get(subtype.getValue()));
+                if (lattice.incomparableType.keySet().contains(subtype.getValue())) {
+                    mustNotBe.addAll(lattice.incomparableType.get(subtype.getValue()));
                 }
                 return getMustNotBe(mustNotBe, supertype, subtype);
             }
@@ -67,13 +69,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_constant(VariableSlot subtype, ConstantSlot supertype, SubtypeConstraint constraint) {
 
-                if (ConstantUtils.areSameType(supertype.getValue(), Lattice.bottom)) {
-                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
+                if (ConstantUtils.areSameType(supertype.getValue(), lattice.bottom)) {
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(subtype.getId(), lattice.bottom, lattice));
                 }
-
-                mustNotBe.addAll(Lattice.superType.get(supertype.getValue()));
-                if (Lattice.incomparableType.keySet().contains(supertype.getValue())) {
-                    mustNotBe.addAll(Lattice.incomparableType.get(supertype.getValue()));
+                
+                if (lattice.superType.get(supertype.getValue()) != null) {
+                    mustNotBe.addAll(lattice.superType.get(supertype.getValue()));
+                }
+                if (lattice.incomparableType.keySet().contains(supertype.getValue())) {
+                    mustNotBe.addAll(lattice.incomparableType.get(supertype.getValue()));
                 }
                 return getMustNotBe(mustNotBe, subtype, supertype);
             }
@@ -84,24 +88,24 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 // if subtype is top, then supertype is top.
                 // if supertype is bottom, then subtype is bottom.
                 VecInt supertypeOfTop = VectorUtils.asVec(
-                        -MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.top),
-                        MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.top));
+                        -MathUtils.mapIdToMatrixEntry(subtype.getId(), lattice.top, lattice),
+                        MathUtils.mapIdToMatrixEntry(supertype.getId(), lattice.top, lattice));
                 VecInt subtypeOfBottom = VectorUtils.asVec(
-                        -MathUtils.mapIdToMatrixEntry(supertype.getId(), Lattice.bottom),
-                        MathUtils.mapIdToMatrixEntry(subtype.getId(), Lattice.bottom));
+                        -MathUtils.mapIdToMatrixEntry(supertype.getId(), lattice.bottom, lattice),
+                        MathUtils.mapIdToMatrixEntry(subtype.getId(), lattice.bottom, lattice));
 
                 List<VecInt> resultList = new ArrayList<VecInt>();
-                for (AnnotationMirror type : Lattice.allTypes) {
+                for (AnnotationMirror type : lattice.getAllTypes()) {
                     // if we know subtype
-                    if (!ConstantUtils.areSameType(type, Lattice.top)) {
+                    if (!ConstantUtils.areSameType(type, lattice.top)) {
                         resultList.add(VectorUtils.asVec(getMaybe(type, subtype, supertype,
-                                Lattice.superType.get(type))));
+                                lattice.superType.get(type))));
                     }
 
                     // if we know supertype
-                    if (!ConstantUtils.areSameType(type, Lattice.bottom)) {
+                    if (!ConstantUtils.areSameType(type, lattice.bottom)) {
                         resultList.add(VectorUtils.asVec(getMaybe(type, supertype, subtype,
-                                Lattice.subType.get(type))));
+                                lattice.subType.get(type))));
                     }
                 }
                 resultList.add(supertypeOfTop);
@@ -111,13 +115,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             }
 
             @Override
-            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, SubtypeConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in subtype constraint: " + slot1.getValue()
-                            + " is not subtype of " + slot2.getValue());
-                }
-
-                return defaultAction(slot1, slot2, constraint);
+            protected VecInt[] constant_constant(ConstantSlot subtype, ConstantSlot supertype,
+                    SubtypeConstraint constraint) {
+//                if (!ConstantUtils.checkConstant(subtype, supertype, constraint)) {
+//                    ErrorReporter.errorAbort("Confliction in subtype constraint: " + subtype.getValue()
+//                            + " is not subtype of " + supertype.getValue());
+//                }
+                return defaultAction(subtype, supertype, constraint);
             }
 
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
@@ -138,7 +142,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
         for (AnnotationMirror sub : mustNotBe) {
             if (!ConstantUtils.areSameType(sub, cSlot.getValue())) {
-                resultList.add(-MathUtils.mapIdToMatrixEntry(vSlot.getId(), sub));
+                resultList.add(-MathUtils.mapIdToMatrixEntry(vSlot.getId(), sub, lattice));
             }
         }
 
@@ -165,9 +169,9 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             Collection<AnnotationMirror> maybeSet) {
         int[] maybeArray = new int[maybeSet.size() + 1];
         int i = 1;
-        maybeArray[0] = -MathUtils.mapIdToMatrixEntry(knownType.getId(), type);
+        maybeArray[0] = -MathUtils.mapIdToMatrixEntry(knownType.getId(), type, lattice);
         for (AnnotationMirror sup : maybeSet) {
-            maybeArray[i] = MathUtils.mapIdToMatrixEntry(unknownType.getId(), sup);
+            maybeArray[i] = MathUtils.mapIdToMatrixEntry(unknownType.getId(), sup, lattice);
             i++;
         }
         return maybeArray;
@@ -179,7 +183,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue()));
+                return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue(), lattice));
             }
 
             @Override
@@ -190,15 +194,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
                 // a <=> b which is the same as (!a v b) & (!b v a)
-                VecInt[] result = new VecInt[Lattice.numTypes * 2];
+                VecInt[] result = new VecInt[lattice.numTypes * 2];
                 int i = 0;
-                for (AnnotationMirror type : Lattice.allTypes) {
+                for (AnnotationMirror type : lattice.getAllTypes()) {
                     result[i] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
-                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type));
+                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
                     result[i + 1] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
-                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type));
+                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
+                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
                     i = i + 2;
                 }
                 return result;
@@ -206,10 +210,10 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             
             @Override
             protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
-                            + " is not equal to " + slot2.getValue());
-                }
+//                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+//                    ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
+//                            + " is not equal to " + slot2.getValue());
+//                }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -222,7 +226,8 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
-                return VectorUtils.asVecArray(-MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue()));
+                return VectorUtils.asVecArray(-MathUtils.mapIdToMatrixEntry(slot2.getId(),
+                        slot1.getValue(), lattice));
             }
 
             @Override
@@ -233,15 +238,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             @Override
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
-                VecInt[] result = new VecInt[Lattice.numTypes * 2];
+                VecInt[] result = new VecInt[lattice.numTypes * 2];
                 int i = 0;
-                for (AnnotationMirror type : Lattice.allTypes) {
+                for (AnnotationMirror type : lattice.getAllTypes()) {
                     result[i] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
-                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type));
+                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
                     result[i + 1] = VectorUtils.asVec(
-                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type),
-                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type));
+                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
+                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
                     i = i + 2;
                 }
                 return result;
@@ -249,10 +254,10 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             
             @Override
             protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, InequalityConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in inequality constraint: " + slot1.getValue()
-                            + " is equal to " + slot2.getValue());
-                }
+//                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+//                    ErrorReporter.errorAbort("Confliction in inequality constraint: " + slot1.getValue()
+//                            + " is equal to " + slot2.getValue());
+//                }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -269,14 +274,14 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, ComparableConstraint constraint) {
                 // a <=> !b which is the same as (!a v !b) & (b v a)
                 List<VecInt> list = new ArrayList<VecInt>();
-                for (AnnotationMirror type : Lattice.allTypes) {
-                    if (Lattice.incomparableType.keySet().contains(type)) {
-                        for (AnnotationMirror notComparable : Lattice.incomparableType.get(type)) {
+                for (AnnotationMirror type : lattice.getAllTypes()) {
+                    if (lattice.incomparableType.keySet().contains(type)) {
+                        for (AnnotationMirror notComparable : lattice.incomparableType.get(type)) {
                             list.add(VectorUtils.asVec(
-                                    -MathUtils.mapIdToMatrixEntry(slot1.getId(), type),
-                                    -MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable),
-                                    MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable),
-                                    MathUtils.mapIdToMatrixEntry(slot1.getId(), type)));
+                                    -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                                    -MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable, lattice),
+                                    MathUtils.mapIdToMatrixEntry(slot2.getId(), notComparable, lattice),
+                                    MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice)));
                         }
                     }
                 }
@@ -286,10 +291,10 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
             
             @Override
             protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, ComparableConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in comparable constraint: " + slot1.getValue()
-                            + " is not comparable to " + slot2.getValue());
-                }
+//                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+//                    ErrorReporter.errorAbort("Confliction in comparable constraint: " + slot1.getValue()
+//                            + " is not comparable to " + slot2.getValue());
+//                }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -339,7 +344,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     public VecInt[] serialize(PreferenceConstraint preferenceConstraint) {
         VariableSlot vs = preferenceConstraint.getVariable();
         ConstantSlot cs = preferenceConstraint.getGoal();
-        return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue()));
+        return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(), lattice));
     }
 
     protected static final VecInt[] emptyClauses = new VecInt[0];
