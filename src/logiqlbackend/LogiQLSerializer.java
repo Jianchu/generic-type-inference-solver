@@ -1,10 +1,5 @@
 package logiqlbackend;
 
-import org.checkerframework.javacutil.ErrorReporter;
-
-import org.sat4j.core.VecInt;
-
-import util.ConstantUtils;
 import util.NameUtils;
 import checkers.inference.model.CombVariableSlot;
 import checkers.inference.model.CombineConstraint;
@@ -60,10 +55,11 @@ public class LogiQLSerializer implements Serializer<String, String> {
             
             @Override
             protected String constant_constant(ConstantSlot slot1, ConstantSlot slot2, SubtypeConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in subtype constraint: " + slot1.getValue()
-                            + " is not subtype of " + slot2.getValue());
-                }
+                // if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                // ErrorReporter.errorAbort("Confliction in subtype constraint: "
+                // + slot1.getValue()
+                // + " is not subtype of " + slot2.getValue());
+                // }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -101,10 +97,11 @@ public class LogiQLSerializer implements Serializer<String, String> {
             
             @Override
             protected String constant_constant(ConstantSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
-                            + " is not equal to " + slot2.getValue());
-                }
+                // if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                // ErrorReporter.errorAbort("Confliction in equality constraint: "
+                // + slot1.getValue()
+                // + " is not equal to " + slot2.getValue());
+                // }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -151,10 +148,11 @@ public class LogiQLSerializer implements Serializer<String, String> {
             
             @Override
             protected String constant_constant(ConstantSlot slot1, ConstantSlot slot2, InequalityConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in inequality constraint: " + slot1.getValue()
-                            + " is equal to " + slot2.getValue());
-                }
+                // if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                // ErrorReporter.errorAbort("Confliction in inequality constraint: "
+                // + slot1.getValue()
+                // + " is equal to " + slot2.getValue());
+                // }
 
                 return defaultAction(slot1, slot2, constraint);
             }
@@ -225,10 +223,11 @@ public class LogiQLSerializer implements Serializer<String, String> {
             
             @Override
             protected String constant_constant(ConstantSlot slot1, ConstantSlot slot2, ComparableConstraint constraint) {
-                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-                    ErrorReporter.errorAbort("Confliction in comparable constraint: " + slot1.getValue()
-                            + " is not comparable to " + slot2.getValue());
-                }
+                // if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+                // ErrorReporter.errorAbort("Confliction in comparable constraint: "
+                // + slot1.getValue()
+                // + " is not comparable to " + slot2.getValue());
+                // }
 
                 return defaultAction(slot1, slot2, constraint);
             }

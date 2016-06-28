@@ -89,4 +89,12 @@ public class Lattice {
     public Set<? extends AnnotationMirror> getAllTypes() {
         return this.allTypes;
     }
+
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> getSubtype() {
+        return latticeInstance.subType;
+    }
+
+    public static Map<AnnotationMirror, Collection<AnnotationMirror>> getIncomparableType() {
+        return latticeInstance.incomparableType;
+    }
 }
