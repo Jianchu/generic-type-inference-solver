@@ -70,8 +70,7 @@ Running Example
 ---------------
 
 After the second step of Building, a `dataflowexample` directory will be
-placed under `$JSR308`.  This is a sample project that is annotated with
-@Dataflow annotations, and you can play around with it: type check,
+placed under `$JSR308`.  This is a sample project that is annotated without any @Dataflow annotations, so you can play around with it: type check,
 type infer, insert the inferred annotations to source code, visualize the control flow graph, etc.
 
 Here are some instructions that shows how to do these tasks with
