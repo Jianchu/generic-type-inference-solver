@@ -45,6 +45,6 @@ public class ConstantUtils {
     }
 
     public static boolean areSameType(AnnotationMirror m1, AnnotationMirror m2) {
-        return AnnotationUtils.areSameIgnoringValues(m1, m2);
+        return AnnotationUtils.areSame(m1, m2);
     }
 }

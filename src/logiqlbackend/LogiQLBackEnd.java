@@ -73,7 +73,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
     }
 
     private void addConstants() {
-        for (AnnotationMirror annoMirror : lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.getAllTypes()) {
             String constant = NameUtils.getSimpleName(annoMirror);
             logiQLText.insert(0, "+constant(c), +hasconstantName[c] = \"" + constant + "\".\n");
         }

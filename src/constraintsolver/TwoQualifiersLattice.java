@@ -8,7 +8,7 @@ import javax.lang.model.element.AnnotationMirror;
 
 public class TwoQualifiersLattice extends Lattice {
 
-    public Set<AnnotationMirror> allTypes;
+    protected Set<AnnotationMirror> allTypes;
 
     public TwoQualifiersLattice(AnnotationMirror top, AnnotationMirror bottom) {
         this.top = top;
@@ -38,6 +38,11 @@ public class TwoQualifiersLattice extends Lattice {
         superType.put(top, topSet);
         subType.put(bottom, bottomSet);
         superType.put(bottom, allTypes);
+    }
+
+    @Override
+    public Set<AnnotationMirror> getAllTypes() {
+        return this.allTypes;
     }
 
 }

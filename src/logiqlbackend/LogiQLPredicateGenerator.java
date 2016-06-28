@@ -44,7 +44,7 @@ public class LogiQLPredicateGenerator {
 
     private String getEqualityConstraintEncoding() {
         StringBuilder equalityEncoding = new StringBuilder();
-        for (AnnotationMirror annoMirror : lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.getAllTypes()) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             equalityEncoding.append("is" + simpleName + "[v2] = true <- equalityConstraint(v1, v2), is"
                     + simpleName + "[v1] = true.\n");
@@ -57,7 +57,7 @@ public class LogiQLPredicateGenerator {
     
     private String getInequalityConstraintEncoding() {
         StringBuilder inequalityEncoding = new StringBuilder();
-        for (AnnotationMirror annoMirror : lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.getAllTypes()) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             inequalityEncoding.append("is" + simpleName + "[v2] = false <- inequalityConstraint(v1, v2), is"
                     + simpleName + "[v1] = true.\n");
@@ -143,16 +143,16 @@ public class LogiQLPredicateGenerator {
         basicEncoding.append("comparableConstraint(v1,v2) -> variable(v1), variable(v2).\n");
         basicEncoding.append("comparableConstraintContainsConstant(v1,v2) -> constant(v1), variable(v2).\n");
         // each type
-        for (AnnotationMirror annoMirror : lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.getAllTypes()) {
             basicEncoding.append("is" + NameUtils.getSimpleName(annoMirror)
                     + "[v] = i -> variable(v), boolean(i).\n");
         }
-        for (AnnotationMirror annoMirror : lattice.allTypes) {
+        for (AnnotationMirror annoMirror : lattice.getAllTypes()) {
             String simpleName = NameUtils.getSimpleName(annoMirror);
             basicEncoding.append("AnnotationOf[v] = \"" + simpleName + "\" <- " + "is" + simpleName + "[v] = true.\n");
         }
-        for (AnnotationMirror rightAnnoMirror : lattice.allTypes) {
-            for (AnnotationMirror leftAnnoMirror : lattice.allTypes) {
+        for (AnnotationMirror rightAnnoMirror : lattice.getAllTypes()) {
+            for (AnnotationMirror leftAnnoMirror : lattice.getAllTypes()) {
                 String leftAnnoName = NameUtils.getSimpleName(leftAnnoMirror);
                 String rightAnnoName = NameUtils.getSimpleName(rightAnnoMirror);
                 if (!leftAnnoName.equals(rightAnnoName)) {

@@ -59,7 +59,7 @@ public class ConstraintSolver implements InferenceSolver {
                     processingEnvironment, defaultSerializer);
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
-                    processingEnvironment, defaultSerializer);
+                    processingEnvironment, lattice, defaultSerializer);
             return solve();
         }
     }
@@ -67,6 +67,12 @@ public class ConstraintSolver implements InferenceSolver {
     protected void configureLattice(QualifierHierarchy qualHierarchy) {
         this.lattice = new Lattice(qualHierarchy);
         lattice.configure();
+    }
+
+    protected TwoQualifiersLattice configureLatticeFor2(AnnotationMirror top, AnnotationMirror bottom) {
+        TwoQualifiersLattice latticeFor2 = new TwoQualifiersLattice(top, bottom);
+        latticeFor2.configure();
+        return latticeFor2;
     }
 
     protected InferenceSolution graphSolve(ConstraintGraph constraintGraph,
@@ -79,7 +85,7 @@ public class ConstraintSolver implements InferenceSolver {
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             backEnds.add(createBackEnd(backEndType, configuration, slots, entry.getValue(),
-                    qualHierarchy, processingEnvironment, defaultSerializer));
+                    qualHierarchy, processingEnvironment, lattice, defaultSerializer));
         }
         try {
             if (backEnds.size() > 0) {
@@ -152,7 +158,7 @@ public class ConstraintSolver implements InferenceSolver {
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
             QualifierHierarchy qualHierarchy, ProcessingEnvironment processingEnvironment,
-            Serializer<?, ?> defaultSerializer) {
+            Lattice lattice, Serializer<?, ?> defaultSerializer) {
         BackEnd backEnd = null;
         try {
             Class<?> backEndClass = Class.forName(backEndType + "BackEnd");

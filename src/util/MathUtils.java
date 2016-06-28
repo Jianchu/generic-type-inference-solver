@@ -6,25 +6,27 @@ import constraintsolver.Lattice;
 
 public class MathUtils {
 
-    public static int mapIdToMatrixEntry(int id, AnnotationMirror type) {
-        int column = Lattice.getTypeToInt().get(type) + 1;
+    public static int mapIdToMatrixEntry(int id, AnnotationMirror type, Lattice lattice) {
+        // System.out.println(type);
+        // System.out.println(Lattice.getTypeToInt());
+        int column = lattice.typeToInt.get(type) + 1;
         int row = id - 1;
-        int length = Lattice.getNumTypes();
+        int length = lattice.numTypes;
         return column + row * length;
     }
 
-    public static int mapIdToMatrixEntry(int id, int type) {
+    public static int mapIdToMatrixEntry(int id, int type, Lattice lattice) {
         int column = type + 1;
         int row = id - 1;
-        int length = Lattice.getNumTypes();
+        int length = lattice.numTypes;
         return column + row * length;
     }
 
-    public static int getSlotId(int var) {
-        return (Math.abs(var) / Lattice.getNumTypes() + 1);
+    public static int getSlotId(int var, Lattice lattice) {
+        return (Math.abs(var) / lattice.numTypes + 1);
     }
 
-    public static int getIntRep(int var) {
-        return Math.abs(var) - (Math.abs(var) / Lattice.getNumTypes()) * Lattice.getNumTypes();
+    public static int getIntRep(int var, Lattice lattice) {
+        return Math.abs(var) - (Math.abs(var) / lattice.numTypes) * lattice.numTypes;
     }
 }

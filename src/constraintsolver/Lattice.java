@@ -29,7 +29,7 @@ public class Lattice {
     public Map<AnnotationMirror, Collection<AnnotationMirror>> incomparableType = AnnotationUtils.createAnnotationMap();
     public Map<AnnotationMirror, Integer> typeToInt = AnnotationUtils.createAnnotationMap();
     public Map<Integer, AnnotationMirror> intToType = new HashMap<Integer, AnnotationMirror>();
-    public Set<? extends AnnotationMirror> allTypes;
+    protected Set<? extends AnnotationMirror> allTypes;
     public AnnotationMirror top;
     public AnnotationMirror bottom;
     public int numTypes;
@@ -84,6 +84,10 @@ public class Lattice {
                 incomparableType.put(i, incomparableOfi);
             }
         }
+    }
+
+    public Set<? extends AnnotationMirror> getAllTypes() {
+        return this.allTypes;
     }
 
     public static Lattice getInstance() {
