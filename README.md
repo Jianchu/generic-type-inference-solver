@@ -121,4 +121,16 @@ by the third step, you can find the string field
 Running On Open Source
 ---------------
 
-If you want to infer Dataflow annotations for large open source projects, the steps are same as the above instructions.
+If you want to infer Dataflow annotations for large open source projects, the steps are very similar to the above instructions.
+
+In second step, instead of running:
+
+  ```
+  do-like-javac -t inference --checker dataflow.DataflowChecker
+    --solver dataflow.solvers.classic.DataflowSolver -o logs 
+    -m ROUNDTRIP -afud annotated -- ant compile-project
+  ```
+Changing `ant compile-project` to the build command for the open source project, and if the whole process runs successfully, the output with annotations inserted will be placed in `annotated` directory.
+
+
+
