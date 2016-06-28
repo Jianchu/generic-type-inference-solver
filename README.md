@@ -89,7 +89,7 @@ and then inserts the results back into the original source code.
 If the whole process runs successfully, the inserted output will be placed in `annotated` directory.
 
   ```
-  do-like-javac -t inference --checker dataflow.DataflowChecker
+  dljc -t inference --checker dataflow.DataflowChecker
     --solver dataflow.solvers.classic.DataflowSolver -o logs 
     -m ROUNDTRIP -afud annotated -- ant compile-project
   ```
@@ -100,7 +100,7 @@ This step will type check the newly created source code, and generate
 control flow graph.
 
   ```
-  do-like-javac -t checker --checker "dataflow.DataflowChecker -Aflowdotdir=./dotfiles" -o logs -- ant check-annotated-src
+  dljc -t checker --checker "dataflow.DataflowChecker -Aflowdotdir=./dotfiles" -o logs -- ant check-annotated-src
   ```
   Note the quotes around the `--checker` argument to ensure the
 whole string is used.
@@ -126,7 +126,7 @@ If you want to infer Dataflow annotations for large open source projects, the st
 In second step, instead of running:
 
   ```
-  do-like-javac -t inference --checker dataflow.DataflowChecker
+  dljc -t inference --checker dataflow.DataflowChecker
     --solver dataflow.solvers.classic.DataflowSolver -o logs 
     -m ROUNDTRIP -afud annotated -- ant compile-project
   ```
