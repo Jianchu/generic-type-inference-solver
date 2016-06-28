@@ -7,8 +7,6 @@ import constraintsolver.Lattice;
 public class MathUtils {
 
     public static int mapIdToMatrixEntry(int id, AnnotationMirror type, Lattice lattice) {
-        // System.out.println(type);
-        // System.out.println(Lattice.getTypeToInt());
         int column = lattice.typeToInt.get(type) + 1;
         int row = id - 1;
         int length = lattice.numTypes;

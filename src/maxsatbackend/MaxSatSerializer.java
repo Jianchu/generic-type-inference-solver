@@ -183,7 +183,11 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue(), lattice));
+                if (lattice.getAllTypes().contains(slot1.getValue())) {
+                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue(), lattice));
+                } else {
+                    return emptyClauses;
+                }
             }
 
             @Override
@@ -197,13 +201,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 VecInt[] result = new VecInt[lattice.numTypes * 2];
                 int i = 0;
                 for (AnnotationMirror type : lattice.getAllTypes()) {
-                    result[i] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
-                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
-                    result[i + 1] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
-                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
-                    i = i + 2;
+                    if (lattice.getAllTypes().contains(type)) {
+                        result[i] = VectorUtils.asVec(
+                                -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                                MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
+                        result[i + 1] = VectorUtils.asVec(
+                                -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
+                                MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
+                        i = i + 2;
+                    }
                 }
                 return result;
             }
@@ -226,8 +232,12 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
             @Override
             protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, InequalityConstraint constraint) {
-                return VectorUtils.asVecArray(-MathUtils.mapIdToMatrixEntry(slot2.getId(),
-                        slot1.getValue(), lattice));
+                if (lattice.getAllTypes().contains(slot1.getValue())) {
+                    return VectorUtils.asVecArray(-MathUtils.mapIdToMatrixEntry(slot2.getId(),
+                            slot1.getValue(), lattice));
+                } else {
+                    return emptyClauses;
+                }
             }
 
             @Override
@@ -241,13 +251,15 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
                 VecInt[] result = new VecInt[lattice.numTypes * 2];
                 int i = 0;
                 for (AnnotationMirror type : lattice.getAllTypes()) {
-                    result[i] = VectorUtils.asVec(
-                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
-                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
-                    result[i + 1] = VectorUtils.asVec(
-                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
-                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
-                    i = i + 2;
+                    if (lattice.getAllTypes().contains(type)) {
+                        result[i] = VectorUtils.asVec(
+                                -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                                -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
+                        result[i + 1] = VectorUtils.asVec(
+                                MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
+                                MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
+                        i = i + 2;
+                    }
                 }
                 return result;
             }
