@@ -15,7 +15,6 @@ ln -s $MYDIR/src/constraintsolver $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/generalconstraintsolver $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/maxsatbackend $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/util $MYDIR/../checker-framework-inference/src
-ln -s $MYDIR/src/constraintsolver $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/logiqlbackend $MYDIR/../checker-framework-inference/src
 ln -s $MYDIR/src/constraintgraph $MYDIR/../checker-framework-inference/src
 

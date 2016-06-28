@@ -90,18 +90,6 @@ public class Lattice {
         return this.allTypes;
     }
 
-    public static Lattice getInstance() {
-        return latticeInstance;
-    }
-
-    public static Map<AnnotationMirror, Integer> getTypeToInt() {
-        return latticeInstance.typeToInt;
-    }
-
-    public static int getNumTypes() {
-        return latticeInstance.numTypes;
-    }
-
     public static Map<AnnotationMirror, Collection<AnnotationMirror>> getSubtype() {
         return latticeInstance.subType;
     }

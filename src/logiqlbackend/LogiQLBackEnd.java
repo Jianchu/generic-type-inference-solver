@@ -42,7 +42,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
          * GenerateLogiqlEncoding method, in order to generate the logiql fixed
          * encoding part of current type system.
          */
-        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(logiqldataPath);
+        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(logiqldataPath, lattice);
         constraintGenerator.GenerateLogiqlEncoding();
 
         this.convertAll();
@@ -54,7 +54,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         // writeDeleteData(logiqldataPath);
         LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath);
         runLogicBlox.runLogicBlox();
-        DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath);
+        DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath, lattice);
         result = DecodeTool.decodeResult();
         // PrintUtils.printResult(result);
 

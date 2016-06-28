@@ -54,7 +54,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         for (Constraint constraint : constraints) {
             collectVarSlots(constraint);
             for (VecInt res : constraint.serialize(realSerializer)) {
-                if (res.size() != 0) {
+                if (res != null && res.size() != 0) {
                     if (constraint instanceof PreferenceConstraint) {
                         softClauses.add(res);
                     } else {
