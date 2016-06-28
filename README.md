@@ -23,7 +23,7 @@ The tool `do-like-javac` makes usage easier:
 I created a shortcut for this tool:
 
 ```
-alias dljc='/the/path/to/do-like-javac/bin/dljc'
+alias dljc='/the/path/to/do-like-javac/dljc'
 ```
 
 And make sure checking out the `checker` branch of `do-like-javac`.
