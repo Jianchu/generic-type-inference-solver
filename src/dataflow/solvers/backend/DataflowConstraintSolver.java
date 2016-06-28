@@ -48,7 +48,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
         DATAFLOWBOTTOM = DataflowUtils.createDataflowAnnotation(DataflowUtils.convert(""),
                 processingEnvironment);
         this.processingEnvironment = processingEnvironment;
-        List<BackEnd> backEnds = new ArrayList<BackEnd>();
+        List<BackEnd<?, ?>> backEnds = new ArrayList<>();
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
@@ -57,7 +57,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
                 String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                 String[] dataflowRoots = DataflowUtils.getTypeNameRoots(anno);
                 if (dataflowValues.length == 1) {
-                    AnnotationMirror DATAFLOWTOP = DataflowUtils.createDataflowAnnotation(DataflowUtils.convert(dataflowValues[0]), processingEnvironment);
+                    AnnotationMirror DATAFLOWTOP = DataflowUtils.createDataflowAnnotation(DataflowUtils.convert(dataflowValues), processingEnvironment);
                     TwoQualifiersLattice latticeFor2 = configureLatticeFor2(DATAFLOWTOP, DATAFLOWBOTTOM);
                     Serializer<?, ?> serializer = createSerializer(backEndType, latticeFor2);
                     backEnds.add(createBackEnd(backEndType, configuration, slots, entry.getValue(),
