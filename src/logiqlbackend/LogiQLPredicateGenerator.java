@@ -23,9 +23,10 @@ public class LogiQLPredicateGenerator {
     private final String path;
     private final StringBuilder allEncodings = new StringBuilder();
     private final Lattice lattice;
-    public LogiQLPredicateGenerator(String path) {
+
+    public LogiQLPredicateGenerator(String path, Lattice lattice) {
         this.path = path;
-        this.lattice = Lattice.getInstance();
+        this.lattice = lattice;
     }
 
     public void GenerateLogiqlEncoding() {
