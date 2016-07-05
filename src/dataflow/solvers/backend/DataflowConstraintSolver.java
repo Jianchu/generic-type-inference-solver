@@ -28,6 +28,7 @@ import constraintsolver.ConstraintSolver;
 import constraintsolver.TwoQualifiersLattice;
 import dataflow.DataflowAnnotatedTypeFactory;
 import dataflow.qual.DataFlow;
+import dataflow.qual.DataFlowInferenceBottom;
 import dataflow.util.DataflowUtils;
 
 public class DataflowConstraintSolver extends ConstraintSolver {
@@ -43,8 +44,9 @@ public class DataflowConstraintSolver extends ConstraintSolver {
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
 
         DATAFLOW = AnnotationUtils.fromClass(processingEnvironment.getElementUtils(), DataFlow.class);
-        DATAFLOWBOTTOM = DataflowUtils.createDataflowAnnotation(DataflowUtils.convert(""),
-                processingEnvironment);
+        DATAFLOWBOTTOM = AnnotationUtils.fromClass(processingEnvironment.getElementUtils(),
+                DataFlowInferenceBottom.class);
+
         this.processingEnvironment = processingEnvironment;
         List<BackEnd<?, ?>> backEnds = new ArrayList<>();
 
