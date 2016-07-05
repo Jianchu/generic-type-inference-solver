@@ -17,7 +17,7 @@ public class PrintUtils {
 
         final int maxLength = String.valueOf(InferenceMain.getInstance().getSlotManager().nextId()).length();
 
-        System.out.println("/***********************result*****************************/");
+        System.out.println("/***********************results****************************/");
         for (Integer j : result.keySet()) {
             String resultStr = "SlotID: " + j;
             for (int i = 0; i < maxLength + 2 - String.valueOf(j).length(); i++) {

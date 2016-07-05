@@ -43,6 +43,7 @@ public class ConstraintSolver implements InferenceSolver {
     public BackEnd realBackEnd;
     public String backEndType;
     public boolean useGraph;
+    public boolean solveInParallel;
     protected Lattice lattice;
 
     @Override
@@ -81,21 +82,38 @@ public class ConstraintSolver implements InferenceSolver {
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
         System.out.println("Using ConstraintGraph!");
         List<BackEnd<?, ?>> backEnds = new ArrayList<BackEnd<?, ?>>();
-        List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             backEnds.add(createBackEnd(backEndType, configuration, slots, entry.getValue(),
                     qualHierarchy, processingEnvironment, lattice, defaultSerializer));
         }
-        try {
-            if (backEnds.size() > 0) {
-                inferenceSolutionMaps = solveInparallel(backEnds);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
 
-        return mergeSolution(inferenceSolutionMaps);
+        return mergeSolution(solve(backEnds));
+    }
+
+    protected List<Map<Integer, AnnotationMirror>> solve(List<BackEnd<?, ?>> backEnds) {
+        List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
+        if (backEnds.size() > 0) {
+            if (this.solveInParallel) {
+                try {
+                    inferenceSolutionMaps = solveInparallel(backEnds);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                inferenceSolutionMaps = solveInSequence(backEnds);
+            }
+        }
+        return inferenceSolutionMaps;
+    }
+
+    protected List<Map<Integer, AnnotationMirror>> solveInSequence(List<BackEnd<?, ?>> backEnds) {
+        List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
+
+        for (final BackEnd backEnd : backEnds) {
+            solutions.add(backEnd.solve());
+        }
+        return solutions;
     }
 
     protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd<?, ?>> backEnds)
@@ -135,6 +153,7 @@ public class ConstraintSolver implements InferenceSolver {
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
         String useGraph = configuration.get("useGraph");
+        String solveInParallel = configuration.get("solveInParallel");
         if (backEndName == null) {
             this.backEndType = "maxsatbackend.MaxSat";
             // TODO: warning
@@ -153,6 +172,17 @@ public class ConstraintSolver implements InferenceSolver {
         } else {
             this.useGraph = false;
         }
+
+        if (this.backEndType.equals("logiqlbackend.LogiQL")) {
+            this.solveInParallel = false;
+        } else if (solveInParallel == null || solveInParallel.equals("true")) {
+            this.solveInParallel = true;
+        } else {
+            this.solveInParallel = false;
+        }
+
+        System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "
+                + this.useGraph + "; \nsolveInParallel: " + this.solveInParallel + ".");
     }
 
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,

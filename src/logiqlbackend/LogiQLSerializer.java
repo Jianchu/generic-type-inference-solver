@@ -16,8 +16,15 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 import checkers.inference.model.VariableSlot;
+import constraintsolver.Lattice;
 
 public class LogiQLSerializer implements Serializer<String, String> {
+
+    private final Lattice lattice;
+
+    public LogiQLSerializer(Lattice lattice) {
+        this.lattice = lattice;
+    }
 
     @Override
     public String serialize(SubtypeConstraint constraint) {
