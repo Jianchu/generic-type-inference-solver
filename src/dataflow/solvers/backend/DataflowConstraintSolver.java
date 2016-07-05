@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -49,7 +47,6 @@ public class DataflowConstraintSolver extends ConstraintSolver {
                 processingEnvironment);
         this.processingEnvironment = processingEnvironment;
         List<BackEnd<?, ?>> backEnds = new ArrayList<>();
-        List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
@@ -71,15 +68,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
                 }
             }
         }
-        try {
-            if (backEnds.size() > 0) {
-                inferenceSolutionMaps = solveInparallel(backEnds);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return mergeSolution(inferenceSolutionMaps);
+        return mergeSolution(solve(backEnds));
     }
 
     @Override
