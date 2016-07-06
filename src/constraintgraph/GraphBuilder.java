@@ -43,7 +43,7 @@ public class GraphBuilder {
         }
         addConstant();
         calculateIndependentPath();
-        // printEdges();
+        printEdges();
         // printGraph();
         return getGraph();
     }
@@ -65,7 +65,7 @@ public class GraphBuilder {
             visited.add(current);
             for (Edge edge : current.getOutgoingEdge()) {
                 independentConstraints.add(edge.getConstraint());
-                Vertex next = current.equals(edge.getFromVertex()) ? edge.getToVertex() : edge.getFromVertex();
+                Vertex next = edge.getToVertex();
                 if (!visited.contains(next)) {
                     queue.add(next);
                 }
