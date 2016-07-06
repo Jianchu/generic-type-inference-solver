@@ -1,8 +1,7 @@
 package constraintgraph;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,15 +15,15 @@ import checkers.inference.model.Constraint;
  */
 public class ConstraintGraph {
 
-    private List<Vertex> verticies;
-    private List<Edge> edges;
-    private List<Vertex> constantVerticies;
+    private Set<Vertex> verticies;
+    private Set<Edge> edges;
+    private Set<Vertex> constantVerticies;
     private Map<Vertex, Set<Constraint>> independentPath;
 
     public ConstraintGraph() {
-        this.verticies = new ArrayList<Vertex>();
-        this.edges = new ArrayList<Edge>();
-        this.constantVerticies = new ArrayList<Vertex>();
+        this.verticies = new HashSet<Vertex>();
+        this.edges = new HashSet<Edge>();
+        this.constantVerticies = new HashSet<Vertex>();
         this.independentPath = new HashMap<Vertex, Set<Constraint>>();
     }
 
@@ -42,15 +41,15 @@ public class ConstraintGraph {
         }
     }
 
-    public List<Vertex> getVerticies() {
+    public Set<Vertex> getVerticies() {
         return this.verticies;
     }
 
-    public List<Edge> getEdges() {
+    public Set<Edge> getEdges() {
         return this.edges;
     }
 
-    public List<Vertex> getConstantVerticies() {
+    public Set<Vertex> getConstantVerticies() {
         return this.constantVerticies;
     }
 

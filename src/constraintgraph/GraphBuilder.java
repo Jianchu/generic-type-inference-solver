@@ -44,6 +44,7 @@ public class GraphBuilder {
         addConstant();
         calculateIndependentPath();
         // printEdges();
+        // printGraph();
         return getGraph();
     }
     
@@ -106,7 +107,6 @@ public class GraphBuilder {
     }
 
     private void createSingleEdge(Vertex from, Vertex to, Constraint constraint) {
-
         for (Vertex vertex : this.graph.getVerticies()) {
             if (from.equals(vertex)) {
                 from = vertex;
@@ -156,4 +156,13 @@ public class GraphBuilder {
         }
     }
 
+    private void printGraph() {
+        for (Edge edge : this.graph.getEdges()) {
+            System.out.println(edge);
+        }
+
+        for (Vertex vertex : this.graph.getVerticies()) {
+            System.out.println(vertex.getId());
+        }
+    }
 }

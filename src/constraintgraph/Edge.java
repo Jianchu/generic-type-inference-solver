@@ -1,5 +1,7 @@
 package constraintgraph;
 
+import java.util.Objects;
+
 import checkers.inference.model.Constraint;
 
 /**
@@ -36,5 +38,29 @@ public class Edge {
 
     public Constraint getConstraint() {
         return this.constraint;
+    }
+
+    @Override
+    public String toString() {
+        return from.getId() + "--->" + to.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Edge) {
+            Edge edge = (Edge) o;
+            if (this.from.equals(edge.from) && this.to.equals(edge.to)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to);
     }
 }
