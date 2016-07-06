@@ -140,20 +140,23 @@ public class GraphBuilder {
     private void printEdges() {
         for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
             System.out.println(entry.getKey().getSlot());
-            System.out.println(entry.getValue());
+            for (Constraint constraint : entry.getValue()) {
+                System.out.println(constraint);
+            }
+            System.out.println("**************");
         }
 
-        for (Edge edge : graph.getEdges()) {
-            System.out.println(edge.getFromVertex().getSlot());
-            System.out.println(edge.getToVertex().getSlot());
-            System.out.println(edge.getConstraint());
-        }
-
-        for (Vertex vertex : graph.getVerticies()) {
-            System.out.println(vertex.getSlot());
-            System.out.println("incoming edge: " + vertex.getIncomingEdges());
-            System.out.println("outgoing edge: " + vertex.getOutgoingEdge());
-        }
+        // for (Edge edge : graph.getEdges()) {
+        // System.out.println(edge.getFromVertex().getSlot());
+        // System.out.println(edge.getToVertex().getSlot());
+        // System.out.println(edge.getConstraint());
+        // }
+        //
+        // for (Vertex vertex : graph.getVerticies()) {
+        // System.out.println(vertex.getSlot());
+        // System.out.println("incoming edge: " + vertex.getIncomingEdges());
+        // System.out.println("outgoing edge: " + vertex.getOutgoingEdge());
+        // }
     }
 
     private void printGraph() {
