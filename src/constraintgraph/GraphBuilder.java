@@ -63,7 +63,10 @@ public class GraphBuilder {
         while (!queue.isEmpty()) {
             Vertex current = queue.remove();
             visited.add(current);
-            for (Edge edge : current.getOutgoingEdge()) {
+            for (Edge edge : current.getEdges()) {
+                if ((edge instanceof SubtypeEdge) && current.equals(edge.to)) {
+                    continue;
+                }
                 independentConstraints.add(edge.getConstraint());
                 Vertex next = edge.getToVertex();
                 if (!visited.contains(next)) {
@@ -89,48 +92,24 @@ public class GraphBuilder {
             if (first instanceof ConstantSlot && next instanceof ConstantSlot) {
                 continue;
             }
-            Vertex vertex1 = new Vertex(first);
-            Vertex vertex2 = new Vertex(next);
-            createDoubleEdge(vertex1, vertex2, constraint);
+            this.graph.createEdge(first, next, constraint);
+            addEdges(slots, constraint);
         }
     }
     
+    /**
+     * The order of subtype and supertype matters, first one has to be subtype,
+     * second one has to be supertype.
+     * 
+     * @param subtypeConstraint
+     */
     private void addSubtypeEdge(SubtypeConstraint subtypeConstraint) {
         Slot subtype = subtypeConstraint.getSubtype();
         Slot supertype = subtypeConstraint.getSupertype();
         if (subtype instanceof ConstantSlot && supertype instanceof ConstantSlot) {
             return;
         }
-        Vertex subtypeVertex = new Vertex(subtype);
-        Vertex supertypeVertex = new Vertex(supertype);
-        createSingleEdge(subtypeVertex, supertypeVertex, subtypeConstraint);
-    }
-
-    private void createSingleEdge(Vertex from, Vertex to, Constraint constraint) {
-        for (Vertex vertex : this.graph.getVerticies()) {
-            if (from.equals(vertex)) {
-                from = vertex;
-            } else if (to.equals(vertex)) {
-                to = vertex;
-            }
-        }
-        Edge edge = new Edge(from, to, constraint);
-        this.graph.addEdge(edge);
-    }
-
-    private void createDoubleEdge(Vertex vertex1, Vertex vertex2, Constraint constraint) {
-
-        for (Vertex vertex : this.graph.getVerticies()) {
-            if (vertex1.equals(vertex)) {
-                vertex1 = vertex;
-            } else if (vertex2.equals(vertex)) {
-                vertex2 = vertex;
-            }
-        }
-        Edge edge1 = new Edge(vertex1, vertex2, constraint);
-        Edge edge2 = new Edge(vertex2, vertex1, constraint);
-        this.graph.addEdge(edge1);
-        this.graph.addEdge(edge2);
+        this.graph.createEdge(subtype, supertype, subtypeConstraint);
     }
 
     public ConstraintGraph getGraph() {
@@ -138,6 +117,7 @@ public class GraphBuilder {
     }
 
     private void printEdges() {
+        System.out.println("new graph!");
         for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
             System.out.println(entry.getKey().getSlot());
             for (Constraint constraint : entry.getValue()) {
