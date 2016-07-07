@@ -62,7 +62,7 @@ public class DataflowSolver implements InferenceSolver {
                 }
             }
         }
-
+        System.exit(0);
         List<DatatypeSolution> solutions = new ArrayList<>();
         try {
             if (dataflowSolvers.size() > 0) {
