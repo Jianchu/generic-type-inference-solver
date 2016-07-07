@@ -43,7 +43,7 @@ public class GraphBuilder {
         }
         addConstant();
         calculateIndependentPath();
-        printEdges();
+        // printEdges();
         // printGraph();
         return getGraph();
     }
