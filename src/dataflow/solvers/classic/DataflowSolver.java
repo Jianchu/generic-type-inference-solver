@@ -45,7 +45,6 @@ public class DataflowSolver implements InferenceSolver {
         GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
         Collection<String> datatypesUsed = getDatatypesUsed(slots);
-        System.exit(0);
         List<DatatypeSolver> dataflowSolvers = new ArrayList<>();
 
         // Configure datatype solvers
