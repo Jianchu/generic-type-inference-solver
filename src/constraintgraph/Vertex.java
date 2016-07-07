@@ -22,7 +22,7 @@ public class Vertex {
     private int id;
     private AnnotationMirror value;
 
-    public Vertex(Slot slot) {
+    protected Vertex(Slot slot) {
         this.edges = new HashSet<Edge>();
         this.slot = slot;
 
@@ -38,25 +38,25 @@ public class Vertex {
         }
     }
 
-    public boolean isConstant() {
+    protected boolean isConstant() {
         return (this.slot instanceof ConstantSlot);
     }
 
-    public void addEdge(Edge edge) {
+    protected void addEdge(Edge edge) {
         if (!edges.contains(edge)) {
             edges.add(edge);
         }
     }
 
-    public Slot getSlot() {
+    protected Slot getSlot() {
         return this.slot;
     }
 
-    public int getId() {
+    protected int getId() {
         return this.id;
     }
 
-    public Set<Edge> getEdges() {
+    protected Set<Edge> getEdges() {
         return this.edges;
     }
 

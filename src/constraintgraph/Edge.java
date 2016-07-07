@@ -17,7 +17,7 @@ public class Edge {
     protected Vertex to;
     protected Constraint constraint;
 
-    public Edge(Vertex from, Vertex to, Constraint constraint) {
+    protected Edge(Vertex from, Vertex to, Constraint constraint) {
         this.from = from;
         this.to = to;
         this.constraint = constraint;
@@ -29,15 +29,15 @@ public class Edge {
         to.addEdge(this);
     }
 
-    public Vertex getFromVertex() {
+    protected Vertex getFromVertex() {
         return this.from;
     }
 
-    public Vertex getToVertex() {
+    protected Vertex getToVertex() {
         return this.to;
     }
 
-    public Constraint getConstraint() {
+    protected Constraint getConstraint() {
         return this.constraint;
     }
 

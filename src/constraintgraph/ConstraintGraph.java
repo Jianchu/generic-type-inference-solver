@@ -25,28 +25,28 @@ public class ConstraintGraph {
     private Map<Vertex, Set<Constraint>> independentPath;
     private Map<Integer, Vertex> verticies;
 
-    public ConstraintGraph() {
+    protected ConstraintGraph() {
         this.edges = new HashSet<Edge>();
         this.constantVerticies = new HashSet<Vertex>();
         this.independentPath = new HashMap<Vertex, Set<Constraint>>();
         this.verticies = new HashMap<Integer, Vertex>();
     }
 
-    public void addEdge(Edge edge) {
+    protected void addEdge(Edge edge) {
         if (!this.edges.contains(edge)) {
             this.edges.add(edge);
         }
     }
 
-    public List<Vertex> getVerticies() {
+    protected List<Vertex> getVerticies() {
         return new ArrayList<Vertex>(this.verticies.values());
     }
 
-    public Set<Edge> getEdges() {
+    protected Set<Edge> getEdges() {
         return this.edges;
     }
 
-    public Set<Vertex> getConstantVerticies() {
+    protected Set<Vertex> getConstantVerticies() {
         return this.constantVerticies;
     }
 
@@ -54,11 +54,11 @@ public class ConstraintGraph {
         return this.independentPath;
     }
 
-    public void addIndependentPath(Vertex vertex, Set<Constraint> constraints) {
+    protected void addIndependentPath(Vertex vertex, Set<Constraint> constraints) {
         this.independentPath.put(vertex, constraints);
     }
 
-    public void addConstant(Vertex vertex) {
+    protected void addConstant(Vertex vertex) {
         if (!this.constantVerticies.contains(vertex)) {
             this.constantVerticies.add(vertex);
         }

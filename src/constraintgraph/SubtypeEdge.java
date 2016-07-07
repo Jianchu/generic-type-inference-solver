@@ -11,7 +11,7 @@ import checkers.inference.model.SubtypeConstraint;
  */
 public class SubtypeEdge extends Edge {
 
-    public SubtypeEdge(Vertex from, Vertex to, SubtypeConstraint constraint) {
+    protected SubtypeEdge(Vertex from, Vertex to, SubtypeConstraint constraint) {
         super(from, to, constraint);
     }
 }
