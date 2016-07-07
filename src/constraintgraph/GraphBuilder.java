@@ -41,7 +41,6 @@ public class GraphBuilder {
                 addEdges(slots, constraint);
             }
         }
-        System.exit(0);
         addConstant();
         calculateIndependentPath();
         // printEdges();
