@@ -53,16 +53,18 @@ public class ConstraintSolver implements InferenceSolver {
         configure(configuration);
         configureLattice(qualHierarchy);
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
+        InferenceSolution solution;
         if (useGraph) {
             GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
             ConstraintGraph constraintGraph = graphBuilder.buildGraph();
-            return graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
+            solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, lattice, defaultSerializer);
-            return solve();
+            solution = solve();
         }
+        return solution;
     }
     
     protected void configureLattice(QualifierHierarchy qualHierarchy) {
