@@ -17,6 +17,8 @@ import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
 import util.MathUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import util.VectorUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.SlotManager;
@@ -36,6 +38,11 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     private final SlotManager slotManager;
     private final List<VecInt> hardClauses = new LinkedList<VecInt>();
     private final List<VecInt> softClauses = new LinkedList<VecInt>();
+
+    private long serializationStart;
+    private long serializationEnd;
+    private long solvingStart;
+    private long solvingEnd;
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -112,7 +119,11 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
+        this.serializationStart = System.currentTimeMillis();
         this.convertAll();
+        this.serializationEnd = System.currentTimeMillis();
+        StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+                (serializationEnd - serializationStart));
         generateWellForm(hardClauses);
         // printClauses();
         configureSatSolver(solver);
@@ -125,8 +136,29 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             for (VecInt softclause : softClauses) {
                 solver.addSoftClause(softclause);
             }
+            this.solvingStart = System.currentTimeMillis();
+            boolean isSatisfiable = solver.isSatisfiable();
+            this.solvingEnd = System.currentTimeMillis();
 
-            if (solver.isSatisfiable()) {
+            boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph")
+                    .equals("true")) ? true : false;
+            boolean parallel = (configuration.get("solveInParallel") == null || configuration.get(
+                    "solveInParallel").equals("true")) ? true : false;
+
+            if (graph) {
+                if (parallel) {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
+                            (solvingEnd - solvingStart));
+                } else {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+                            (solvingEnd - solvingStart));
+                }
+            } else {
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
+                        (solvingEnd - solvingStart));
+            }
+
+            if (isSatisfiable) {
                 result = decode(solver.model());
                 // PrintUtils.printResult(result);
             } else {
@@ -151,6 +183,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
+        StatisticPrinter.record(StatisticKey.CNF_CLAUSES_SIZE, (long) totalClauses);
+        StatisticPrinter.record(StatisticKey.CNF_VARIABLE_SIZE, (long) totalVars);
         solver.setTimeoutMs(1000000);
     }
 

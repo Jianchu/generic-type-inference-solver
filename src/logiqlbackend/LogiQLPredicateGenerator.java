@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 
 import util.NameUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import constraintsolver.Lattice;
 
 /**
@@ -171,6 +173,8 @@ public class LogiQLPredicateGenerator {
      *
      */
     private void writeFile(String output) {
+        String[] lines = output.split("\r\n|\r|\n");
+        StatisticPrinter.record(StatisticKey.LOGIQL_PREDICATES_SIZE, (long) lines.length);
         try {
             String writePath = path + "/logiqlEncoding.logic";
             File f = new File(writePath);

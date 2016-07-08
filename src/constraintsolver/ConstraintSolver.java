@@ -21,6 +21,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
 import util.PrintUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
@@ -46,23 +48,38 @@ public class ConstraintSolver implements InferenceSolver {
     public boolean solveInParallel;
     protected Lattice lattice;
 
+    // timing variables:
+    private long graphBuildingStart;
+    private long graphBuildingEnd;
+
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
+        // record constraint size
+        StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
+        // record slot size
+        StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
         configure(configuration);
         configureLattice(qualHierarchy);
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
+        InferenceSolution solution;
         if (useGraph) {
+            this.graphBuildingStart = System.currentTimeMillis();
             GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
             ConstraintGraph constraintGraph = graphBuilder.buildGraph();
-            return graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
+            this.graphBuildingEnd = System.currentTimeMillis();
+            StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
+            
+            solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, lattice, defaultSerializer);
-            return solve();
+            solution = solve();
         }
+        PrintUtils.printStatistic(StatisticPrinter.getStatistic());
+        return solution;
     }
     
     protected void configureLattice(QualifierHierarchy qualHierarchy) {
