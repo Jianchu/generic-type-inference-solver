@@ -5,38 +5,39 @@ import java.util.Objects;
 import checkers.inference.model.Constraint;
 
 /**
- * Edge in ConstraintGraph
+ * Edge in ConstraintGraph There is no direction for this edge, which means the
+ * edge represented by this class is undirected edge.
  * 
  * @author jianchu
  *
  */
 public class Edge {
 
-    private Vertex from;
-    private Vertex to;
-    private Constraint constraint;
+    protected Vertex from;
+    protected Vertex to;
+    protected Constraint constraint;
 
-    public Edge(Vertex from, Vertex to, Constraint constraint) {
+    protected Edge(Vertex from, Vertex to, Constraint constraint) {
         this.from = from;
         this.to = to;
         this.constraint = constraint;
         attachEdge();
     }
 
-    private void attachEdge() {
-        from.addOutgoingEdge(this);
-        to.addIncomingEdge(this);
+    protected void attachEdge() {
+        from.addEdge(this);
+        to.addEdge(this);
     }
 
-    public Vertex getFromVertex() {
+    protected Vertex getFromVertex() {
         return this.from;
     }
 
-    public Vertex getToVertex() {
+    protected Vertex getToVertex() {
         return this.to;
     }
 
-    public Constraint getConstraint() {
+    protected Constraint getConstraint() {
         return this.constraint;
     }
 
