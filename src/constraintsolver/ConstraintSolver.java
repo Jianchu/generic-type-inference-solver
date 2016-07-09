@@ -29,7 +29,6 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintgraph.ConstraintGraph;
 import constraintgraph.GraphBuilder;
-import constraintgraph.Vertex;
 
 /**
  * The default solver that could be called if there is no view adaptation
@@ -85,11 +84,10 @@ public class ConstraintSolver implements InferenceSolver {
         System.out.println("Using ConstraintGraph!");
         List<BackEnd<?, ?>> backEnds = new ArrayList<BackEnd<?, ?>>();
 
-        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
-            backEnds.add(createBackEnd(backEndType, configuration, slots, entry.getValue(),
+        for (Set<Constraint> independentConstraints : constraintGraph.getIndependentPath()) {
+            backEnds.add(createBackEnd(backEndType, configuration, slots, independentConstraints,
                     qualHierarchy, processingEnvironment, lattice, defaultSerializer));
         }
-
         return mergeSolution(solve(backEnds));
     }
 

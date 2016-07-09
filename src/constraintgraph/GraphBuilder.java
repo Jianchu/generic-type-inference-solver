@@ -43,20 +43,45 @@ public class GraphBuilder {
         }
         addConstant();
         calculateIndependentPath();
+        calculateConstantPath();
         // printEdges();
         // printGraph();
         return getGraph();
     }
     
     private void calculateIndependentPath() {
+        Set<Vertex> visited = new HashSet<Vertex>();
+        for (Vertex vertex : this.graph.getVerticies()) {
+            if (!visited.contains(vertex)) {
+                Set<Constraint> independentPath = new HashSet<Constraint>();
+                Queue<Vertex> queue = new LinkedList<Vertex>();
+                queue.add(vertex);
+                while (!queue.isEmpty()) {
+                    Vertex current = queue.remove();
+                    visited.add(current);
+                    for (Edge edge : current.getEdges()) {
+                        independentPath.add(edge.getConstraint());
+                        Vertex next = edge.getFromVertex().equals(current) ? edge.getToVertex() : edge
+                                .getFromVertex();
+                        if (!visited.contains(next)) {
+                            queue.add(next);
+                        }
+                    }
+                }
+                this.graph.addIndependentPath(independentPath);
+            }
+        }
+    }
+
+    private void calculateConstantPath() {
         for (Vertex vertex : this.graph.getConstantVerticies()) {
-            Set<Constraint> independentConstraints = BFSSearch(vertex);
-            this.graph.addIndependentPath(vertex, independentConstraints);
+            Set<Constraint> constantPathConstraints = BFSSearch(vertex);
+            this.graph.addConstantPath(vertex, constantPathConstraints);
         }
     }
 
     private Set<Constraint> BFSSearch(Vertex vertex) {
-        Set<Constraint> independentConstraints = new HashSet<Constraint>();
+        Set<Constraint> constantPathConstraints = new HashSet<Constraint>();
         Queue<Vertex> queue = new LinkedList<Vertex>();
         queue.add(vertex);
         Set<Vertex> visited = new HashSet<Vertex>();
@@ -67,14 +92,14 @@ public class GraphBuilder {
                 if ((edge instanceof SubtypeEdge) && current.equals(edge.to)) {
                     continue;
                 }
-                independentConstraints.add(edge.getConstraint());
+                constantPathConstraints.add(edge.getConstraint());
                 Vertex next = edge.getToVertex();
                 if (!visited.contains(next)) {
                     queue.add(next);
                 }
             }
         }
-        return independentConstraints;
+        return constantPathConstraints;
     }
 
     private void addConstant() {
@@ -118,7 +143,7 @@ public class GraphBuilder {
 
     private void printEdges() {
         System.out.println("new graph!");
-        for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getIndependentPath().entrySet()) {
+        for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getConstantPath().entrySet()) {
             System.out.println(entry.getKey().getSlot());
             for (Constraint constraint : entry.getValue()) {
                 System.out.println(constraint);

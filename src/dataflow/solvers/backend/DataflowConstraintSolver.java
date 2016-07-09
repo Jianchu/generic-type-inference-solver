@@ -50,7 +50,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
         this.processingEnvironment = processingEnvironment;
         List<BackEnd<?, ?>> backEnds = new ArrayList<>();
 
-        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getIndependentPath().entrySet()) {
+        for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getConstantPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
             if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
                 String[] dataflowValues = DataflowUtils.getTypeNames(anno);
