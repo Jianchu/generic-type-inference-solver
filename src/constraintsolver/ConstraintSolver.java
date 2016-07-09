@@ -136,13 +136,13 @@ public class ConstraintSolver implements InferenceSolver {
                     e.printStackTrace();
                 }
             } else {
-                inferenceSolutionMaps = solveInSequence(backEnds);
+                inferenceSolutionMaps = solveInSequential(backEnds);
             }
         }
         return inferenceSolutionMaps;
     }
 
-    protected List<Map<Integer, AnnotationMirror>> solveInSequence(List<BackEnd<?, ?>> backEnds) {
+    protected List<Map<Integer, AnnotationMirror>> solveInSequential(List<BackEnd<?, ?>> backEnds) {
         List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
 
         for (final BackEnd backEnd : backEnds) {
