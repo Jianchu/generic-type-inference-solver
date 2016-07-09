@@ -3,6 +3,7 @@ package constraintgraph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,14 +23,16 @@ public class ConstraintGraph {
 
     private Set<Edge> edges;
     private Set<Vertex> constantVerticies;
-    private Map<Vertex, Set<Constraint>> independentPath;
+    private Map<Vertex, Set<Constraint>> constantPath;
     private Map<Integer, Vertex> verticies;
+    private List<Set<Constraint>> independentPath;
 
     protected ConstraintGraph() {
         this.edges = new HashSet<Edge>();
         this.constantVerticies = new HashSet<Vertex>();
-        this.independentPath = new HashMap<Vertex, Set<Constraint>>();
+        this.constantPath = new HashMap<Vertex, Set<Constraint>>();
         this.verticies = new HashMap<Integer, Vertex>();
+        this.independentPath = new LinkedList<Set<Constraint>>();
     }
 
     protected void addEdge(Edge edge) {
@@ -50,12 +53,20 @@ public class ConstraintGraph {
         return this.constantVerticies;
     }
 
-    public Map<Vertex, Set<Constraint>> getIndependentPath() {
+    public Map<Vertex, Set<Constraint>> getConstantPath() {
+        return this.constantPath;
+    }
+
+    protected void addConstantPath(Vertex vertex, Set<Constraint> constraints) {
+        this.constantPath.put(vertex, constraints);
+    }
+
+    public List<Set<Constraint>> getIndependentPath() {
         return this.independentPath;
     }
 
-    protected void addIndependentPath(Vertex vertex, Set<Constraint> constraints) {
-        this.independentPath.put(vertex, constraints);
+    protected void addIndependentPath(Set<Constraint> independentPath) {
+        this.independentPath.add(independentPath);
     }
 
     protected void addConstant(Vertex vertex) {
