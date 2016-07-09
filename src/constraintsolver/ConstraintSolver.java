@@ -80,6 +80,41 @@ public class ConstraintSolver implements InferenceSolver {
         return solution;
     }
     
+    private void configure(Map<String, String> configuration) {
+        String backEndName = configuration.get("backEndType");
+        String useGraph = configuration.get("useGraph");
+        String solveInParallel = configuration.get("solveInParallel");
+        if (backEndName == null) {
+            this.backEndType = "maxsatbackend.MaxSat";
+            // TODO: warning
+            // ErrorReporter.errorAbort("not found back end.");
+        } else {
+            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.LogiQL")
+                    || backEndName.equals("General")) {
+                this.backEndType = backEndName;
+            } else {
+                ErrorReporter.errorAbort("back end is not implemented yet.");
+            }
+        }
+
+        if (useGraph == null || useGraph.equals("true")) {
+            this.useGraph = true;
+        } else {
+            this.useGraph = false;
+        }
+
+        if (this.backEndType.equals("logiqlbackend.LogiQL")) {
+            this.solveInParallel = false;
+        } else if (solveInParallel == null || solveInParallel.equals("true")) {
+            this.solveInParallel = true;
+        } else {
+            this.solveInParallel = false;
+        }
+
+        System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "
+                + this.useGraph + "; \nsolveInParallel: " + this.solveInParallel + ".");
+    }
+
     protected void configureLattice(QualifierHierarchy qualHierarchy) {
         this.lattice = new Lattice(qualHierarchy);
         lattice.configure();
@@ -115,13 +150,13 @@ public class ConstraintSolver implements InferenceSolver {
                     e.printStackTrace();
                 }
             } else {
-                inferenceSolutionMaps = solveInSequence(backEnds);
+                inferenceSolutionMaps = solveInSequential(backEnds);
             }
         }
         return inferenceSolutionMaps;
     }
 
-    protected List<Map<Integer, AnnotationMirror>> solveInSequence(List<BackEnd<?, ?>> backEnds) {
+    protected List<Map<Integer, AnnotationMirror>> solveInSequential(List<BackEnd<?, ?>> backEnds) {
         List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
 
         for (final BackEnd backEnd : backEnds) {
@@ -164,40 +199,7 @@ public class ConstraintSolver implements InferenceSolver {
         return new DefaultInferenceSolution(result);
     }
 
-    private void configure(Map<String, String> configuration) {
-        String backEndName = configuration.get("backEndType");
-        String useGraph = configuration.get("useGraph");
-        String solveInParallel = configuration.get("solveInParallel");
-        if (backEndName == null) {
-            this.backEndType = "maxsatbackend.MaxSat";
-            // TODO: warning
-            // ErrorReporter.errorAbort("not found back end.");
-        } else {
-            if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.LogiQL")
-                    || backEndName.equals("General")) {
-                this.backEndType = backEndName;
-            } else {
-                ErrorReporter.errorAbort("back end is not implemented yet.");
-            }
-        }
 
-        if (useGraph == null || useGraph.equals("true")) {
-            this.useGraph = true;
-        } else {
-            this.useGraph = false;
-        }
-
-        if (this.backEndType.equals("logiqlbackend.LogiQL")) {
-            this.solveInParallel = false;
-        } else if (solveInParallel == null || solveInParallel.equals("true")) {
-            this.solveInParallel = true;
-        } else {
-            this.solveInParallel = false;
-        }
-
-        System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "
-                + this.useGraph + "; \nsolveInParallel: " + this.solveInParallel + ".");
-    }
 
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
