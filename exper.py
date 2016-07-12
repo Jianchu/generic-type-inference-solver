@@ -11,7 +11,7 @@ def main():
 	statistic = run_command(commands, project_path)
 	json_file = json.dumps(statistic, ensure_ascii=False)
 	with open('data.json', 'w') as outfile:
-		json.dump(statistic, outfile, indent=4)
+		json.dump(statistic, outfile, indent=4, sort_keys=True)
 	print json_file
 
 def run_command(commands, project_path):
