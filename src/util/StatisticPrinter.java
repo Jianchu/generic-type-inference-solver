@@ -55,6 +55,7 @@ public class StatisticPrinter {
     }
 
     public static void record(StatisticKey key, Long value) {
+        System.out.println("key: " + key + "value: " + value);
         synchronized (statistic) {
             if (key.equals(StatisticKey.LOGIQL_PREDICATES_SIZE)) {
                 statistic.put(key, value);
