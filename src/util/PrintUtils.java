@@ -32,13 +32,13 @@ public class PrintUtils {
     }
 
     public static void printStatistic(Map<StatisticKey, Long> statistic) {
-        System.out.println("/***********************statistic*************************/");
+        System.out.println("/***********************statistic start*************************/");
         for (StatisticKey j : statistic.keySet()) {
             if (statistic.get(j) != (long) 0) {
                 System.out.println(j.toString().toLowerCase() + ": " + statistic.get(j));
             }
         }
         System.out.flush();
-        System.out.println("/**********************************************************/");
+        System.out.println("/**********************statistic end****************************/");
     }
 }
