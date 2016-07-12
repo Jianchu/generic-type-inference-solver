@@ -77,6 +77,7 @@ public class ConstraintSolver implements InferenceSolver {
             solution = solve();
         }
         PrintUtils.printStatistic(StatisticPrinter.getStatistic());
+        PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
         return solution;
     }
     
