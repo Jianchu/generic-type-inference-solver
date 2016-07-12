@@ -3,26 +3,35 @@ import subprocess
 import os
 import traceback
 import sys
+import json
 from subprocess import call
 
 def main():
 	commands, project_path = build_command(sys.argv)
-	run_command(commands, project_path)
-	parse_result(project_path)
+	statistic = run_command(commands, project_path)
+	json_file = json.dumps(statistic, ensure_ascii=False)
+	with open('data.json', 'w') as outfile:
+		json.dump(statistic, outfile, indent=4)
+	print json_file
 
 def run_command(commands, project_path):
+	statistic = {}
 	os.chdir(project_path)
 	print project_path
 	for command in commands:
 		print command
 		result = subprocess.check_output(command, shell=True, stderr=None)
-		print result
+		parsed = parse_result(project_path)
+		statistic.update(parsed)
+	return statistic
 
 def parse_result(project_path):
+	result = {}
 	f = open(project_path + "/statistic.txt")
 	for line in f:
-		print line
-
+		index = line.find(',')
+		result[line[:index]] = line[index + 1 : -1]
+	return result
 
 def build_command(argvs):
 	commands = []
