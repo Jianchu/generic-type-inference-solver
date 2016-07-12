@@ -58,9 +58,8 @@ def build_command(argvs):
 	inference_logiQL_nograph = dljc + logiQL_nograph + type_system_command + " -- " + compile_command
 	inference_logiQL_graph = dljc + logiQL_graph + type_system_command + " -- " + compile_command
 
-
 	if argvs[1] == "dataflow":
-		#commands.append(inference_MAXSAT_sequence)
+		commands.append(inference_MAXSAT_sequence)
 		commands.append(inference_MAXSAT_parallel)
 		#commands.append(inference_logiQL_graph)
 	elif argvs[1]  == "ostrusted":
