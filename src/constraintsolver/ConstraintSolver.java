@@ -82,17 +82,19 @@ public class ConstraintSolver implements InferenceSolver {
             solution = solve();
             this.solvingEnd = System.currentTimeMillis();
         }
-        if (useGraph) {
-            if (solveInParallel) {
-                StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
-                        (solvingEnd - solvingStart));
+        if (this.backEndType.equals("maxsatbackend.MaxSat")) {
+            if (useGraph) {
+                if (solveInParallel) {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
+                            (solvingEnd - solvingStart));
+                } else {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+                            (solvingEnd - solvingStart));
+                }
             } else {
-                StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
                         (solvingEnd - solvingStart));
             }
-        } else {
-            StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
-                    (solvingEnd - solvingStart));
         }
         PrintUtils.printStatistic(StatisticPrinter.getStatistic());
         PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
