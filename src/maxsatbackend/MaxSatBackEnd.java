@@ -145,18 +145,18 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             boolean parallel = (configuration.get("solveInParallel") == null || configuration.get(
                     "solveInParallel").equals("true")) ? true : false;
 
-//            if (graph) {
-//                if (parallel) {
-//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
-//                            (solvingEnd - solvingStart));
-//                } else {
-//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
-//                            (solvingEnd - solvingStart));
-//                }
-//            } else {
-//                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
-//                        (solvingEnd - solvingStart));
-//            }
+            if (graph) {
+                if (parallel) {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
+                            (solvingEnd - solvingStart));
+                } else {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+                            (solvingEnd - solvingStart));
+                }
+            } else {
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
+                        (solvingEnd - solvingStart));
+            }
 
             if (isSatisfiable) {
                 result = decode(solver.model());

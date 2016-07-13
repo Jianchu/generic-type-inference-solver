@@ -50,8 +50,8 @@ public class ConstraintSolver implements InferenceSolver {
     // timing variables:
     private long graphBuildingStart;
     private long graphBuildingEnd;
-    private long solvingStart;
-    private long solvingEnd;
+    //private long solvingStart;
+    //private long solvingEnd;
 
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
@@ -71,31 +71,31 @@ public class ConstraintSolver implements InferenceSolver {
             ConstraintGraph constraintGraph = graphBuilder.buildGraph();
             this.graphBuildingEnd = System.currentTimeMillis();
             StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
-            this.solvingStart = System.currentTimeMillis();
+            //this.solvingStart = System.currentTimeMillis();
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
-            this.solvingEnd = System.currentTimeMillis();
+            // this.solvingEnd = System.currentTimeMillis();
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, lattice, defaultSerializer);
-            this.solvingStart = System.currentTimeMillis();
+            //this.solvingStart = System.currentTimeMillis();
             solution = solve();
-            this.solvingEnd = System.currentTimeMillis();
+            //this.solvingEnd = System.currentTimeMillis();
         }
-        if (this.backEndType.equals("maxsatbackend.MaxSat")) {
-            if (useGraph) {
-                if (solveInParallel) {
-                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
-                            (solvingEnd - solvingStart));
-                } else {
-                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
-                            (solvingEnd - solvingStart));
-                }
-            } else {
-                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
-                        (solvingEnd - solvingStart));
-            }
-        }
+//        if (this.backEndType.equals("maxsatbackend.MaxSat")) {
+//            if (useGraph) {
+//                if (solveInParallel) {
+//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
+//                            (solvingEnd - solvingStart));
+//                } else {
+//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+//                            (solvingEnd - solvingStart));
+//                }
+//            } else {
+//                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
+//                        (solvingEnd - solvingStart));
+//            }
+//        }
         PrintUtils.printStatistic(StatisticPrinter.getStatistic());
         PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
         return solution;
