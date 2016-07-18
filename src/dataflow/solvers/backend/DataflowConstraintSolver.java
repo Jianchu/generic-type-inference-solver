@@ -82,12 +82,14 @@ public class DataflowConstraintSolver extends ConstraintSolver {
             for (Map.Entry<Integer, AnnotationMirror> entry : inferenceSolutionMap.entrySet()) {
                 Integer id = entry.getKey();
                 AnnotationMirror dataflowAnno = entry.getValue();
-                Set<AnnotationMirror> datas = dataflowResults.get(id);
-                if (datas == null) {
-                    datas = AnnotationUtils.createAnnotationSet();
-                    dataflowResults.put(id, datas);
+                if (AnnotationUtils.areSameIgnoringValues(dataflowAnno, DATAFLOW)) {
+                    Set<AnnotationMirror> datas = dataflowResults.get(id);
+                    if (datas == null) {
+                        datas = AnnotationUtils.createAnnotationSet();
+                        dataflowResults.put(id, datas);
+                    }
+                    datas.add(dataflowAnno);
                 }
-                datas.add(dataflowAnno);
             }
 
         }

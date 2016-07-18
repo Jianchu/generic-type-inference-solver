@@ -163,10 +163,16 @@ public class ConstraintSolver implements InferenceSolver {
 
     protected List<Map<Integer, AnnotationMirror>> solve(List<BackEnd<?, ?>> backEnds) {
         List<Map<Integer, AnnotationMirror>> inferenceSolutionMaps = new LinkedList<Map<Integer, AnnotationMirror>>();
+
         if (backEnds.size() > 0) {
             if (this.solveInParallel) {
                 try {
-                    inferenceSolutionMaps = solveInparallel(backEnds);
+                    // 32 Threads each time.
+                    for (int i = 0; i < backEnds.size(); i += 32) {
+                        int upperBound = (i + 32 > backEnds.size()) ? backEnds.size() : i + 32;
+                        List<BackEnd<?, ?>> backEndsSublist = backEnds.subList(i, upperBound);
+                        inferenceSolutionMaps.addAll(solveInparallel(backEndsSublist));
+                    }
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
