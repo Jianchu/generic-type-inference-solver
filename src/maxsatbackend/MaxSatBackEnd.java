@@ -2,13 +2,12 @@ package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -78,18 +77,13 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
                 leastOneIsTrue[i] = MathUtils.mapIdToMatrixEntry(id, i.intValue(), lattice);
             }
             clauses.add(VectorUtils.asVec(leastOneIsTrue));
-
-            Iterator<Integer> entries1 = lattice.intToType.keySet().iterator();
-            Set<Integer> entries2 = lattice.intToType.keySet();
-            while (entries1.hasNext()) {
-                Integer entry1 = entries1.next();
-                for (Integer entry2 : entries2) {
+            List<Integer> varList = new ArrayList<Integer>(lattice.intToType.keySet());
+            for (int i = 0; i < varList.size(); i++) {
+                for (int j = i + 1; j < varList.size(); j++) {
                     int[] onlyOneIsTrue = new int[2];
-                    if (entry2.intValue() != entry1.intValue()) {
-                        onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, entry1.intValue(), lattice);
-                        onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, entry2.intValue(), lattice);
-                        clauses.add(VectorUtils.asVec(onlyOneIsTrue));
-                    }
+                    onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, varList.get(i), lattice);
+                    onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, varList.get(j), lattice);
+                    clauses.add(VectorUtils.asVec(onlyOneIsTrue));
                 }
             }
         }
