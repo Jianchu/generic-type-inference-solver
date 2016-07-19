@@ -53,7 +53,12 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         CNFInput.append(totalVars + " ");
         CNFInput.append(totalClauses + "\n");
         for (VecInt clause : clauses) {
-            CNFInput.append(clause.toString().replaceAll(",", " ") + " 0\n");
+            try {
+                CNFInput.append(clause.toString().replaceAll(",", " ") + " 0\n");
+            } catch (java.lang.OutOfMemoryError e) {
+                System.out.println("The failed string is: " + clause.toString());
+            }
+            
         }
     }
 
