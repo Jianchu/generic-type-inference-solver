@@ -31,6 +31,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     private StringBuilder CNFInput = new StringBuilder();
     private final File CNFData = new File(new File("").getAbsolutePath() + "/cnfData");
     private final String lingeling = System.getenv().get("JSR308") + "/lingeling/lingeling";
+    // record cnf integers in clauses. lingeling solver give the answer for all
+    // the integers from 1 to the largest one. Some of them may be not in the
+    // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
@@ -115,6 +118,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         getOutPut.join();
         getError.join();
         p.waitFor();
+        // cannot convert from Integer[] to int[] directly...
         int[] resultArray = new int[resultList.size()];
         for (int i = 0; i < resultList.size(); i++) {
             resultArray[i] = resultList.get(i);
