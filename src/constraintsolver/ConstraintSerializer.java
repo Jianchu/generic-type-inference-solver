@@ -32,6 +32,9 @@ public class ConstraintSerializer<S, T> implements Serializer<S, T> {
     @SuppressWarnings("unchecked")
     public ConstraintSerializer(String backEndType, Lattice lattice) {
         try {
+            if (backEndType.equals("maxsatbackend.Lingeling")) {
+                backEndType = "maxsatbackend.MaxSat";
+            }
             Class<?> serializerClass = Class.forName(backEndType + "Serializer");
             Constructor<?> cons = serializerClass.getConstructor(Lattice.class);
             realSerializer = (Serializer<S, T>)cons.newInstance(lattice);

@@ -76,7 +76,7 @@ public class ConstraintSolver implements InferenceSolver {
             // ErrorReporter.errorAbort("not found back end.");
         } else {
             if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.LogiQL")
-                    || backEndName.equals("General")) {
+                    || backEndName.equals("General") || backEndName.equals("maxsatbackend.Lingeling")) {
                 this.backEndType = backEndName;
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");

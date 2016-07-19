@@ -33,9 +33,9 @@ import constraintsolver.Lattice;
  */
 public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
-    private final SlotManager slotManager;
-    private final List<VecInt> hardClauses = new LinkedList<VecInt>();
-    private final List<VecInt> softClauses = new LinkedList<VecInt>();
+    protected final SlotManager slotManager;
+    protected final List<VecInt> hardClauses = new LinkedList<VecInt>();
+    protected final List<VecInt> softClauses = new LinkedList<VecInt>();
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -71,7 +71,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
      *
      * @param clauses
      */
-    private void generateWellForm(List<VecInt> clauses) {
+    protected void generateWellForm(List<VecInt> clauses) {
         for (Integer id : this.varSlotIds) {
             int[] leastOneIsTrue = new int[lattice.numTypes];
             for (Integer i : lattice.intToType.keySet()) {
@@ -95,7 +95,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         }
     }
 
-    private Map<Integer, AnnotationMirror> decode(int[] solution) {
+    protected Map<Integer, AnnotationMirror> decode(int[] solution) {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         for (Integer var : solution) {
             if (var > 0) {
@@ -157,7 +157,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     /**
      * print all soft and hard clauses for testing.
      */
-    private void printClauses() {
+    protected void printClauses() {
         System.out.println("Hard clauses: ");
         for (VecInt hardClause : hardClauses) {
             System.out.println(hardClause);
