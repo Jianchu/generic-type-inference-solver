@@ -80,10 +80,10 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             List<Integer> varList = new ArrayList<Integer>(lattice.intToType.keySet());
             for (int i = 0; i < varList.size(); i++) {
                 for (int j = i + 1; j < varList.size(); j++) {
-                    int[] onlyOneIsTrue = new int[2];
-                    onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, varList.get(i), lattice);
-                    onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, varList.get(j), lattice);
-                    clauses.add(VectorUtils.asVec(onlyOneIsTrue));
+                    VecInt vecInt = new VecInt(2);
+                    vecInt.push(-MathUtils.mapIdToMatrixEntry(id, varList.get(i), lattice));
+                    vecInt.push(-MathUtils.mapIdToMatrixEntry(id, varList.get(j), lattice));
+                    clauses.add(vecInt);
                 }
             }
         }
