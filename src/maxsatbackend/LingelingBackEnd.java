@@ -50,16 +50,22 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         final int totalVars = (slotManager.nextId() * lattice.numTypes);
         final int totalClauses = hardClauses.size() + softClauses.size();
         CNFInput.append("p cnf ");
-        CNFInput.append(totalVars + " ");
-        CNFInput.append(totalClauses + "\n");
+        CNFInput.append(totalVars);
+        CNFInput.append(" ");
+        CNFInput.append(totalClauses);
+        CNFInput.append("\n");
         for (VecInt clause : clauses) {
-            try {
-                CNFInput.append(clause.toString().replaceAll(",", " ") + " 0\n");
-            } catch (java.lang.OutOfMemoryError e) {
-                System.out.println("The failed string is: " + clause.toString());
-            }
-            
+            CNFHelper(clause);
         }
+    }
+
+    private void CNFHelper(VecInt clause) {
+        int[] literals = clause.toArray();
+        for (int i = 0; i < literals.length; i++) {
+            CNFInput.append(literals[i]);
+            CNFInput.append(" ");
+        }
+        CNFInput.append("0\n");
     }
 
     private void writeCNFinput() {
@@ -86,9 +92,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
                 try {
                     while ((s = stdInput.readLine()) != null) {
                         if (s.charAt(0) == 'v') {
-                            s = s.substring(1);
                             for (String retval : s.split(" ")) {
-                                if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")) {
+                                if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")
+                                        && !retval.equals("v")) {
                                     int val = Integer.parseInt(retval);
                                     if (variableSet.contains(Math.abs(val))) {
                                         resultList.add(val);
@@ -107,11 +113,11 @@ public class LingelingBackEnd extends MaxSatBackEnd {
             @Override
             public void run() {
                 String s = "";
-                String errReply = "";
+                StringBuilder sb = new StringBuilder();
                 BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                 try {
                     while ((s = stdError.readLine()) != null) {
-                        errReply = errReply + s;
+                        sb.append(s);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
