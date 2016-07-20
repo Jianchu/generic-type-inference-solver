@@ -102,6 +102,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
                                 }
                             }
                         }
+                        System.gc();
                     }
                 } catch (NumberFormatException | IOException e) {
                     e.printStackTrace();
