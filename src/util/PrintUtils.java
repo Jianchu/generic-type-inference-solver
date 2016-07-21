@@ -15,7 +15,7 @@ public class PrintUtils {
      */
     public static void printResult(Map<Integer, AnnotationMirror> result) {
 
-        final int maxLength = String.valueOf(InferenceMain.getInstance().getSlotManager().nextId()).length();
+        final int maxLength = String.valueOf(InferenceMain.getInstance().getSlotManager().getNumberOfSlots()).length();
 
         System.out.println("/***********************results****************************/");
         for (Integer j : result.keySet()) {

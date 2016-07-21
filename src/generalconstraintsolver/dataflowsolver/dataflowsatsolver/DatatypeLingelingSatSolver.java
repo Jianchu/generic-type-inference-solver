@@ -48,7 +48,7 @@ public class DatatypeLingelingSatSolver extends SatSubSolver {
         String datatype = DataflowUtils.getTypeNames(logic.getLattice().top)[0];
         sb.append("c This is the input for ");
         sb.append(datatype + "\n");
-        final int totalVars = (slotManager.nextId() * lattice.numModifiers);
+        final int totalVars = (slotManager.getNumberOfSlots() * lattice.numModifiers);
         final int totalClauses = clauses.size();
         sb.append("p cnf ");
         sb.append(totalVars + " ");
