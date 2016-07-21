@@ -1,23 +1,14 @@
 package dataflow;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.TypeMirror;
+
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.javacutil.ElementUtils;
 import org.checkerframework.javacutil.TreeUtils;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.type.TypeMirror;
-
-import checkers.inference.InferenceAnnotatedTypeFactory;
-import checkers.inference.InferenceMain;
-import checkers.inference.InferenceTreeAnnotator;
-import checkers.inference.InferrableChecker;
-import checkers.inference.SlotManager;
-import checkers.inference.VariableAnnotator;
-import checkers.inference.model.ConstantSlot;
-import checkers.inference.qual.VarAnnot;
 
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -28,6 +19,14 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 
+import checkers.inference.InferenceAnnotatedTypeFactory;
+import checkers.inference.InferenceMain;
+import checkers.inference.InferenceTreeAnnotator;
+import checkers.inference.InferrableChecker;
+import checkers.inference.SlotManager;
+import checkers.inference.VariableAnnotator;
+import checkers.inference.model.ConstantSlot;
+import checkers.inference.qual.VarAnnot;
 import dataflow.util.DataflowUtils;
 
 public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
@@ -113,8 +112,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
     }
 
     private void replaceATM(AnnotatedTypeMirror atm, AnnotationMirror dataflowAM) {
-        final ConstantSlot cs = new ConstantSlot(dataflowAM, slotManager.nextId());
-        slotManager.addVariable(cs);
+        final ConstantSlot cs = slotManager.createConstantSlot(dataflowAM);
         AnnotationBuilder ab = new AnnotationBuilder(realTypeFactory.getProcessingEnv(), VarAnnot.class);
         ab.setValue("value", cs.getId());
         AnnotationMirror varAnno = ab.build();

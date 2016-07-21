@@ -140,7 +140,7 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
      * @param solver
      */
     private void configureSatSolver(WeightedMaxSatDecorator solver) {
-        final int totalVars = (slotManager.nextId() * lattice.numTypes);
+        final int totalVars = (slotManager.getNumberOfSlots() * lattice.numTypes);
         final int totalClauses = hardClauses.size() + softClauses.size();
 
         solver.newVar(totalVars);
