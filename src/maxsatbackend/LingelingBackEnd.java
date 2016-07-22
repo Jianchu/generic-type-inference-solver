@@ -3,8 +3,11 @@ package maxsatbackend;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -90,21 +93,32 @@ public class LingelingBackEnd extends MaxSatBackEnd {
                 String s = "";
                 BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 try {
+                    File temp = File.createTempFile("tempfile", ".tmp");
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
                     while ((s = stdInput.readLine()) != null) {
                         if (s.charAt(0) == 'v') {
-                            for (String retval : s.split(" ")) {
-                                if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")
-                                        && !retval.equals("v")) {
-                                    int val = Integer.parseInt(retval);
-                                    if (variableSet.contains(Math.abs(val))) {
-                                        resultList.add(val);
-                                    }
+                            bw.write(s);
+                            bw.write("\n");
+                        }
+                    }
+                    bw.close();
+                    stdInput = null;
+                    FileReader fileReader = new FileReader(temp);
+                    BufferedReader bufferedReader = new BufferedReader(fileReader);
+                    String line = "";
+                    while ((line = bufferedReader.readLine()) != null) {
+                        for (String retval : line.split(" ")) {
+                            if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")
+                                    && !retval.equals("v")) {
+                                int val = Integer.parseInt(retval);
+                                if (variableSet.contains(Math.abs(val))) {
+                                    resultList.add(val);
                                 }
                             }
                         }
                     }
-                } catch (NumberFormatException | IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         };
