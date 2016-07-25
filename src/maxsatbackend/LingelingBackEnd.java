@@ -21,6 +21,8 @@ import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
@@ -158,12 +160,22 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         // saving memory of JVM...
         this.hardClauses.clear();
         writeCNFinput();
+        this.solvingStart = System.currentTimeMillis();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt");
             nth++;
             result = decode(resultArray);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        }
+        this.solvingEnd = System.currentTimeMillis();
+        boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph").equals(
+                "true")) ? true : false;
+        long solvingTime = solvingEnd - solvingStart;
+        if (graph) {
+            StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
+        } else {
+            StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, solvingTime);
         }
         // saving memory of JVM...
         this.constraints = null;

@@ -22,6 +22,8 @@ public class StatisticPrinter {
         SAT_SOLVING_GRAPH_PARALLEL_TIME,
         SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
         SAT_SOLVING_WITHOUT_GRAPH_TIME,
+        SAT_SOLVING_WITHOUT_GRAPH_TIME_LL,
+        SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL,
         
         LOGIQL_SERIALIZATION_TIME,
         LOGIQL_SOLVING_GRAPH_SEQUENTIAL_TIME,
@@ -52,6 +54,8 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.LOGIQL_SOLVING_WITHOUT_GRAPH_TIME, (long) 0);
         statistic.put(StatisticKey.SAT_SOLVING_MEMORY, (long) 0);
         statistic.put(StatisticKey.LOGIQL_SOLVING_MEMORY, (long) 0);
+        statistic.put(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, (long) 0);
+        statistic.put(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, (long) 0);
     }
 
     public static void record(StatisticKey key, Long value) {

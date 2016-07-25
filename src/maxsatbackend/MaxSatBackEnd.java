@@ -40,8 +40,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
     private long serializationStart;
     private long serializationEnd;
-    private long solvingStart;
-    private long solvingEnd;
+    protected long solvingStart;
+    protected long solvingEnd;
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
