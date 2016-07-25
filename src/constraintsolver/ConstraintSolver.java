@@ -214,7 +214,8 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected InferenceSolution solve() {
-        PrintUtils.printResult(realBackEnd.solve());
-        return new DefaultInferenceSolution(realBackEnd.solve());
+        Map<Integer, AnnotationMirror> result = realBackEnd.solve();
+        PrintUtils.printResult(result);
+        return new DefaultInferenceSolution(result);
     }
 }
