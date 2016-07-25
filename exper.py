@@ -6,6 +6,7 @@ import sys
 import json
 from subprocess import call
 
+#./exper.py dataflow /home/jianchu/Desktop/testcase/ant-javacard ant
 def main():
 	commands, project_path = build_command(sys.argv)
 	statistic = run_command(commands, project_path)
@@ -51,16 +52,20 @@ def build_command(argvs):
 	MAXSAT_nograph = ' --solverArgs="backEndType=maxsatbackend.MaxSat,useGraph=false,solveInParallel=false"'
 	logiQL_nograph = ' --solverArgs="backEndType=logiqlbackend.LogiQL,useGraph=false"'
 	logiQL_graph = ' --solverArgs="backEndType=logiqlbackend.LogiQL"'
+	MAXSAT_sequence_ll = ' --solverArgs="backEndType=maxsatbackend.Lingeling,solveInParallel=false"'
 
 	inference_MAXSAT_sequence = dljc + MAXSAT_sequence + type_system_command + " -- " + compile_command
 	inference_MAXSAT_parallel = dljc + MAXSAT_parallel + type_system_command + " -- " + compile_command
+	inference_MAXSAT_sequence_ll = dljc + MAXSAT_sequence_ll + type_system_command + " -- " + compile_command
 	inference_MAXSAT_nograph = dljc + MAXSAT_nograph + type_system_command + " -- " + compile_command
 	inference_logiQL_nograph = dljc + logiQL_nograph + type_system_command + " -- " + compile_command
 	inference_logiQL_graph = dljc + logiQL_graph + type_system_command + " -- " + compile_command
 
+
 	if argvs[1] == "dataflow":
 		commands.append(inference_MAXSAT_sequence)
 		commands.append(inference_MAXSAT_parallel)
+		commands.append(inference_MAXSAT_sequence_ll)
 		#commands.append(inference_logiQL_graph)
 	elif argvs[1]  == "ostrusted":
 		commands.append(inference_MAXSAT_sequence)
