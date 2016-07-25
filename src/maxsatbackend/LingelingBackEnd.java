@@ -82,6 +82,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         try {
             pw = new PrintWriter(f);
             pw.write(CNFInput.toString());
+            CNFInput = null;
             pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -202,8 +203,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         buildCNF(this.hardClauses);
         writeCNFinput();
         try {
-            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath()
- + "/cnfdata"
+            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata"
                     + nth + ".txt");
             nth++;
             result = decode(resultArray);
