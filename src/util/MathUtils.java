@@ -1,5 +1,7 @@
 package util;
 
+import maxsatbackend.LingelingBackEnd;
+
 import javax.lang.model.element.AnnotationMirror;
 
 import constraintsolver.Lattice;
@@ -7,6 +9,7 @@ import constraintsolver.Lattice;
 public class MathUtils {
 
     public static int mapIdToMatrixEntry(int id, AnnotationMirror type, Lattice lattice) {
+        id = LingelingBackEnd.sortedSlotId.indexOf(id) + 1;
         int column = lattice.typeToInt.get(type) + 1;
         int row = id - 1;
         int length = lattice.numTypes;
@@ -14,6 +17,7 @@ public class MathUtils {
     }
 
     public static int mapIdToMatrixEntry(int id, int type, Lattice lattice) {
+        id = LingelingBackEnd.sortedSlotId.indexOf(id) + 1;
         int column = type + 1;
         int row = id - 1;
         int length = lattice.numTypes;

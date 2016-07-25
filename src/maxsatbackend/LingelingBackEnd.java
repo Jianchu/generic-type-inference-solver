@@ -10,8 +10,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +23,9 @@ import javax.lang.model.element.AnnotationMirror;
 
 import org.sat4j.core.VecInt;
 
+import util.MathUtils;
 import checkers.inference.model.Constraint;
+import checkers.inference.model.PreferenceConstraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintsolver.Lattice;
@@ -35,6 +39,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     // the integers from 1 to the largest one. Some of them may be not in the
     // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
+    public static List<Integer> sortedSlotId;
+    private int max = 0;
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -50,7 +56,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         final int totalVars = (slotManager.nextId() * lattice.numTypes);
         final int totalClauses = hardClauses.size() + softClauses.size();
         CNFInput.append("p cnf ");
-        CNFInput.append(totalVars);
+        CNFInput.append(max);
         CNFInput.append(" ");
         CNFInput.append(totalClauses);
         CNFInput.append("\n");
@@ -140,18 +146,59 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         for (VecInt clause : this.hardClauses) {
             int[] clauseArray = clause.toArray();
             for (int i = 0; i < clauseArray.length; i++) {
-                variableSet.add(Math.abs(clauseArray[i]));
+                int currentLiteral = Math.abs(clauseArray[i]);
+                if (currentLiteral >= max) {
+                    max = currentLiteral;
+                }
+                variableSet.add(currentLiteral);
             }
         }
+    }
+
+    // duplicate code...
+    @Override
+    public void convertAll() {
+        for (Constraint constraint : constraints) {
+            for (VecInt res : constraint.serialize(realSerializer)) {
+                if (res != null && res.size() != 0) {
+                    if (constraint instanceof PreferenceConstraint) {
+                        softClauses.add(res);
+                    } else {
+                        hardClauses.add(res);
+                    }
+                }
+            }
+        }
+    }
+
+    // duplicate code...
+    @Override
+    protected Map<Integer, AnnotationMirror> decode(int[] solution) {
+        Map<Integer, AnnotationMirror> result = new HashMap<>();
+        for (Integer var : solution) {
+            if (var > 0) {
+                var = var - 1;
+                int slotId = MathUtils.getSlotId(var, lattice);
+                AnnotationMirror type = lattice.intToType.get(MathUtils.getIntRep(var, lattice));
+                slotId = sortedSlotId.get(slotId - 1);
+                result.put(slotId, type);
+            }
+        }
+        return result;
     }
 
     @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
+        for (Constraint constraint : constraints) {
+            collectVarSlots(constraint);
+        }
+        sortedSlotId = new LinkedList<Integer>(this.varSlotIds);
+        Collections.sort(sortedSlotId);
         this.convertAll();
         generateWellForm(hardClauses);
-        buildCNF(this.hardClauses);
         collectVals();
+        buildCNF(this.hardClauses);
         writeCNFinput();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath()
