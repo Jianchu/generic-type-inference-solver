@@ -215,6 +215,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         generateWellForm(hardClauses);
         collectVals();
         buildCNF(this.hardClauses);
+        this.hardClauses.clear();
         writeCNFinput();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata"
@@ -224,6 +225,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        this.constraints = null;
         return result;
     }
 
