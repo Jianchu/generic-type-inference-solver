@@ -41,6 +41,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     private Set<Integer> variableSet = new HashSet<Integer>();
     public static List<Integer> sortedSlotId;
     private int max = 0;
+    public static int nth = 0;
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -75,7 +76,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     }
 
     private void writeCNFinput() {
-        String writePath = CNFData.getAbsolutePath() + "/cnfdata.txt";
+        String writePath = CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt";
         File f = new File(writePath);
         PrintWriter pw;
         try {
@@ -202,7 +203,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         writeCNFinput();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath()
-                    + "/cnfdata.txt");
+ + "/cnfdata"
+                    + nth + ".txt");
+            nth++;
             result = decode(resultArray);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
