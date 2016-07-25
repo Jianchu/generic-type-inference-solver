@@ -70,9 +70,10 @@ def build_command(argvs):
 	elif argvs[1]  == "ostrusted":
 		commands.append(inference_MAXSAT_sequence)
 		commands.append(inference_MAXSAT_parallel)
-		commands.append(inference_logiQL_graph)
-		commands.append(inference_logiQL_nograph)
-		commands.append(inference_MAXSAT_nograph)	
+		#commands.append(inference_logiQL_graph)
+		#commands.append(inference_logiQL_nograph)
+		commands.append(inference_MAXSAT_nograph)
+		commands.append(inference_MAXSAT_sequence_ll)	
 	return commands, project_path
 
 def choose_type_system(type_system_name):
