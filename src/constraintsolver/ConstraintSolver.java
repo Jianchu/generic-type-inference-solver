@@ -111,7 +111,7 @@ public class ConstraintSolver implements InferenceSolver {
             // ErrorReporter.errorAbort("not found back end.");
         } else {
             if (backEndName.equals("maxsatbackend.MaxSat") || backEndName.equals("logiqlbackend.LogiQL")
-                    || backEndName.equals("General")) {
+                    || backEndName.equals("General") || backEndName.equals("maxsatbackend.Lingeling")) {
                 this.backEndType = backEndName;
             } else {
                 ErrorReporter.errorAbort("back end is not implemented yet.");
@@ -158,6 +158,7 @@ public class ConstraintSolver implements InferenceSolver {
             backEnds.add(createBackEnd(backEndType, configuration, slots, independentConstraints,
                     qualHierarchy, processingEnvironment, lattice, defaultSerializer));
         }
+        constraintGraph = null;
         return mergeSolution(solve(backEnds));
     }
 
@@ -167,12 +168,7 @@ public class ConstraintSolver implements InferenceSolver {
         if (backEnds.size() > 0) {
             if (this.solveInParallel) {
                 try {
-                    // 32 Threads each time.
-                    for (int i = 0; i < backEnds.size(); i += 32) {
-                        int upperBound = (i + 32 > backEnds.size()) ? backEnds.size() : i + 32;
-                        List<BackEnd<?, ?>> backEndsSublist = backEnds.subList(i, upperBound);
-                        inferenceSolutionMaps.addAll(solveInparallel(backEndsSublist));
-                    }
+                    inferenceSolutionMaps = solveInparallel(backEnds);
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -195,7 +191,7 @@ public class ConstraintSolver implements InferenceSolver {
     protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd<?, ?>> backEnds)
             throws InterruptedException, ExecutionException {
 
-        ExecutorService service = Executors.newFixedThreadPool(backEnds.size());
+        ExecutorService service = Executors.newFixedThreadPool(32);
 
         List<Future<Map<Integer, AnnotationMirror>>> futures = new ArrayList<Future<Map<Integer, AnnotationMirror>>>();
 

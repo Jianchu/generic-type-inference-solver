@@ -39,7 +39,7 @@ import constraintsolver.VariableCombos;
 
 public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
-    private final Lattice lattice;
+    protected final Lattice lattice;
 
     public MaxSatSerializer(Lattice lattice) {
         this.lattice = lattice;

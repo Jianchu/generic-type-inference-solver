@@ -19,3 +19,5 @@ scripts/ontology/runOntologyGe.sh
 **/CNFfiles/
 **/annotated/
 **/logs
+**/cnfData
+**/dljc-out

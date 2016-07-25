@@ -1,7 +1,7 @@
 import dataflow.qual.DataFlow;
 
 public class TestUpperBound5 {
-    public @DataFlow(typeNames={"int", "double", "java.lang.String"}) Object upperBoundTesting5(int c) {
+    public Object upperBoundTesting5(int c) {
         if (c == 1) {
             return 3;
         }

@@ -28,10 +28,15 @@ import checkers.inference.model.VariableSlot;
 public class ConstraintSerializer<S, T> implements Serializer<S, T> {
 
     public Serializer<S, T> realSerializer;
+    protected Lattice lattice;
 
     @SuppressWarnings("unchecked")
     public ConstraintSerializer(String backEndType, Lattice lattice) {
+        this.lattice = lattice;
         try {
+            if (backEndType.equals("maxsatbackend.Lingeling")) {
+                backEndType = "maxsatbackend.MaxSat";
+            }
             Class<?> serializerClass = Class.forName(backEndType + "Serializer");
             Constructor<?> cons = serializerClass.getConstructor(Lattice.class);
             realSerializer = (Serializer<S, T>)cons.newInstance(lattice);
