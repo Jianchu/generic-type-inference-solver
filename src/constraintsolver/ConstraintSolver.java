@@ -147,8 +147,9 @@ public class ConstraintSolver implements InferenceSolver {
     protected List<Map<Integer, AnnotationMirror>> solveInSequential(List<BackEnd<?, ?>> backEnds) {
         List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
 
-        for (final BackEnd backEnd : backEnds) {
+        for (BackEnd backEnd : backEnds) {
             solutions.add(backEnd.solve());
+            backEnd = null;
         }
         return solutions;
     }
