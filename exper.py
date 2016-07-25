@@ -54,11 +54,13 @@ def build_command(argvs):
 	logiQL_nograph = ' --solverArgs="backEndType=logiqlbackend.LogiQL,useGraph=false"'
 	logiQL_graph = ' --solverArgs="backEndType=logiqlbackend.LogiQL"'
 	MAXSAT_sequence_ll = ' --solverArgs="backEndType=maxsatbackend.Lingeling,solveInParallel=false"'
+	MAXSAT_nograph_ll = ' --solverArgs="backEndType=maxsatbackend.Lingeling,useGraph=false"'
 
 	inference_MAXSAT_sequence = dljc + MAXSAT_sequence + type_system_command + " -- " + compile_command
 	inference_MAXSAT_parallel = dljc + MAXSAT_parallel + type_system_command + " -- " + compile_command
 	inference_MAXSAT_sequence_ll = dljc + MAXSAT_sequence_ll + type_system_command + " -- " + compile_command
 	inference_MAXSAT_nograph = dljc + MAXSAT_nograph + type_system_command + " -- " + compile_command
+	inference_MAXSAT_nograph_ll = dljc + MAXSAT_nograph_ll + type_system_command + " -- " + compile_command
 	inference_logiQL_nograph = dljc + logiQL_nograph + type_system_command + " -- " + compile_command
 	inference_logiQL_graph = dljc + logiQL_graph + type_system_command + " -- " + compile_command
 
@@ -74,7 +76,8 @@ def build_command(argvs):
 		#commands.append(inference_logiQL_graph)
 		#commands.append(inference_logiQL_nograph)
 		commands.append(inference_MAXSAT_nograph)
-		commands.append(inference_MAXSAT_sequence_ll)	
+		commands.append(inference_MAXSAT_sequence_ll)
+		commands.append(inference_MAXSAT_nograph_ll)	
 	return commands, project_path
 
 def choose_type_system(type_system_name):
