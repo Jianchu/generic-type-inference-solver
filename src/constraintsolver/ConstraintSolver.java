@@ -184,7 +184,7 @@ public class ConstraintSolver implements InferenceSolver {
         for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
             result.putAll(inferenceSolutionMap);
         }
-        PrintUtils.printResult(result);
+        // PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
     }
 
@@ -215,7 +215,7 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected InferenceSolution solve() {
-        PrintUtils.printResult(realBackEnd.solve());
+        // PrintUtils.printResult(realBackEnd.solve());
         return new DefaultInferenceSolution(realBackEnd.solve());
     }
 }

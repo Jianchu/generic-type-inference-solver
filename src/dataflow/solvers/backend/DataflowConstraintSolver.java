@@ -74,7 +74,6 @@ public class DataflowConstraintSolver extends ConstraintSolver {
             }
         }
         File CNFData = new File(new File("").getAbsolutePath());
-        System.out.println("size!!!!!!!!!!: " + backEnds.size());
         String writePath = CNFData.getAbsolutePath() + "/number_backends" + ".txt";
         File f = new File(writePath);
         PrintWriter pw;
@@ -131,8 +130,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
                     .refineDataflow(entry.getValue());
             entry.setValue(refinedDataflow);
         }
-
-        PrintUtils.printResult(result);
+        PrintUtils.writeResult(result);
         return new DefaultInferenceSolution(result);
     }
 
