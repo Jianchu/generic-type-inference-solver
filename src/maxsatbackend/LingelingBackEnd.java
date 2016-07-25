@@ -75,6 +75,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         try {
             pw = new PrintWriter(f);
             pw.write(CNFInput.toString());
+            // saving memory of JVM...
+            this.CNFInput = null;
             pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -152,6 +154,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         generateWellForm(hardClauses);
         buildCNF(this.hardClauses);
         collectVals();
+        // saving memory of JVM...
+        this.hardClauses.clear();
         writeCNFinput();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath()
@@ -160,6 +164,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        // saving memory of JVM...
+        this.constraints = null;
+        this.variableSet = null;
         return result;
     }
 

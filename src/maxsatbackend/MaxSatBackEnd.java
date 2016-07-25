@@ -115,11 +115,14 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             for (VecInt hardClause : hardClauses) {
                 solver.addHardClause(hardClause);
             }
+            // saving memory of JVM...
+            this.hardClauses.clear();
 
             for (VecInt softclause : softClauses) {
                 solver.addSoftClause(softclause);
             }
-
+            // saving memory of JVM...
+            this.softClauses.clear();
             if (solver.isSatisfiable()) {
                 result = decode(solver.model());
                 // PrintUtils.printResult(result);
@@ -130,7 +133,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
+        // saving memory of JVM...
+        this.constraints = null;
         return result;
     }
 
