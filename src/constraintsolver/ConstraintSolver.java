@@ -123,6 +123,7 @@ public class ConstraintSolver implements InferenceSolver {
             backEnds.add(createBackEnd(backEndType, configuration, slots, independentConstraints,
                     qualHierarchy, processingEnvironment, lattice, defaultSerializer));
         }
+        constraintGraph = null;
         return mergeSolution(solve(backEnds));
     }
 
