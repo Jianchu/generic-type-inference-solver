@@ -11,7 +11,8 @@ def main():
 	commands, project_path = build_command(sys.argv)
 	statistic = run_command(commands, project_path)
 	json_file = json.dumps(statistic, ensure_ascii=False)
-	with open('data.json', 'w') as outfile:
+	file_name = 'data_' + sys.argv[1] + '.json'
+	with open(file_name, 'w') as outfile:
 		json.dump(statistic, outfile, indent=4, sort_keys=True)
 	print json_file
 
