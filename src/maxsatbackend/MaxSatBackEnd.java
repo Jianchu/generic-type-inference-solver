@@ -5,9 +5,11 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -181,8 +183,19 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
         StatisticPrinter.record(StatisticKey.CNF_CLAUSES_SIZE, (long) totalClauses);
-        StatisticPrinter.record(StatisticKey.CNF_VARIABLE_SIZE, (long) totalVars);
+        countVariables();
         solver.setTimeoutMs(1000000);
+    }
+
+    protected void countVariables() {
+
+        Set<Integer> vars = new HashSet<Integer>();
+        for (VecInt vi : hardClauses) {
+            for (int i : vi.toArray()) {
+                vars.add(i);
+            }
+        }
+        StatisticPrinter.record(StatisticKey.CNF_VARIABLE_SIZE, (long) vars.size());
     }
 
     /**
