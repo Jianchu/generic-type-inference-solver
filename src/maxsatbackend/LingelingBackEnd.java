@@ -226,6 +226,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
             e.printStackTrace();
         }
         this.constraints = null;
+        this.variableSet = null;
         return result;
     }
 
