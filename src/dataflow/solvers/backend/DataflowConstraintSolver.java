@@ -3,6 +3,9 @@ package dataflow.solvers.backend;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,6 +72,18 @@ public class DataflowConstraintSolver extends ConstraintSolver {
                             qualHierarchy, processingEnvironment, latticeFor2, serializer));
                 }
             }
+        }
+        File CNFData = new File(new File("").getAbsolutePath());
+        System.out.println("size!!!!!!!!!!: " + backEnds.size());
+        String writePath = CNFData.getAbsolutePath() + "/number_backends" + ".txt";
+        File f = new File(writePath);
+        PrintWriter pw;
+        try {
+            pw = new PrintWriter(f);
+            pw.write(String.valueOf(backEnds.size()));
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
         return mergeSolution(solve(backEnds));
     }
