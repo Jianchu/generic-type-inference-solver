@@ -35,6 +35,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     // the integers from 1 to the largest one. Some of them may be not in the
     // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
+    public static int nth = 0;
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -50,25 +51,33 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         final int totalVars = (slotManager.nextId() * lattice.numTypes);
         final int totalClauses = hardClauses.size() + softClauses.size();
         CNFInput.append("p cnf ");
-        CNFInput.append(totalVars + " ");
-        CNFInput.append(totalClauses + "\n");
+        CNFInput.append(totalVars);
+        CNFInput.append(" ");
+        CNFInput.append(totalClauses);
+        CNFInput.append("\n");
         for (VecInt clause : clauses) {
-            try {
-                CNFInput.append(clause.toString().replaceAll(",", " ") + " 0\n");
-            } catch (java.lang.OutOfMemoryError e) {
-                System.out.println("The failed string is: " + clause.toString());
-            }
-            
+            CNFHelper(clause);
         }
     }
 
+    private void CNFHelper(VecInt clause) {
+        int[] literals = clause.toArray();
+        for (int i = 0; i < literals.length; i++) {
+            CNFInput.append(literals[i]);
+            CNFInput.append(" ");
+        }
+        CNFInput.append("0\n");
+    }
+
     private void writeCNFinput() {
-        String writePath = CNFData.getAbsolutePath() + "/cnfdata.txt";
+        String writePath = CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt";
         File f = new File(writePath);
         PrintWriter pw;
         try {
             pw = new PrintWriter(f);
             pw.write(CNFInput.toString());
+            // saving memory of JVM...
+            this.CNFInput = null;
             pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -86,9 +95,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
                 try {
                     while ((s = stdInput.readLine()) != null) {
                         if (s.charAt(0) == 'v') {
-                            s = s.substring(1);
                             for (String retval : s.split(" ")) {
-                                if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")) {
+                                if (!retval.equals("") && !retval.equals(" ") && !retval.equals("\n")
+                                        && !retval.equals("v")) {
                                     int val = Integer.parseInt(retval);
                                     if (variableSet.contains(Math.abs(val))) {
                                         resultList.add(val);
@@ -107,11 +116,11 @@ public class LingelingBackEnd extends MaxSatBackEnd {
             @Override
             public void run() {
                 String s = "";
-                String errReply = "";
+                StringBuilder sb = new StringBuilder();
                 BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                 try {
                     while ((s = stdError.readLine()) != null) {
-                        errReply = errReply + s;
+                        sb.append(s);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -146,14 +155,19 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         generateWellForm(hardClauses);
         buildCNF(this.hardClauses);
         collectVals();
+        // saving memory of JVM...
+        this.hardClauses.clear();
         writeCNFinput();
         try {
-            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath()
-                    + "/cnfdata.txt");
+            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt");
+            nth++;
             result = decode(resultArray);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        // saving memory of JVM...
+        this.constraints = null;
+        this.variableSet = null;
         return result;
     }
 

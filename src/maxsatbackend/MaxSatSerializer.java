@@ -39,7 +39,7 @@ import constraintsolver.VariableCombos;
 
 public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
-    private final Lattice lattice;
+    protected final Lattice lattice;
 
     public MaxSatSerializer(Lattice lattice) {
         this.lattice = lattice;
@@ -356,7 +356,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     public VecInt[] serialize(PreferenceConstraint preferenceConstraint) {
         VariableSlot vs = preferenceConstraint.getVariable();
         ConstantSlot cs = preferenceConstraint.getGoal();
-        return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(), lattice));
+        if (lattice.getAllTypes().contains(cs)) {
+            return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(),
+                    lattice));
+        } else {
+            return emptyClauses;
+        }
+
     }
 
     protected static final VecInt[] emptyClauses = new VecInt[0];

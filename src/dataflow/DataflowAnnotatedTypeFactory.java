@@ -3,6 +3,8 @@ package dataflow;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
+import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
+import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedPrimitiveType;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
@@ -22,6 +24,8 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 
 import com.sun.source.tree.LiteralTree;
@@ -62,6 +66,28 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
         return new DataFlowQualifierHierarchy(factory, DATAFLOWBOTTOM);
+    }
+
+    @Override
+    public AnnotatedDeclaredType getBoxedType(AnnotatedPrimitiveType type) {
+        TypeElement typeElt = types.boxedClass(type.getUnderlyingType());
+        AnnotationMirror am = DataflowUtils.createDataflowAnnotation(typeElt.asType().toString(),
+                this.processingEnv);
+        AnnotatedDeclaredType dt = fromElement(typeElt);
+        dt.addAnnotation(am);
+        return dt;
+    }
+
+    @Override
+    public AnnotatedPrimitiveType getUnboxedType(AnnotatedDeclaredType type)
+            throws IllegalArgumentException {
+        PrimitiveType primitiveType = types.unboxedType(type.getUnderlyingType());
+        AnnotationMirror am = DataflowUtils.createDataflowAnnotation(primitiveType.toString(),
+                this.processingEnv);
+        AnnotatedPrimitiveType pt = (AnnotatedPrimitiveType) AnnotatedTypeMirror.createType(
+                primitiveType, this, false);
+        pt.addAnnotation(am);
+        return pt;
     }
 
     private final class DataFlowQualifierHierarchy extends GraphQualifierHierarchy {

@@ -8,10 +8,6 @@ import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.PrimitiveType;
@@ -44,7 +40,7 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
     @Override
     public AnnotatedDeclaredType getBoxedType(AnnotatedPrimitiveType type) {
         TypeElement typeElt = types.boxedClass(type.getUnderlyingType());
-        AnnotationMirror am = createDataflow(typeElt.asType().toString(), this.processingEnv);
+        AnnotationMirror am = DataflowUtils.createDataflowAnnotation(typeElt.asType().toString(), this.processingEnv);
         AnnotatedDeclaredType dt = fromElement(typeElt);
         ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
         InferenceMain.getInstance().getSlotManager().addVariable(cs);
@@ -57,7 +53,7 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
     public AnnotatedPrimitiveType getUnboxedType(AnnotatedDeclaredType type)
             throws IllegalArgumentException {
         PrimitiveType primitiveType = types.unboxedType(type.getUnderlyingType());
-        AnnotationMirror am = createDataflow(primitiveType.toString(), this.processingEnv);
+        AnnotationMirror am = DataflowUtils.createDataflowAnnotation(primitiveType.toString(), this.processingEnv);
         AnnotatedPrimitiveType pt = (AnnotatedPrimitiveType) AnnotatedTypeMirror.createType(
                 primitiveType, this, false);
         ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
@@ -66,12 +62,4 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
         pt.addAnnotation(cs.getValue());
         return pt;
     }
-
-    private AnnotationMirror createDataflow(String typeName, ProcessingEnvironment processingEnv) {
-        Set<String> typeNames = new HashSet<String>();
-        typeNames.add(typeName);
-        AnnotationMirror am = DataflowUtils.createDataflowAnnotation(typeNames, processingEnv);
-        return am;
-    }
-
 }

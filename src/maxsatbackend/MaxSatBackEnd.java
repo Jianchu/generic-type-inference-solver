@@ -80,10 +80,10 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             List<Integer> varList = new ArrayList<Integer>(lattice.intToType.keySet());
             for (int i = 0; i < varList.size(); i++) {
                 for (int j = i + 1; j < varList.size(); j++) {
-                    int[] onlyOneIsTrue = new int[2];
-                    onlyOneIsTrue[0] = -MathUtils.mapIdToMatrixEntry(id, varList.get(i), lattice);
-                    onlyOneIsTrue[1] = -MathUtils.mapIdToMatrixEntry(id, varList.get(j), lattice);
-                    clauses.add(VectorUtils.asVec(onlyOneIsTrue));
+                    VecInt vecInt = new VecInt(2);
+                    vecInt.push(-MathUtils.mapIdToMatrixEntry(id, varList.get(i), lattice));
+                    vecInt.push(-MathUtils.mapIdToMatrixEntry(id, varList.get(j), lattice));
+                    clauses.add(vecInt);
                 }
             }
         }
@@ -115,11 +115,14 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             for (VecInt hardClause : hardClauses) {
                 solver.addHardClause(hardClause);
             }
+            // saving memory of JVM...
+            this.hardClauses.clear();
 
             for (VecInt softclause : softClauses) {
                 solver.addSoftClause(softclause);
             }
-
+            // saving memory of JVM...
+            this.softClauses.clear();
             if (solver.isSatisfiable()) {
                 result = decode(solver.model());
                 // PrintUtils.printResult(result);
@@ -130,7 +133,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
+        // saving memory of JVM...
+        this.constraints = null;
         return result;
     }
 
