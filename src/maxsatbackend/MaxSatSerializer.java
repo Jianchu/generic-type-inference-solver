@@ -356,7 +356,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     public VecInt[] serialize(PreferenceConstraint preferenceConstraint) {
         VariableSlot vs = preferenceConstraint.getVariable();
         ConstantSlot cs = preferenceConstraint.getGoal();
-        if (lattice.getAllTypes().contains(cs)) {
+        if (lattice.getAllTypes().contains(cs.getValue())) {
             return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(),
                     lattice));
         } else {
