@@ -1,6 +1,7 @@
 package util;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import javax.tools.JavaFileObject;
@@ -41,6 +42,16 @@ public class TypeHarness {
         types = Types.instance(ctx);
     }
     
+    public static void main(String[] args) {
+
+        ArrayList<String> imports = new ArrayList<>();
+        ArrayList<String> typeVars = new ArrayList<>();
+        TypeHarness typeHarness = new TypeHarness();
+        StrToTypeFactory strToTypeFactory = typeHarness.new StrToTypeFactory(null, imports, typeVars);
+        Type aType = strToTypeFactory.getType("java.lang.Object[]");
+        Type aType1 = strToTypeFactory.getType("int");
+    }
+
     /**
      * An example is reported below:
      * List<String> imports = new ArrayList<>();
