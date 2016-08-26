@@ -28,6 +28,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 
+import util.TypeHarness;
+import util.TypeHarness.StrToTypeFactory;
+
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewArrayTree;
@@ -44,6 +47,8 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     private ExecutableElement dataflowValue = TreeUtils.getMethod(
             "dataflow.qual.DataFlow", "typeNames", 0, processingEnv);
     private final Map<String, TypeMirror> typeNamesMap = new HashMap<String, TypeMirror>();
+    private final StrToTypeFactory strToTypeFactory = new TypeHarness().new StrToTypeFactory(null,
+            new ArrayList<String>(), new ArrayList<String>());
 
     //cannot use DataFlow.class.toString(), the string would be "interface dataflow.quals.DataFlow"
     //private ExecutableElement dataflowValue = TreeUtils.getMethod(DataFlow.class.toString(), "typeNames", 0, processingEnv);
@@ -279,7 +284,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         if (this.typeNamesMap.keySet().contains(typeName)) {
             return this.typeNamesMap.get(typeName);
         } else {
-            return elements.getTypeElement(convertToReferenceType(typeName)).asType();
+            return strToTypeFactory.getType(typeName);
         }
     }
 
