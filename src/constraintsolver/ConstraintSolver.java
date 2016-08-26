@@ -45,23 +45,22 @@ public class ConstraintSolver implements InferenceSolver {
     public String backEndType;
     public boolean useGraph;
     public boolean solveInParallel;
+    public boolean collectStatistic;
     protected Lattice lattice;
 
     // timing variables:
     private long graphBuildingStart;
     private long graphBuildingEnd;
-    //private long solvingStart;
-    //private long solvingEnd;
 
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
+        configure(configuration);
         // record constraint size
         StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
         // record slot size
         StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
-        configure(configuration);
         configureLattice(qualHierarchy);
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
         InferenceSolution solution;
@@ -71,33 +70,17 @@ public class ConstraintSolver implements InferenceSolver {
             ConstraintGraph constraintGraph = graphBuilder.buildGraph();
             this.graphBuildingEnd = System.currentTimeMillis();
             StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
-            //this.solvingStart = System.currentTimeMillis();
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
-            // this.solvingEnd = System.currentTimeMillis();
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, lattice, defaultSerializer);
-            //this.solvingStart = System.currentTimeMillis();
             solution = solve();
-            //this.solvingEnd = System.currentTimeMillis();
         }
-//        if (this.backEndType.equals("maxsatbackend.MaxSat")) {
-//            if (useGraph) {
-//                if (solveInParallel) {
-//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME,
-//                            (solvingEnd - solvingStart));
-//                } else {
-//                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
-//                            (solvingEnd - solvingStart));
-//                }
-//            } else {
-//                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME,
-//                        (solvingEnd - solvingStart));
-//            }
-//        }
-        PrintUtils.printStatistic(StatisticPrinter.getStatistic());
-        PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
+        if (collectStatistic) {
+            PrintUtils.printStatistic(StatisticPrinter.getStatistic());
+            PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
+        }
         return solution;
     }
     
@@ -105,6 +88,7 @@ public class ConstraintSolver implements InferenceSolver {
         String backEndName = configuration.get("backEndType");
         String useGraph = configuration.get("useGraph");
         String solveInParallel = configuration.get("solveInParallel");
+        String collectStatistic = configuration.get("collectStatistic");
         if (backEndName == null) {
             this.backEndType = "maxsatbackend.MaxSat";
             // TODO: warning
@@ -130,6 +114,12 @@ public class ConstraintSolver implements InferenceSolver {
             this.solveInParallel = true;
         } else {
             this.solveInParallel = false;
+        }
+
+        if (useGraph == null || collectStatistic.equals("false")) {
+            this.collectStatistic = false;
+        } else if (collectStatistic.equals("true")) {
+            this.collectStatistic = true;
         }
 
         System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "
