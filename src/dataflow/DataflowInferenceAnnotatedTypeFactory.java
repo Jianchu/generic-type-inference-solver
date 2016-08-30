@@ -42,8 +42,9 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
         TypeElement typeElt = types.boxedClass(type.getUnderlyingType());
         AnnotationMirror am = DataflowUtils.createDataflowAnnotation(typeElt.asType().toString(), this.processingEnv);
         AnnotatedDeclaredType dt = fromElement(typeElt);
-        ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
-        InferenceMain.getInstance().getSlotManager().addVariable(cs);
+        //ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
+        //InferenceMain.getInstance().getSlotManager().addVariable(cs);
+        ConstantSlot cs = InferenceMain.getInstance().getSlotManager().createConstantSlot(am);
         dt.addAnnotation(InferenceMain.getInstance().getSlotManager().getAnnotation(cs));
         dt.addAnnotation(cs.getValue());
         return dt;
@@ -56,8 +57,7 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
         AnnotationMirror am = DataflowUtils.createDataflowAnnotation(primitiveType.toString(), this.processingEnv);
         AnnotatedPrimitiveType pt = (AnnotatedPrimitiveType) AnnotatedTypeMirror.createType(
                 primitiveType, this, false);
-        ConstantSlot cs = new ConstantSlot(am, InferenceMain.getInstance().getSlotManager().nextId());
-        InferenceMain.getInstance().getSlotManager().addVariable(cs);
+        ConstantSlot cs = InferenceMain.getInstance().getSlotManager().createConstantSlot(am);
         pt.addAnnotation(InferenceMain.getInstance().getSlotManager().getAnnotation(cs));
         pt.addAnnotation(cs.getValue());
         return pt;
