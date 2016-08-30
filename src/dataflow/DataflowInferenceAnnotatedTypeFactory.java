@@ -12,13 +12,13 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.PrimitiveType;
 
-import checkers.inference.ConstraintManager;
 import checkers.inference.InferenceAnnotatedTypeFactory;
 import checkers.inference.InferenceChecker;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
 import checkers.inference.model.ConstantSlot;
+import checkers.inference.model.ConstraintManager;
 import dataflow.util.DataflowUtils;
 
 public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTypeFactory {
