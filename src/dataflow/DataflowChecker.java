@@ -7,10 +7,10 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.util.Elements;
 
 import checkers.inference.BaseInferrableChecker;
-import checkers.inference.ConstraintManager;
 import checkers.inference.InferenceChecker;
 import checkers.inference.InferrableChecker;
 import checkers.inference.SlotManager;
+import checkers.inference.model.ConstraintManager;
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowTop;
 
