@@ -30,19 +30,19 @@ public class VariableCombos<T extends Constraint, S> {
         return defaultAction();
     }
     
-    protected S variable_variable(Slot target, Slot decl, VariableSlot result, CombineConstraint constraint) {
+    protected S variable_variable(VariableSlot target, VariableSlot decl, VariableSlot result, CombineConstraint constraint) {
         return defaultAction();
     }
 
-    protected S constant_variable(Slot target, Slot decl, VariableSlot result, CombineConstraint constraint) {
+    protected S constant_variable(ConstantSlot target, VariableSlot decl, VariableSlot result, CombineConstraint constraint) {
         return defaultAction();
     }
 
-    protected S variable_constant(Slot target, Slot decl, VariableSlot result, CombineConstraint constraint) {
+    protected S variable_constant(VariableSlot target, ConstantSlot decl, VariableSlot result, CombineConstraint constraint) {
         return defaultAction();
     }
 
-    protected S constant_constant(Slot target, Slot decl, VariableSlot result, CombineConstraint constraint) {
+    protected S constant_constant(ConstantSlot target, ConstantSlot decl, VariableSlot result, CombineConstraint constraint) {
         return defaultAction();
     }
 
