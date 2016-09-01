@@ -2,6 +2,7 @@ package constraintgraph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -24,11 +25,17 @@ public class GraphBuilder {
     private final Collection<Slot> slots;
     private final Collection<Constraint> constraints;
     private final ConstraintGraph graph;
-
-    public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints) {
+    // Temporary approach to distinguish the direction of subtype constraint.
+    // True: from subtype to supertype
+    // False: from supertype to subtype
+    private final boolean subtypeDirection;
+    private Map<Vertex, Set<Vertex>> vertexCache = new HashMap<>();
+    
+    public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints, boolean subtypeDirection) {
         this.slots = slots;
         this.constraints = constraints;
         this.graph = new ConstraintGraph();
+        this.subtypeDirection = subtypeDirection;
     }
 
     public ConstraintGraph buildGraph() {
@@ -74,9 +81,28 @@ public class GraphBuilder {
     }
 
     private void calculateConstantPath() {
+        Collection<Constraint> alias = new HashSet<Constraint>(this.constraints);
         for (Vertex vertex : this.graph.getConstantVerticies()) {
             Set<Constraint> constantPathConstraints = BFSSearch(vertex);
+            alias.removeAll(constantPathConstraints);
             this.graph.addConstantPath(vertex, constantPathConstraints);
+        }
+        addMissingVertex(alias);
+    }
+
+    private void addMissingVertex(Collection<Constraint> alias) {
+        for (Constraint constraint : alias) {
+            Edge edge = this.graph.findEdge(constraint);
+            if (edge != null) {
+                Vertex from = edge.getFromVertex();
+                Vertex to = edge.getToVertex();
+                for (Map.Entry<Vertex, Set<Vertex>> entry : this.vertexCache.entrySet()) {
+                    Set<Vertex> vertexes = entry.getValue();
+                    if (vertexes.contains(from) && vertexes.contains(to)) {
+                        this.graph.addEdgeToConstantPath(entry.getKey(), constraint);
+                    }
+                }
+            }
         }
     }
 
@@ -89,11 +115,24 @@ public class GraphBuilder {
             Vertex current = queue.remove();
             visited.add(current);
             for (Edge edge : current.getEdges()) {
-                if ((edge instanceof SubtypeEdge) && current.equals(edge.to)) {
-                    continue;
+                if (edge instanceof SubtypeEdge) {
+                    if (this.subtypeDirection && current.equals(edge.to)) {
+                        continue;
+                    } else if (!this.subtypeDirection && current.equals(edge.from)) {
+                        continue;
+                    }
                 }
                 constantPathConstraints.add(edge.getConstraint());
                 Vertex next = edge.getToVertex();
+                Set<Vertex> cacheSet;
+                if (this.vertexCache.keySet().contains(vertex)) {
+                    cacheSet = vertexCache.get(vertex);
+                } else {
+                    cacheSet = new HashSet<Vertex>();
+                }
+                cacheSet.add(current);
+                cacheSet.add(next);
+                this.vertexCache.put(vertex, cacheSet);
                 if (!visited.contains(next)) {
                     queue.add(next);
                 }

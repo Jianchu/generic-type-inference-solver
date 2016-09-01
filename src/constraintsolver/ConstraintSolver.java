@@ -54,8 +54,7 @@ public class ConstraintSolver implements InferenceSolver {
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
         InferenceSolution solution;
         if (useGraph) {
-            GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
-            ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+            ConstraintGraph constraintGraph = generateGraph(slots, constraints);
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
         } else {
@@ -66,6 +65,12 @@ public class ConstraintSolver implements InferenceSolver {
         return solution;
     }
     
+    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, true);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+        return constraintGraph;
+    }
+
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
         String useGraph = configuration.get("useGraph");
