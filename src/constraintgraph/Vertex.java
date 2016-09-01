@@ -48,7 +48,7 @@ public class Vertex {
         }
     }
 
-    protected Slot getSlot() {
+    public Slot getSlot() {
         return this.slot;
     }
 

@@ -1,6 +1,7 @@
 package constraintgraph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ public class ConstraintGraph {
     private Map<Vertex, Set<Constraint>> constantPath;
     private Map<Integer, Vertex> verticies;
     private List<Set<Constraint>> independentPath;
+    private Collection<Constraint> missingConstraints = new HashSet<>();
 
     protected ConstraintGraph() {
         this.edges = new HashSet<Edge>();
@@ -118,5 +120,13 @@ public class ConstraintGraph {
         }
 
         this.addEdge(edge);
+    }
+
+    public Collection<Constraint> getMissingConstraints() {
+        return this.missingConstraints;
+    }
+
+    public void SetMissingConstraints(Collection<Constraint> missingConstraint) {
+        this.missingConstraints = missingConstraint;
     }
 }

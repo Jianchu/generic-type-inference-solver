@@ -28,6 +28,7 @@ public class GraphBuilder {
     private final ConstraintGraph graph;
     private SubtypeDirection subtypeDirection = SubtypeDirection.UNDIRECTED;
     private Map<Vertex, Set<Vertex>> vertexCache = new HashMap<>();
+    private Collection<Constraint> missingConstraints = new HashSet<>();
     
     public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints) {
         this.slots = slots;
@@ -55,6 +56,7 @@ public class GraphBuilder {
         addConstant();
         calculateIndependentPath();
         calculateConstantPath();
+        // System.out.println(this.missingConstraint);
         // printEdges();
         // printGraph();
         return getGraph();
@@ -91,6 +93,8 @@ public class GraphBuilder {
             alias.removeAll(constantPathConstraints);
             this.graph.addConstantPath(vertex, constantPathConstraints);
         }
+        this.graph.SetMissingConstraints(alias);
+        missingConstraints = alias;
         // addMissingVertex(alias);
     }
 
