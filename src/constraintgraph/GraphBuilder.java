@@ -87,7 +87,7 @@ public class GraphBuilder {
             alias.removeAll(constantPathConstraints);
             this.graph.addConstantPath(vertex, constantPathConstraints);
         }
-        addMissingVertex(alias);
+        // addMissingVertex(alias);
     }
 
     private void addMissingVertex(Collection<Constraint> alias) {
