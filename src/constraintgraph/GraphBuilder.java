@@ -98,7 +98,7 @@ public class GraphBuilder {
                 Vertex to = edge.getToVertex();
                 for (Map.Entry<Vertex, Set<Vertex>> entry : this.vertexCache.entrySet()) {
                     Set<Vertex> vertexes = entry.getValue();
-                    if (vertexes.contains(from) && vertexes.contains(to)) {
+                    if (vertexes.contains(from) || vertexes.contains(to)) {
                         this.graph.addEdgeToConstantPath(entry.getKey(), constraint);
                     }
                 }
