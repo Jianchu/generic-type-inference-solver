@@ -11,6 +11,7 @@ import java.util.Set;
 
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
+import checkers.inference.model.ExistentialConstraint;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
 
@@ -25,11 +26,9 @@ public class GraphBuilder {
     private final Collection<Slot> slots;
     private final Collection<Constraint> constraints;
     private final ConstraintGraph graph;
-    // Temporary approach to distinguish the direction of subtype constraint.
-    // True: from subtype to supertype
-    // False: from supertype to subtype
     private SubtypeDirection subtypeDirection = SubtypeDirection.UNDIRECTED;
     private Map<Vertex, Set<Vertex>> vertexCache = new HashMap<>();
+    private Collection<Constraint> missingConstraints = new HashSet<>();
     
     public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints) {
         this.slots = slots;
@@ -47,15 +46,17 @@ public class GraphBuilder {
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
                 addSubtypeEdge((SubtypeConstraint) constraint);
-            } else {
+            } else if (!(constraint instanceof ExistentialConstraint)) {
                 ArrayList<Slot> slots = new ArrayList<Slot>();
                 slots.addAll(constraint.getSlots());
                 addEdges(slots, constraint);
             }
         }
+
         addConstant();
         calculateIndependentPath();
         calculateConstantPath();
+        // System.out.println(this.missingConstraint);
         // printEdges();
         // printGraph();
         return getGraph();
@@ -92,6 +93,8 @@ public class GraphBuilder {
             alias.removeAll(constantPathConstraints);
             this.graph.addConstantPath(vertex, constantPathConstraints);
         }
+        this.graph.SetMissingConstraints(alias);
+        missingConstraints = alias;
         // addMissingVertex(alias);
     }
 
@@ -192,6 +195,9 @@ public class GraphBuilder {
         for (Map.Entry<Vertex, Set<Constraint>> entry : this.graph.getConstantPath().entrySet()) {
             System.out.println(entry.getKey().getSlot());
             for (Constraint constraint : entry.getValue()) {
+                if (constraint instanceof ExistentialConstraint) {
+                    continue;
+                }
                 System.out.println(constraint);
             }
             System.out.println("**************");

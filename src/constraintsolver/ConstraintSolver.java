@@ -44,6 +44,7 @@ public class ConstraintSolver implements InferenceSolver {
     public boolean useGraph;
     public boolean solveInParallel;
     protected Lattice lattice;
+    protected ConstraintGraph constraintGraph;
 
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
@@ -54,7 +55,7 @@ public class ConstraintSolver implements InferenceSolver {
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
         InferenceSolution solution;
         if (useGraph) {
-            ConstraintGraph constraintGraph = generateGraph(slots, constraints);
+            this.constraintGraph = generateGraph(slots, constraints);
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
         } else {
@@ -64,7 +65,7 @@ public class ConstraintSolver implements InferenceSolver {
         }
         return solution;
     }
-    
+
     protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
         GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
@@ -188,11 +189,14 @@ public class ConstraintSolver implements InferenceSolver {
         for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
             result.putAll(inferenceSolutionMap);
         }
+        result = inferMissingConstraint(result);
         PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
     }
 
-
+    protected Map<Integer, AnnotationMirror> inferMissingConstraint(Map<Integer, AnnotationMirror> result) {
+        return result;
+    }
 
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,
