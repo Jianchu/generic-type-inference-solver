@@ -22,6 +22,8 @@ import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintgraph.ConstraintGraph;
+import constraintgraph.GraphBuilder;
+import constraintgraph.GraphBuilder.SubtypeDirection;
 import constraintgraph.Vertex;
 import constraintsolver.BackEnd;
 import constraintsolver.ConstraintSolver;
@@ -71,6 +73,13 @@ public class DataflowConstraintSolver extends ConstraintSolver {
             }
         }
         return mergeSolution(solve(backEnds));
+    }
+
+    @Override
+    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, SubtypeDirection.FROMSUBTYPE);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+        return constraintGraph;
     }
 
     @Override

@@ -66,7 +66,7 @@ public class ConstraintSolver implements InferenceSolver {
     }
     
     protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
-        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, true);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
         return constraintGraph;
     }
