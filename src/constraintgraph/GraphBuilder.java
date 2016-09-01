@@ -28,13 +28,18 @@ public class GraphBuilder {
     // Temporary approach to distinguish the direction of subtype constraint.
     // True: from subtype to supertype
     // False: from supertype to subtype
-    private final boolean subtypeDirection;
+    private SubtypeDirection subtypeDirection = SubtypeDirection.UNDIRECTED;
     private Map<Vertex, Set<Vertex>> vertexCache = new HashMap<>();
     
-    public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints, boolean subtypeDirection) {
+    public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints) {
         this.slots = slots;
         this.constraints = constraints;
         this.graph = new ConstraintGraph();
+    }
+
+    public GraphBuilder(Collection<Slot> slots, Collection<Constraint> constraints,
+            SubtypeDirection subtypeDirection) {
+        this(slots, constraints);
         this.subtypeDirection = subtypeDirection;
     }
 
@@ -116,9 +121,11 @@ public class GraphBuilder {
             visited.add(current);
             for (Edge edge : current.getEdges()) {
                 if (edge instanceof SubtypeEdge) {
-                    if (this.subtypeDirection && current.equals(edge.to)) {
+                    if (this.subtypeDirection.equals(SubtypeDirection.FROMSUBTYPE)
+                            && current.equals(edge.to)) {
                         continue;
-                    } else if (!this.subtypeDirection && current.equals(edge.from)) {
+                    } else if (this.subtypeDirection.equals(SubtypeDirection.FROMSUPERTYPE)
+                            && current.equals(edge.from)) {
                         continue;
                     }
                 }
@@ -211,5 +218,9 @@ public class GraphBuilder {
         for (Vertex vertex : this.graph.getVerticies()) {
             System.out.println(vertex.getId());
         }
+    }
+
+    public enum SubtypeDirection {
+        UNDIRECTED, FROMSUBTYPE, FROMSUPERTYPE
     }
 }
