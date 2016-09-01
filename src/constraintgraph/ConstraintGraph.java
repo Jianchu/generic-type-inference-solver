@@ -61,6 +61,11 @@ public class ConstraintGraph {
         this.constantPath.put(vertex, constraints);
     }
 
+    protected void addEdgeToConstantPath(Vertex vertex, Constraint constraint) {
+        Set<Constraint> constrants = this.constantPath.get(vertex);
+        constrants.add(constraint);
+    }
+
     public List<Set<Constraint>> getIndependentPath() {
         return this.independentPath;
     }
@@ -75,6 +80,15 @@ public class ConstraintGraph {
         }
     }
     
+    public Edge findEdge(Constraint constraint) {
+        for (Edge edge : this.edges) {
+            if (edge.getConstraint().equals(constraint)) {
+                return edge;
+            }
+        }
+        return null;
+    }
+
     protected void createEdge(Slot slot1, Slot slot2, Constraint constraint) {
         Integer slot1Id = ((VariableSlot) slot1).getId();
         Integer slot2Id = ((VariableSlot) slot2).getId();

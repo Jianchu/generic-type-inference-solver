@@ -42,7 +42,7 @@ public class DataflowSolver implements InferenceSolver {
 
         Elements elements = processingEnvironment.getElementUtils();
         DATAFLOW = AnnotationUtils.fromClass(elements, DataFlow.class);
-        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, true);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
 
         Collection<String> datatypesUsed = getDatatypesUsed(slots);
