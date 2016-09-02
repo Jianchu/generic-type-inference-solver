@@ -49,7 +49,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     private void buildCNF(List<VecInt> clauses) {
         CNFInput.append("c This is the CNF input\n");
         final int totalVars = (slotManager.nextId() * lattice.numTypes);
-        final int totalClauses = hardClauses.size() + softClauses.size();
+        // TODO: We need to handle softclauses at some point...
+        final int totalClauses = hardClauses.size();
         CNFInput.append("p cnf ");
         CNFInput.append(totalVars);
         CNFInput.append(" ");
@@ -152,6 +153,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         this.convertAll();
+        // this.hardClauses.addAll(softClauses);
         generateWellForm(hardClauses);
         buildCNF(this.hardClauses);
         collectVals();
