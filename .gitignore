@@ -21,3 +21,8 @@ scripts/ontology/runOntologyGe.sh
 **/logs
 **/cnfData
 **/dljc-out
+
+## gradle config and output
+.gradle/
+build/
+dist/
