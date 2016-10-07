@@ -1,7 +1,5 @@
 apply plugin: 'java'
 
-sourceCompatibility = "1.8"
-
 /************************ system variables ************************/
 def env         = System.getenv()
 
