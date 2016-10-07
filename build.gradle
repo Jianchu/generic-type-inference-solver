@@ -5,6 +5,26 @@ def env         = System.getenv()
 
 def javaHome    = env["JAVA_HOME"]
 
+//determined based on the the version of the currently running JVM
+def jreVersion  = {
+    def envJreVersion = env["CFI_JRE_VERSION"];
+    if(envJreVersion == null) {
+        def jreVersionStr  = System.getProperty("java.version");
+        def matches        = ( jreVersionStr =~ /^(\d\.\d+)\..*$/ )
+
+        final double jreVer;
+        if(matches.matches()) {
+            jreVer = Double.parseDouble(matches.group(1));
+        } else {
+            throw new RuntimeException("Could not determine version from property java.version=" + jreVersionStr);
+        }
+
+        return jreVer
+    } else {
+        return envJreVersion;
+    }
+}.call()
+
 /************************ jsr308 variables ************************/
 def jsr308Dir   = env["JSR308"] ?: file(new File("..")).absolutePath
 
