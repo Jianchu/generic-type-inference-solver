@@ -47,6 +47,7 @@ public class ConstraintSolver implements InferenceSolver {
     public boolean solveInParallel;
     public boolean collectStatistic;
     protected Lattice lattice;
+    protected ConstraintGraph constraintGraph;
 
     // timing variables:
     private long graphBuildingStart;
@@ -66,8 +67,7 @@ public class ConstraintSolver implements InferenceSolver {
         InferenceSolution solution;
         if (useGraph) {
             this.graphBuildingStart = System.currentTimeMillis();
-            GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
-            ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+            this.constraintGraph = generateGraph(slots, constraints);
             this.graphBuildingEnd = System.currentTimeMillis();
             StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
@@ -77,13 +77,20 @@ public class ConstraintSolver implements InferenceSolver {
                     processingEnvironment, lattice, defaultSerializer);
             solution = solve();
         }
+        
         if (collectStatistic) {
             PrintUtils.printStatistic(StatisticPrinter.getStatistic());
             PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
         }
         return solution;
     }
-    
+
+    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
+        ConstraintGraph constraintGraph = graphBuilder.buildGraph();
+        return constraintGraph;
+    }
+
     private void configure(Map<String, String> configuration) {
         String backEndName = configuration.get("backEndType");
         String useGraph = configuration.get("useGraph");
@@ -116,7 +123,7 @@ public class ConstraintSolver implements InferenceSolver {
             this.solveInParallel = false;
         }
 
-        if (useGraph == null || collectStatistic.equals("false")) {
+        if (collectStatistic == null || collectStatistic.equals("false")) {
             this.collectStatistic = false;
         } else if (collectStatistic.equals("true")) {
             this.collectStatistic = true;
@@ -208,11 +215,14 @@ public class ConstraintSolver implements InferenceSolver {
         for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
             result.putAll(inferenceSolutionMap);
         }
+        result = inferMissingConstraint(result);
         PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
     }
 
-
+    protected Map<Integer, AnnotationMirror> inferMissingConstraint(Map<Integer, AnnotationMirror> result) {
+        return result;
+    }
 
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,
             Collection<Slot> slots, Collection<Constraint> constraints,

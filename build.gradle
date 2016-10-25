@@ -1,0 +1,121 @@
+apply plugin: 'java'
+
+/************************ system variables ************************/
+def env         = System.getenv()
+
+def javaHome    = env["JAVA_HOME"]
+
+//determined based on the the version of the currently running JVM
+def jreVersion  = {
+    def envJreVersion = env["CFI_JRE_VERSION"];
+    if(envJreVersion == null) {
+        def jreVersionStr  = System.getProperty("java.version");
+        def matches        = ( jreVersionStr =~ /^(\d\.\d+)\..*$/ )
+
+        final double jreVer;
+        if(matches.matches()) {
+            jreVer = Double.parseDouble(matches.group(1));
+        } else {
+            throw new RuntimeException("Could not determine version from property java.version=" + jreVersionStr);
+        }
+
+        return jreVer
+    } else {
+        return envJreVersion;
+    }
+}.call()
+
+/************************ jsr308 variables ************************/
+def jsr308Dir   = env["JSR308"] ?: file(new File("..")).absolutePath
+
+def jsr308_langtools = (jsr308Dir + "/jsr308-langtools")
+
+def checkerFrameworkDir = jsr308Dir + "/checker-framework"
+
+def cfInferenceDir = jsr308Dir + "/checker-framework-inference"
+
+/************************ util functions ************************/
+//Closure that creates a file from a base directory and a name of the file in that directory
+def fromBaseDir   = { baseDir, child -> baseDir ? new File(baseDir, child) : new File(child)  }
+
+//A function that, given a file name, creates a file object of that name with 
+//checkersDir as its parent
+def checkerFrameworkChild = fromBaseDir.curry(checkerFrameworkDir)
+
+def cfInferenceChild = fromBaseDir.curry(cfInferenceDir)
+
+/************************ build variables ************************/
+//JarsToPackage contains both all members that should be on the classpath for this build
+// should use `+` operation at the end of a line which would means "append" in groovy
+// http://stackoverflow.com/questions/31044673/groovy-postgres-no-signature-of-method-java-lang-string-positive
+def jarsToPackage = [//checker relative paths
+                        "checker/dist/checker.jar",
+                    ].collect { checkerFrameworkChild(it).getAbsolutePath() } +
+                    [
+                        "dist/checker-framework-inference.jar",
+                    ].collect { cfInferenceChild(it).getAbsolutePath() }
+
+//A list of files to append to the class path during compilation
+def toPackageClasspath = files(
+    jarsToPackage
+)
+
+/************************ java plugin arguments ************************/
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // solver backend dependencies
+    // TODO: should be removed when we get rid of classic solver
+    // TODO: currently the runtime dependencies of sat4j is bit tricky --- it actually uses the sat4j from cfi/dist
+    //       should we also snapshot a copy of sat4j from mavenCentral into ontology?
+    compile 'org.ow2.sat4j:org.ow2.sat4j.core:2.3.4'
+    compile 'org.ow2.sat4j:org.ow2.sat4j.maxsat:2.3.4'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src"
+        }
+
+        resources {
+            srcDir "src"
+        }
+
+        //Leads to a dir structure of "checker-framework-inference/bin/checkers/...classes...
+        output.classesDir "bin"
+        compileClasspath += toPackageClasspath
+        compileClasspath += files("bin")
+    }
+
+    // TODO: add test src path when have unit tests
+}
+
+
+//Switch the Javac used to the JSR308
+tasks.compileJava {
+  description = 'Compiles this project using the jsr308 compiler.'
+  options.fork = true
+  options.compilerArgs = [
+      '-implicit:class',
+      '-Awarns', '-Xmaxwarns', '10000', '-version']
+  if(jreVersion == 1.7) {
+    options.compilerArgs += ['-source' , '7', '-target', '7']
+  }
+  options.forkOptions.executable="$jsr308_langtools/dist/bin/javac"
+}
+
+tasks.jar {
+    description = 'Makes a jar with ONLY the classes compiled for GTIS and NONE of its dependencies'
+    archiveName = "generic-type-inference-solver.jar"
+    exclude("dependency-cache", "libs", "tmp")
+}
+
+tasks.clean {
+    delete += "bin/"
+    delete += "dist/"
+}
+
+libsDirName = "../dist"

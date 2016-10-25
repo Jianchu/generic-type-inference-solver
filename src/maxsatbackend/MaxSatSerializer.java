@@ -126,7 +126,7 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
         }.accept(constraint.getSubtype(), constraint.getSupertype(), constraint);
     }
-    
+
     /**
      * for subtype constraint, if supertype is constant slot, then the subtype
      * cannot be the super type of supertype, same for subtype
@@ -179,51 +179,56 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
 
     @Override
     public VecInt[] serialize(EqualityConstraint constraint) {
-        return new VariableCombos<EqualityConstraint, VecInt[]>(emptyClauses) {
+        return new EqualityVariableCombos(emptyClauses).accept(constraint.getFirst(), constraint.getSecond(), constraint);
+    }
 
-            @Override
-            protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                if (lattice.getAllTypes().contains(slot1.getValue())) {
-                    return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue(), lattice));
-                } else {
-                    return emptyClauses;
+    protected class EqualityVariableCombos extends VariableCombos<EqualityConstraint, VecInt[]> {
+        public EqualityVariableCombos(VecInt[] emptyValue) {
+            super(emptyValue);
+        }
+
+        @Override
+        protected VecInt[] constant_variable(ConstantSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
+            if (lattice.getAllTypes().contains(slot1.getValue())) {
+                return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(slot2.getId(), slot1.getValue(), lattice));
+            } else {
+                return emptyClauses;
+            }
+        }
+
+        @Override
+        protected VecInt[] variable_constant(VariableSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
+            return constant_variable(slot2, slot1, constraint);
+        }
+
+        @Override
+        protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
+            // a <=> b which is the same as (!a v b) & (!b v a)
+            VecInt[] result = new VecInt[lattice.numTypes * 2];
+            int i = 0;
+            for (AnnotationMirror type : lattice.getAllTypes()) {
+                if (lattice.getAllTypes().contains(type)) {
+                    result[i] = VectorUtils.asVec(
+                            -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
+                            MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
+                    result[i + 1] = VectorUtils.asVec(
+                            -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
+                            MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
+                    i = i + 2;
                 }
             }
+            return result;
+        }
 
-            @Override
-            protected VecInt[] variable_constant(VariableSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
-                return constant_variable(slot2, slot1, constraint);
-            }
+        @Override
+        protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
+//            if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
+//                ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
+//                        + " is not equal to " + slot2.getValue());
+//            }
 
-            @Override
-            protected VecInt[] variable_variable(VariableSlot slot1, VariableSlot slot2, EqualityConstraint constraint) {
-                // a <=> b which is the same as (!a v b) & (!b v a)
-                VecInt[] result = new VecInt[lattice.numTypes * 2];
-                int i = 0;
-                for (AnnotationMirror type : lattice.getAllTypes()) {
-                    if (lattice.getAllTypes().contains(type)) {
-                        result[i] = VectorUtils.asVec(
-                                -MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice),
-                                MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice));
-                        result[i + 1] = VectorUtils.asVec(
-                                -MathUtils.mapIdToMatrixEntry(slot2.getId(), type, lattice),
-                                MathUtils.mapIdToMatrixEntry(slot1.getId(), type, lattice));
-                        i = i + 2;
-                    }
-                }
-                return result;
-            }
-            
-            @Override
-            protected VecInt[] constant_constant(ConstantSlot slot1, ConstantSlot slot2, EqualityConstraint constraint) {
-//                if (!ConstantUtils.checkConstant(slot1, slot2, constraint)) {
-//                    ErrorReporter.errorAbort("Confliction in equality constraint: " + slot1.getValue()
-//                            + " is not equal to " + slot2.getValue());
-//                }
-
-                return defaultAction(slot1, slot2, constraint);
-            }
-        }.accept(constraint.getFirst(), constraint.getSecond(), constraint);
+            return defaultAction(slot1, slot2, constraint);
+        }
     }
 
     @Override
@@ -356,7 +361,13 @@ public class MaxSatSerializer implements Serializer<VecInt[], VecInt[]> {
     public VecInt[] serialize(PreferenceConstraint preferenceConstraint) {
         VariableSlot vs = preferenceConstraint.getVariable();
         ConstantSlot cs = preferenceConstraint.getGoal();
-        return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(), lattice));
+        if (lattice.getAllTypes().contains(cs.getValue())) {
+            return VectorUtils.asVecArray(MathUtils.mapIdToMatrixEntry(vs.getId(), cs.getValue(),
+                    lattice));
+        } else {
+            return emptyClauses;
+        }
+
     }
 
     protected static final VecInt[] emptyClauses = new VecInt[0];
