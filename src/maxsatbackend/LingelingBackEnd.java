@@ -86,7 +86,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     }
 
     private int[] getOutPut_Error(String command) throws IOException, InterruptedException {
-        List<Integer> resultList = new ArrayList<Integer>();
+        final List<Integer> resultList = new ArrayList<Integer>();
         final Process p = Runtime.getRuntime().exec(command);
         Thread getOutPut = new Thread() {
             @Override
