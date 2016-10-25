@@ -21,6 +21,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
 import util.PrintUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
@@ -43,25 +45,42 @@ public class ConstraintSolver implements InferenceSolver {
     public String backEndType;
     public boolean useGraph;
     public boolean solveInParallel;
+    public boolean collectStatistic;
     protected Lattice lattice;
     protected ConstraintGraph constraintGraph;
+
+    // timing variables:
+    private long graphBuildingStart;
+    private long graphBuildingEnd;
 
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
         configure(configuration);
+        // record constraint size
+        StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
+        // record slot size
+        StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
         configureLattice(qualHierarchy);
         Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
         InferenceSolution solution;
         if (useGraph) {
+            this.graphBuildingStart = System.currentTimeMillis();
             this.constraintGraph = generateGraph(slots, constraints);
+            this.graphBuildingEnd = System.currentTimeMillis();
+            StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
             solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, defaultSerializer);
         } else {
             realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
                     processingEnvironment, lattice, defaultSerializer);
             solution = solve();
+        }
+        
+        if (collectStatistic) {
+            PrintUtils.printStatistic(StatisticPrinter.getStatistic());
+            PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
         }
         return solution;
     }
@@ -76,6 +95,7 @@ public class ConstraintSolver implements InferenceSolver {
         String backEndName = configuration.get("backEndType");
         String useGraph = configuration.get("useGraph");
         String solveInParallel = configuration.get("solveInParallel");
+        String collectStatistic = configuration.get("collectStatistic");
         if (backEndName == null) {
             this.backEndType = "maxsatbackend.MaxSat";
             // TODO: warning
@@ -101,6 +121,12 @@ public class ConstraintSolver implements InferenceSolver {
             this.solveInParallel = true;
         } else {
             this.solveInParallel = false;
+        }
+
+        if (collectStatistic == null || collectStatistic.equals("false")) {
+            this.collectStatistic = false;
+        } else if (collectStatistic.equals("true")) {
+            this.collectStatistic = true;
         }
 
         System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "

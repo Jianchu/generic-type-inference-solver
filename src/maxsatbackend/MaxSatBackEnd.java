@@ -5,9 +5,11 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -16,6 +18,8 @@ import org.sat4j.core.VecInt;
 import org.sat4j.maxsat.WeightedMaxSatDecorator;
 
 import util.MathUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import util.VectorUtils;
 import checkers.inference.InferenceMain;
 import checkers.inference.SlotManager;
@@ -35,6 +39,11 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     protected final SlotManager slotManager;
     protected final List<VecInt> hardClauses = new LinkedList<VecInt>();
     protected final List<VecInt> softClauses = new LinkedList<VecInt>();
+
+    private long serializationStart;
+    private long serializationEnd;
+    protected long solvingStart;
+    protected long solvingEnd;
 
     public MaxSatBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -106,7 +115,11 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(org.sat4j.pb.SolverFactory.newBoth());
+        this.serializationStart = System.currentTimeMillis();
         this.convertAll();
+        this.serializationEnd = System.currentTimeMillis();
+        StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+                (serializationEnd - serializationStart));
         generateWellForm(hardClauses);
         // printClauses();
         configureSatSolver(solver);
@@ -121,9 +134,29 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             for (VecInt softclause : softClauses) {
                 solver.addSoftClause(softclause);
             }
+
+            this.solvingStart = System.currentTimeMillis();
+            boolean isSatisfiable = solver.isSatisfiable();
+            this.solvingEnd = System.currentTimeMillis();
+
+            boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph")
+                    .equals("true")) ? true : false;
+            boolean parallel = (configuration.get("solveInParallel") == null || configuration.get(
+                    "solveInParallel").equals("true")) ? true : false;
+            long solvingTime = solvingEnd - solvingStart;
+            if (graph) {
+                if (parallel) {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME, solvingTime);
+                } else {
+                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME, solvingTime);
+                }
+            } else {
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME, solvingTime);
+            }
+
+            if (isSatisfiable) {
             // saving memory of JVM...
             this.softClauses.clear();
-            if (solver.isSatisfiable()) {
                 result = decode(solver.model());
                 // PrintUtils.printResult(result);
             } else {
@@ -149,7 +182,20 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
 
         solver.newVar(totalVars);
         solver.setExpectedNumberOfClauses(totalClauses);
+        StatisticPrinter.record(StatisticKey.CNF_CLAUSES_SIZE, (long) totalClauses);
+        countVariables();
         solver.setTimeoutMs(1000000);
+    }
+
+    protected void countVariables() {
+
+        Set<Integer> vars = new HashSet<Integer>();
+        for (VecInt vi : hardClauses) {
+            for (int i : vi.toArray()) {
+                vars.add(i);
+            }
+        }
+        StatisticPrinter.record(StatisticKey.CNF_VARIABLE_SIZE, (long) vars.size());
     }
 
     /**

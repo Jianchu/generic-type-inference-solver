@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 
+import util.StatisticPrinter.StatisticKey;
 import checkers.inference.InferenceMain;
 
 public class PrintUtils {
@@ -34,6 +35,35 @@ public class PrintUtils {
         System.out.println(printResult.toString());
         System.out.flush();
         System.out.println("/**********************************************************/");
+    }
+
+    public static void printStatistic(Map<StatisticKey, Long> statistic) {
+        System.out.println("/***********************statistic start*************************/");
+        for (StatisticKey j : statistic.keySet()) {
+            if (statistic.get(j) != (long) 0) {
+                System.out.println(j.toString().toLowerCase() + ": " + statistic.get(j));
+            }
+        }
+        System.out.flush();
+        System.out.println("/**********************statistic end****************************/");
+    }
+
+    public static void writeStatistic(Map<StatisticKey, Long> statistic) {
+        String writePath = new File(new File("").getAbsolutePath()).toString() + "/statistic.txt";
+        StringBuilder sb = new StringBuilder();
+        for (StatisticKey j : statistic.keySet()) {
+            if (statistic.get(j) != (long) 0) {
+                sb.append((j.toString().toLowerCase() + "," + statistic.get(j)) + "\n");
+            }
+        }
+        try {
+            File f = new File(writePath);
+            PrintWriter pw = new PrintWriter(writePath);
+            pw.write(sb.toString());
+            pw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void writeResult(Map<Integer, AnnotationMirror> result) {
@@ -65,4 +95,5 @@ public class PrintUtils {
         }
         printResult = null;
     }
+
 }
