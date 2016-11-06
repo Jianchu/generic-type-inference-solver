@@ -1,6 +1,5 @@
 package constraintsolver;
 
-import org.checkerframework.dataflow.analysis.RegularTransferResult;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.ErrorReporter;
 
@@ -59,7 +58,6 @@ public class ConstraintSolver implements InferenceSolver {
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
         configure(configuration);
-
         // record constraint size
         StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
         // record slot size
