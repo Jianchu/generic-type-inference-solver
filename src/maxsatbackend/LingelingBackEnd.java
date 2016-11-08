@@ -50,7 +50,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
 
     private void buildCNF(List<VecInt> clauses) {
         CNFInput.append("c This is the CNF input\n");
-        final int totalVars = (slotManager.nextId() * lattice.numTypes);
+        final int totalVars = (slotManager.getNumberOfSlots() * lattice.numTypes);
         // TODO: We need to handle softclauses at some point...
         final int totalClauses = hardClauses.size();
         CNFInput.append("p cnf ");

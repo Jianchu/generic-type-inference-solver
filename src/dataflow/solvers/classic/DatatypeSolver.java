@@ -63,7 +63,7 @@ public class DatatypeSolver {
         Map<Integer, Boolean> idToExistence = new HashMap<>();
         Map<Integer, Boolean> result = new HashMap<>();
 
-        final int totalVars = slotManager.nextId();
+        final int totalVars = slotManager.getNumberOfSlots();
         final int totalClauses = clauses.size();
 
         try {

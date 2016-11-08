@@ -22,8 +22,8 @@ public class DatatypeSatSolver extends SatSubSolver {
     public int[] dataflowsatSolve() {
         List<VecInt> clauses = convertImpliesToClauses();
         becomeWellForm(clauses);
-        final int totalVars = (slotManager.nextId() * lattice.numModifiers);
-        final int totalClauses = clauses.size() + slotManager.nextId()
+        final int totalVars = (slotManager.getNumberOfSlots() * lattice.numModifiers);
+        final int totalClauses = clauses.size() + slotManager.getNumberOfSlots()
                 * (1 + (lattice.numModifiers * (lattice.numModifiers - 1) / 2));
         final WeightedMaxSatDecorator solver = new WeightedMaxSatDecorator(
                 org.sat4j.pb.SolverFactory.newBoth());
