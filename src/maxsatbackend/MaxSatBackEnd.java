@@ -2,6 +2,9 @@ package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +42,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
     protected final SlotManager slotManager;
     protected final List<VecInt> hardClauses = new LinkedList<VecInt>();
     protected final List<VecInt> softClauses = new LinkedList<VecInt>();
+    protected final File CNFData = new File(new File("").getAbsolutePath() + "/cnfData");
+    protected StringBuilder CNFInput = new StringBuilder();
 
     private long serializationStart;
     private long serializationEnd;
@@ -52,6 +57,57 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer,
                 lattice);
         this.slotManager = InferenceMain.getInstance().getSlotManager();
+
+        if (shouldOutputCNF()) {
+            CNFData.mkdir();
+        }
+    }
+
+    protected boolean shouldOutputCNF() {
+        String outputCNF = configuration.get("outputCNF");
+        return outputCNF != null && outputCNF.equals("true");
+    }
+
+    protected void buildCNF() {
+        CNFInput.append("c This is the CNF input\n");
+
+        // TODO: We need to handle softclauses at some point...
+        final int totalClauses = hardClauses.size();
+        final int totalVars = slotManager.getNumberOfSlots() * lattice.numTypes;
+
+        CNFInput.append("p cnf ");
+        CNFInput.append(totalVars);
+        CNFInput.append(" ");
+        CNFInput.append(totalClauses);
+        CNFInput.append("\n");
+
+        for (VecInt clause : hardClauses) {
+            int[] literals = clause.toArray();
+            for (int i = 0; i < literals.length; i++) {
+                CNFInput.append(literals[i]);
+                CNFInput.append(" ");
+            }
+            CNFInput.append("0\n");
+        }
+    }
+
+    protected void writeCNFInput() {
+        writeCNFInput("cnfdata.txt");
+    }
+
+    protected void writeCNFInput(String file) {
+        String writePath = CNFData.getAbsolutePath() + "/" + file;
+        File f = new File(writePath);
+        PrintWriter pw;
+        try {
+            pw = new PrintWriter(f);
+            pw.write(CNFInput.toString());
+            // saving memory of JVM...
+            this.CNFInput = null;
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -121,6 +177,10 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
                 (serializationEnd - serializationStart));
         generateWellForm(hardClauses);
+        if (shouldOutputCNF()) {
+            buildCNF();
+            writeCNFInput();
+        }
         // printClauses();
         configureSatSolver(solver);
 
