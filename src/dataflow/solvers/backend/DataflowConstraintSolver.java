@@ -130,4 +130,12 @@ public class DataflowConstraintSolver extends ConstraintSolver {
         return new DefaultInferenceSolution(result);
     }
 
+    @Override
+    protected void sanitizeConfiguration() {
+        if (!useGraph) {
+            useGraph = true;
+            InferenceMain.getInstance().logger.warning("DataflowConstraintSolver: Don't use graph to solve constraints will "
+                    + "cause wrong answers in Dataflow type system. Modified solver argument \"useGraph\" to true.");
+        }
+    }
 }
