@@ -86,8 +86,9 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     /**
-     * sanitize the configuration of solver
-     * sub-class may override this method to sanitize the configuration of solver
+     * Sanitize and apply check of the configuration of solver based on a specific type system.
+     * Sub-class solver of a specific type system may override this method to sanitize the configuration of solver
+     * in the context of that type system.
      */
     protected void sanitizeConfiguration() {
 
