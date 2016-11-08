@@ -10,5 +10,4 @@ export SHELLOPTS
 
 cd $ROOT/checker-framework-inference
 
-gradle copytest
 ant -f tests.xml
