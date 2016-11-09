@@ -85,6 +85,15 @@ public class ConstraintSolver implements InferenceSolver {
         return solution;
     }
 
+    /**
+     * Sanitize and apply check of the configuration of solver based on a specific type system.
+     * Sub-class solver of a specific type system may override this method to sanitize the configuration of solver
+     * in the context of that type system.
+     */
+    protected void sanitizeConfiguration() {
+
+    }
+
     protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
         GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
@@ -129,6 +138,8 @@ public class ConstraintSolver implements InferenceSolver {
             this.collectStatistic = true;
         }
 
+        // sanitize the configuration if needs
+        sanitizeConfiguration();
         System.out.println("configuration: \nback end type: " + this.backEndType + "; \nuseGraph: "
                 + this.useGraph + "; \nsolveInParallel: " + this.solveInParallel + ".");
     }
