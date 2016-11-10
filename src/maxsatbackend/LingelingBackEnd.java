@@ -3,11 +3,8 @@ package maxsatbackend;
 import org.checkerframework.framework.type.QualifierHierarchy;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,8 +27,6 @@ import constraintsolver.Lattice;
 
 public class LingelingBackEnd extends MaxSatBackEnd {
 
-    private StringBuilder CNFInput = new StringBuilder();
-    private final File CNFData = new File(new File("").getAbsolutePath() + "/cnfData");
     private final String lingeling = System.getenv().get("JSR308") + "/lingeling/lingeling";
     // record cnf integers in clauses. lingeling solver give the answer for all
     // the integers from 1 to the largest one. Some of them may be not in the
@@ -45,46 +40,6 @@ public class LingelingBackEnd extends MaxSatBackEnd {
             Lattice lattice) {
         super(configuration, slots, constraints, qualHierarchy, processingEnvironment, realSerializer,
                 lattice);
-        CNFData.mkdir();
-    }
-
-    private void buildCNF(List<VecInt> clauses) {
-        CNFInput.append("c This is the CNF input\n");
-        final int totalVars = (slotManager.getNumberOfSlots() * lattice.numTypes);
-        // TODO: We need to handle softclauses at some point...
-        final int totalClauses = hardClauses.size();
-        CNFInput.append("p cnf ");
-        CNFInput.append(totalVars);
-        CNFInput.append(" ");
-        CNFInput.append(totalClauses);
-        CNFInput.append("\n");
-        for (VecInt clause : clauses) {
-            CNFHelper(clause);
-        }
-    }
-
-    private void CNFHelper(VecInt clause) {
-        int[] literals = clause.toArray();
-        for (int i = 0; i < literals.length; i++) {
-            CNFInput.append(literals[i]);
-            CNFInput.append(" ");
-        }
-        CNFInput.append("0\n");
-    }
-
-    private void writeCNFinput() {
-        String writePath = CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt";
-        File f = new File(writePath);
-        PrintWriter pw;
-        try {
-            pw = new PrintWriter(f);
-            pw.write(CNFInput.toString());
-            // saving memory of JVM...
-            this.CNFInput = null;
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private int[] getOutPut_Error(String command) throws IOException, InterruptedException {
@@ -152,16 +107,23 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     }
 
     @Override
+    protected boolean shouldOutputCNF() {
+        // We need the CNF output to pass to Linegling
+        // and so we unconditionally signal we want CNF output.
+        return true;
+    }
+
+    @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         this.convertAll();
         // this.hardClauses.addAll(softClauses);
         generateWellForm(hardClauses);
-        buildCNF(this.hardClauses);
+        buildCNF();
         collectVals();
         // saving memory of JVM...
         this.hardClauses.clear();
-        writeCNFinput();
+        writeCNFInput("cnfdata" + nth + ".txt");
         this.solvingStart = System.currentTimeMillis();
         try {
             int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt");
