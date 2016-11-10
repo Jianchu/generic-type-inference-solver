@@ -6,6 +6,8 @@ import org.checkerframework.javacutil.Pair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import dataflow.solvers.backend.DataflowConstraintSolver;
 import dataflow.solvers.classic.DataflowSolver;
 
 import org.junit.runners.Parameterized.Parameters;
@@ -21,7 +23,12 @@ public class DataflowTest extends CFInferenceTest {
 
     @Override
     public Pair<String, List<String>> getSolverNameAndOptions() {
-        return Pair.<String, List<String>>of(DataflowSolver.class.getCanonicalName(), new ArrayList<String>());
+        return Pair.<String, List<String>>of(DataflowConstraintSolver.class.getCanonicalName(), new ArrayList<String>());
+    }
+
+    @Override
+    public boolean useHacks() {
+        return true;
     }
 
     @Parameters
