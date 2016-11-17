@@ -49,7 +49,7 @@ public class PrintUtils {
     }
 
     public static void writeStatistic(Map<StatisticKey, Long> statistic) {
-        String writePath = new File(new File("").getAbsolutePath()).toString() + "/statistic.txt";
+        String writePath = new File(new File("").getAbsolutePath()).toString() + File.separator + "solver-statistic.txt";
         StringBuilder sb = new StringBuilder();
         for (StatisticKey j : statistic.keySet()) {
             if (statistic.get(j) != (long) 0) {
