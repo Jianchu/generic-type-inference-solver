@@ -57,30 +57,37 @@ public class ConstraintSolver implements InferenceSolver {
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
-        configure(configuration);
-        // record constraint size
-        StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
-        // record slot size
-        StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
-        configureLattice(qualHierarchy);
-        Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
-        InferenceSolution solution;
-        if (useGraph) {
-            this.graphBuildingStart = System.currentTimeMillis();
-            this.constraintGraph = generateGraph(slots, constraints);
-            this.graphBuildingEnd = System.currentTimeMillis();
-            StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
-            solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
-                    processingEnvironment, defaultSerializer);
-        } else {
-            realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
-                    processingEnvironment, lattice, defaultSerializer);
-            solution = solve();
+        InferenceSolution solution = null;
+
+        try {
+            configure(configuration);
+            // record constraint size
+            StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
+            // record slot size
+            StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
+            configureLattice(qualHierarchy);
+            Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
+            if (useGraph) {
+                this.graphBuildingStart = System.currentTimeMillis();
+                this.constraintGraph = generateGraph(slots, constraints);
+                this.graphBuildingEnd = System.currentTimeMillis();
+                StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
+                solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
+                        processingEnvironment, defaultSerializer);
+            } else {
+                realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
+                        processingEnvironment, lattice, defaultSerializer);
+                solution = solve();
+            }
+        } finally {
+            if (collectStatistic) {
+                PrintUtils.printStatistic(StatisticPrinter.getStatistic());
+                PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
+            }
         }
-        
-        if (collectStatistic) {
-            PrintUtils.printStatistic(StatisticPrinter.getStatistic());
-            PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
+
+        if (solution == null) {
+            ErrorReporter.errorAbort("null solution detected!");
         }
         return solution;
     }
