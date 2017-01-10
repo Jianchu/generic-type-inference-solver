@@ -222,6 +222,7 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
         
         String[] typeNames = DataflowUtils.getTypeNames(type);
+        Arrays.sort(typeNames);
         Set<String> refinedtypeNames = new HashSet<String>();
 
         if (refinedRoots.size() == 0) {
