@@ -28,6 +28,7 @@ public class DataflowInferenceAnnotatedTypeFactory extends InferenceAnnotatedTyp
             InferrableChecker realChecker, SlotManager slotManager, ConstraintManager constraintManager) {
         super(inferenceChecker, withCombineConstraints, realTypeFactory, realChecker, slotManager,
                 constraintManager);
+        postInit();
     }
 
     @Override

@@ -116,7 +116,7 @@ public class ConstraintSolver implements InferenceSolver {
             this.solveInParallel = false;
         }
 
-        if (useGraph == null || collectStatistic.equals("false")) {
+        if (collectStatistic == null || collectStatistic.equals("false")) {
             this.collectStatistic = false;
         } else if (collectStatistic.equals("true")) {
             this.collectStatistic = true;
