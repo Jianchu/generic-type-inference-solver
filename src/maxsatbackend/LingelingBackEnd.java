@@ -38,6 +38,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
     public static int nth = 0;
+    private long serializationStart;
+    private long serializationEnd;
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -153,7 +155,9 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
+        this.serializationStart = System.currentTimeMillis();
         this.convertAll();
+        this.serializationEnd = System.currentTimeMillis();
         generateWellForm(hardClauses);
         buildCNF(this.hardClauses);
         collectVals();
@@ -172,6 +176,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph").equals(
                 "true")) ? true : false;
         long solvingTime = solvingEnd - solvingStart;
+        StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+                (serializationEnd - serializationStart));
         if (graph) {
             StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
         } else {
