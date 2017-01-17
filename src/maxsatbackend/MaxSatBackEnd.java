@@ -1,6 +1,7 @@
 package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.javacutil.Pair;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,8 +119,8 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
         this.serializationStart = System.currentTimeMillis();
         this.convertAll();
         this.serializationEnd = System.currentTimeMillis();
-        StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
-                (serializationEnd - serializationStart));
+        // StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+        // (serializationEnd - serializationStart));
         generateWellForm(hardClauses);
         // printClauses();
         configureSatSolver(solver);
@@ -146,10 +147,15 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
             long solvingTime = solvingEnd - solvingStart;
             if (graph) {
                 if (parallel) {
-                    StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME, solvingTime);
+                    StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
+                            (serializationEnd - serializationStart), solvingTime));
                 } else {
                     StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME, solvingTime);
                 }
+                // if (!parallel) {
+                // StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
+                // solvingTime);
+                // }
             } else {
                 StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME, solvingTime);
             }

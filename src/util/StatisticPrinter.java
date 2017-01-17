@@ -1,6 +1,10 @@
 package util;
 
+import org.checkerframework.javacutil.Pair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StatisticPrinter {
@@ -34,6 +38,20 @@ public class StatisticPrinter {
     } 
     
     private final static Map<StatisticKey, Long> statistic = new HashMap<StatisticKey, Long>();
+
+
+    private final static List<Pair<Long, Long>> threadsData = new ArrayList<Pair<Long, Long>>();
+
+    // private final static Map<Long, Pair<Long, Long>> threadsData = new
+    // TreeMap<Long, Pair<Long, Long>>(
+    // new Comparator<Long>() {
+    // @Override
+    // public int compare(Long o1, Long o2) {
+    // return (int) (o1 - o2);
+    // }
+    //
+    // });
+
     static {
         statistic.put(StatisticKey.SLOTS_SIZE, (long) 0);
         statistic.put(StatisticKey.CONSTRAINT_SIZE, (long) 0);
@@ -75,8 +93,18 @@ public class StatisticPrinter {
         }
     }
 
+    public static void recordSingleThread(Pair<Long, Long> value) {
+        synchronized (threadsData) {
+            threadsData.add(value);
+        }
+    }
+
     public static Map<StatisticKey, Long> getStatistic() {
         return statistic;
+    }
+
+    public static List<Pair<Long, Long>> getThreadsData() {
+        return threadsData;
     }
 
     public static void printStatistic() {

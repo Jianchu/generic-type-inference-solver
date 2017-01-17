@@ -1,14 +1,20 @@
 package util;
 
+import org.checkerframework.javacutil.Pair;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 
 import util.StatisticPrinter.StatisticKey;
 import checkers.inference.InferenceMain;
+
 
 public class PrintUtils {
 
@@ -37,7 +43,8 @@ public class PrintUtils {
         System.out.println("/**********************************************************/");
     }
 
-    public static void printStatistic(Map<StatisticKey, Long> statistic) {
+    public static void printStatistic(Map<StatisticKey, Long> statistic,
+            List<Pair<Long, Long>> threadData) {
         System.out.println("/***********************statistic start*************************/");
         for (StatisticKey j : statistic.keySet()) {
             if (statistic.get(j) != (long) 0) {
@@ -48,7 +55,8 @@ public class PrintUtils {
         System.out.println("/**********************statistic end****************************/");
     }
 
-    public static void writeStatistic(Map<StatisticKey, Long> statistic) {
+    public static void writeStatistic(Map<StatisticKey, Long> statistic,
+            List<Pair<Long, Long>> threadData) {
         String writePath = new File(new File("").getAbsolutePath()).toString() + "/statistic.txt";
         StringBuilder sb = new StringBuilder();
         for (StatisticKey j : statistic.keySet()) {
@@ -56,6 +64,20 @@ public class PrintUtils {
                 sb.append((j.toString().toLowerCase() + "," + statistic.get(j)) + "\n");
             }
         }
+
+        Collections.sort(threadData, new Comparator<Pair<Long, Long>>() {
+
+            @Override
+            public int compare(Pair<Long, Long> o1, Pair<Long, Long> o2) {
+                // TODO Auto-generated method stub
+                return -(int) ((o1.first + o1.second) - (o2.first + o2.second));
+            }
+
+        });
+        for (Pair<Long, Long> data : threadData) {
+            sb.append(data.first + ", " + data.second + "\n");
+        }
+
         try {
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(writePath);
