@@ -74,9 +74,9 @@ public class PrintUtils {
             }
 
         });
-        for (Pair<Long, Long> data : threadData) {
-            sb.append(data.first + ", " + data.second + "\n");
-        }
+        // for (Pair<Long, Long> data : threadData) {
+        // sb.append(data.first + ", " + data.second + "\n");
+        // }
 
         try {
             File f = new File(writePath);
