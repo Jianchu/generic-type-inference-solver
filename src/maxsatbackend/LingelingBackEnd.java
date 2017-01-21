@@ -1,6 +1,7 @@
 package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.javacutil.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -175,11 +176,21 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         this.solvingEnd = System.currentTimeMillis();
         boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph").equals(
                 "true")) ? true : false;
+        boolean parallel = (configuration.get("solveInParallel") == null || configuration.get(
+                "solveInParallel").equals("true")) ? true : false;
         long solvingTime = solvingEnd - solvingStart;
-        StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
-                (serializationEnd - serializationStart));
         if (graph) {
-            StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
+            if (parallel) {
+                StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
+                        (serializationEnd - serializationStart), solvingTime));
+                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
+                        (serializationEnd - serializationStart));
+                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM, solvingTime);
+            } else {
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
+                StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+                        (serializationEnd - serializationStart));
+            }
         } else {
             StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, solvingTime);
         }
