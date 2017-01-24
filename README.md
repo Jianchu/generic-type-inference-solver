@@ -88,9 +88,7 @@ and then inserts the results back into the original source code.
 If the whole process runs successfully, the inserted output will be placed in `annotated` directory.
 
   ```
-  dljc -t inference --checker dataflow.DataflowChecker
-    --solver dataflow.solvers.classic.DataflowSolver -o logs 
-    -m ROUNDTRIP -afud annotated -- ant compile-project
+  dljc -t inference --checker dataflow.DataflowChecker --solver dataflow.solvers.backend.DataflowConstraintSolver --mode ROUNDTRIP --solverArgs="backEndType=maxsatbackend.MaxSat" -afud annotated -- ant compile-project
   ```
 
 3. Invoke the checker tool with `do-like-javac`.
