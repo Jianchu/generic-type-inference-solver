@@ -206,7 +206,7 @@ public class ConstraintSolver implements InferenceSolver {
     protected List<Map<Integer, AnnotationMirror>> solveInparallel(List<BackEnd<?, ?>> backEnds)
             throws InterruptedException, ExecutionException {
 
-        ExecutorService service = Executors.newFixedThreadPool(32);
+        ExecutorService service = Executors.newFixedThreadPool(30);
 
         List<Future<Map<Integer, AnnotationMirror>>> futures = new ArrayList<Future<Map<Integer, AnnotationMirror>>>();
 
