@@ -120,7 +120,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         this.serializationStart = System.currentTimeMillis();
-        this.convertAll();D
+        this.convertAll();
         // this.hardClauses.addAll(softClauses);
         this.serializationEnd = System.currentTimeMillis();
         generateWellForm(hardClauses);

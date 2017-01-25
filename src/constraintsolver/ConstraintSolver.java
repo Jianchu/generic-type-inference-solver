@@ -62,7 +62,7 @@ public class ConstraintSolver implements InferenceSolver {
             ProcessingEnvironment processingEnvironment) {
         InferenceSolution solution = null;
 
-        try {
+    
             configure(configuration);
             // record constraint size
             StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
@@ -82,14 +82,8 @@ public class ConstraintSolver implements InferenceSolver {
                         processingEnvironment, lattice, defaultSerializer);
                 solution = solve();
             }
-        } finally {
-            if (collectStatistic) {
-                PrintUtils.printStatistic(StatisticPrinter.getStatistic());
-                PrintUtils.writeStatistic(StatisticPrinter.getStatistic());
-            }
-        }
-
-        if (solution == null) {
+        
+        if (solution == null)
             ErrorReporter.errorAbort("null solution detected!");
         if (collectStatistic) {
             PrintUtils.printStatistic(StatisticPrinter.getStatistic(), StatisticPrinter.getThreadsData());
