@@ -53,6 +53,9 @@ public class ConstraintSolver implements InferenceSolver {
     private long graphBuildingStart;
     private long graphBuildingEnd;
 
+    private long solvingStart;
+    private long solvingEnd;
+
     @Override
     public InferenceSolution solve(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -88,6 +91,9 @@ public class ConstraintSolver implements InferenceSolver {
 
         if (solution == null) {
             ErrorReporter.errorAbort("null solution detected!");
+        if (collectStatistic) {
+            PrintUtils.printStatistic(StatisticPrinter.getStatistic(), StatisticPrinter.getThreadsData());
+            PrintUtils.writeStatistic(StatisticPrinter.getStatistic(), StatisticPrinter.getThreadsData());
         }
         return solution;
     }
@@ -209,6 +215,7 @@ public class ConstraintSolver implements InferenceSolver {
         ExecutorService service = Executors.newFixedThreadPool(30);
 
         List<Future<Map<Integer, AnnotationMirror>>> futures = new ArrayList<Future<Map<Integer, AnnotationMirror>>>();
+        solvingStart = System.currentTimeMillis();
 
         for (final BackEnd backEnd : backEnds) {
             Callable<Map<Integer, AnnotationMirror>> callable = new Callable<Map<Integer, AnnotationMirror>>() {
@@ -225,6 +232,8 @@ public class ConstraintSolver implements InferenceSolver {
         for (Future<Map<Integer, AnnotationMirror>> future : futures) {
             solutions.add(future.get());
         }
+        solvingEnd = System.currentTimeMillis();
+        StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME, (solvingEnd - solvingStart));
         return solutions;
     }
 

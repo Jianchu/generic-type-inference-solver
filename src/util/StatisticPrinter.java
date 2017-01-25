@@ -1,6 +1,10 @@
 package util;
 
+import org.checkerframework.javacutil.Pair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StatisticPrinter {
@@ -24,6 +28,8 @@ public class StatisticPrinter {
         SAT_SOLVING_WITHOUT_GRAPH_TIME,
         SAT_SOLVING_WITHOUT_GRAPH_TIME_LL,
         SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL,
+        SAT_PARALLEL_SERIALIZATION_SUM,
+        SAT_PARALLEL_SOLVING_SUM,
         
         LOGIQL_SERIALIZATION_TIME,
         LOGIQL_SOLVING_GRAPH_SEQUENTIAL_TIME,
@@ -34,6 +40,20 @@ public class StatisticPrinter {
     } 
     
     private final static Map<StatisticKey, Long> statistic = new HashMap<StatisticKey, Long>();
+
+
+    private final static List<Pair<Long, Long>> threadsData = new ArrayList<Pair<Long, Long>>();
+
+    // private final static Map<Long, Pair<Long, Long>> threadsData = new
+    // TreeMap<Long, Pair<Long, Long>>(
+    // new Comparator<Long>() {
+    // @Override
+    // public int compare(Long o1, Long o2) {
+    // return (int) (o1 - o2);
+    // }
+    //
+    // });
+
     static {
         statistic.put(StatisticKey.SLOTS_SIZE, (long) 0);
         statistic.put(StatisticKey.CONSTRAINT_SIZE, (long) 0);
@@ -56,6 +76,8 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.LOGIQL_SOLVING_MEMORY, (long) 0);
         statistic.put(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, (long) 0);
         statistic.put(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, (long) 0);
+        statistic.put(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM, (long) 0);
+        statistic.put(StatisticKey.SAT_PARALLEL_SOLVING_SUM, (long) 0);
     }
 
     public static void record(StatisticKey key, Long value) {
@@ -75,8 +97,18 @@ public class StatisticPrinter {
         }
     }
 
+    public static void recordSingleThread(Pair<Long, Long> value) {
+        synchronized (threadsData) {
+            threadsData.add(value);
+        }
+    }
+
     public static Map<StatisticKey, Long> getStatistic() {
         return statistic;
+    }
+
+    public static List<Pair<Long, Long>> getThreadsData() {
+        return threadsData;
     }
 
     public static void printStatistic() {

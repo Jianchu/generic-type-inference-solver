@@ -1,6 +1,7 @@
 package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
+import org.checkerframework.javacutil.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
     public static int nth = 0;
+    private long serializationStart;
+    private long serializationEnd;
 
     public LingelingBackEnd(Map<String, String> configuration, Collection<Slot> slots,
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
@@ -116,8 +119,10 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
-        this.convertAll();
+        this.serializationStart = System.currentTimeMillis();
+        this.convertAll();D
         // this.hardClauses.addAll(softClauses);
+        this.serializationEnd = System.currentTimeMillis();
         generateWellForm(hardClauses);
         buildCNF();
         collectVals();
@@ -135,9 +140,21 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         this.solvingEnd = System.currentTimeMillis();
         boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph").equals(
                 "true")) ? true : false;
+        boolean parallel = (configuration.get("solveInParallel") == null || configuration.get(
+                "solveInParallel").equals("true")) ? true : false;
         long solvingTime = solvingEnd - solvingStart;
         if (graph) {
-            StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
+            if (parallel) {
+                StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
+                        (serializationEnd - serializationStart), solvingTime));
+                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
+                        (serializationEnd - serializationStart));
+                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM, solvingTime);
+            } else {
+                StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
+                StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
+                        (serializationEnd - serializationStart));
+            }
         } else {
             StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, solvingTime);
         }
