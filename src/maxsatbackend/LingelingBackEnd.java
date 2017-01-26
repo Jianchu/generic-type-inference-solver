@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -33,7 +34,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
     // the integers from 1 to the largest one. Some of them may be not in the
     // clauses.
     private Set<Integer> variableSet = new HashSet<Integer>();
-    public static int nth = 0;
+    public static AtomicInteger nth = new AtomicInteger(0);
     private long serializationStart;
     private long serializationEnd;
 
@@ -115,7 +116,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         // and so we unconditionally signal we want CNF output.
         return true;
     }
-
+    
     @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
@@ -128,11 +129,12 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         collectVals();
         // saving memory of JVM...
         this.hardClauses.clear();
-        writeCNFInput("cnfdata" + nth + ".txt");
+        int localNth = nth.incrementAndGet();
+        writeCNFInput("cnfdata" + localNth + ".txt");
         this.solvingStart = System.currentTimeMillis();
         try {
-            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata" + nth + ".txt");
-            nth++;
+            int[] resultArray = getOutPut_Error(lingeling + " " + CNFData.getAbsolutePath() + "/cnfdata"
+                    + localNth + ".txt");
             result = decode(resultArray);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
