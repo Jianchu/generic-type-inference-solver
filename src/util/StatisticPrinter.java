@@ -6,8 +6,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StatisticPrinter {
+
+    public static AtomicInteger SAT_PARALLEL_SERIALIZATION_SUM = new AtomicInteger(0);
+    public static AtomicInteger SAT_PARALLEL_SOLVING_SUM = new AtomicInteger(0);
+
+
+    public static synchronized void recordSerializationSingleThread(long value) {
+        SAT_PARALLEL_SERIALIZATION_SUM.addAndGet((int) value);
+    }
+
+    public static synchronized void recordSolvingSingleThread(long value) {
+        SAT_PARALLEL_SOLVING_SUM.addAndGet((int) value);
+    }
+
+    public static void record(StatisticKey key, Long value) {
+        synchronized (statistic) {
+            if (key.equals(StatisticKey.LOGIQL_PREDICATES_SIZE)) {
+                statistic.put(key, value);
+            } else if (key.equals(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME)
+                    || key.equals(StatisticKey.SAT_SERIALIZATION_TIME)) {
+                long oldValue = statistic.get(key);
+                if (value > oldValue) {
+                    statistic.put(key, value);
+                }
+            } else {
+                long oldValue = statistic.get(key);
+                statistic.put(key, value + oldValue);
+            }
+        }
+    }
 
     public enum StatisticKey {
         SLOTS_SIZE,
@@ -82,22 +112,7 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.GRAPH_SIZE, (long) 0);
     }
 
-    public static void record(StatisticKey key, Long value) {
-        synchronized (statistic) {
-            if (key.equals(StatisticKey.LOGIQL_PREDICATES_SIZE)) {
-                statistic.put(key, value);
-            } else if (key.equals(StatisticKey.SAT_SOLVING_GRAPH_PARALLEL_TIME)
-                    || key.equals(StatisticKey.SAT_SERIALIZATION_TIME)) {
-                long oldValue = statistic.get(key);
-                if (value > oldValue) {
-                    statistic.put(key, value);
-                }
-            } else {
-                long oldValue = statistic.get(key);
-                statistic.put(key, value + oldValue);
-            }
-        }
-    }
+
 
     public static void recordSingleThread(Pair<Long, Long> value) {
         synchronized (threadsData) {

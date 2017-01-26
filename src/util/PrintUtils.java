@@ -49,6 +49,10 @@ public class PrintUtils {
                 System.out.println(j.toString().toLowerCase() + ": " + statistic.get(j));
             }
         }
+        System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM.toString()
+                .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SERIALIZATION_SUM);
+        System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SOLVING_SUM.toString()
+                .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SOLVING_SUM);
         System.out.flush();
         System.out.println("/**********************statistic end****************************/");
     }
@@ -62,6 +66,7 @@ public class PrintUtils {
                 sb.append((j.toString().toLowerCase() + "," + statistic.get(j)) + "\n");
             }
         }
+
 
         // Collections.sort(threadData, new Comparator<Pair<Long, Long>>() {
         //

@@ -1,7 +1,6 @@
 package maxsatbackend;
 
 import org.checkerframework.framework.type.QualifierHierarchy;
-import org.checkerframework.javacutil.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -155,11 +154,15 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         long solvingTime = solvingEnd - solvingStart;
         if (graph) {
             if (parallel) {
-                StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
-                        (serializationEnd - serializationStart), solvingTime));
-                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
-                        (serializationEnd - serializationStart));
-                StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM, solvingTime);
+                // StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
+                // (serializationEnd - serializationStart), solvingTime));
+                // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
+                // (serializationEnd - serializationStart));
+                // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM,
+                // solvingTime);
+                StatisticPrinter
+                        .recordSerializationSingleThread((serializationEnd - serializationStart));
+                StatisticPrinter.recordSolvingSingleThread(solvingTime);
             } else {
                 StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
                 StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
