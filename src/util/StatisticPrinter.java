@@ -36,7 +36,8 @@ public class StatisticPrinter {
         LOGIQL_SOLVING_WITHOUT_GRAPH_TIME,
         
         SAT_SOLVING_MEMORY,
-        LOGIQL_SOLVING_MEMORY;
+        LOGIQL_SOLVING_MEMORY,
+        GRAPH_SIZE;
     } 
     
     private final static Map<StatisticKey, Long> statistic = new HashMap<StatisticKey, Long>();
@@ -78,6 +79,7 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, (long) 0);
         statistic.put(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM, (long) 0);
         statistic.put(StatisticKey.SAT_PARALLEL_SOLVING_SUM, (long) 0);
+        statistic.put(StatisticKey.GRAPH_SIZE, (long) 0);
     }
 
     public static void record(StatisticKey key, Long value) {

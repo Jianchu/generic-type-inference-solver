@@ -26,9 +26,11 @@ import util.StatisticPrinter.StatisticKey;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceSolution;
 import checkers.inference.InferenceSolver;
+import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
 import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
+import checkers.inference.model.VariableSlot;
 import constraintgraph.ConstraintGraph;
 import constraintgraph.GraphBuilder;
 
@@ -61,31 +63,27 @@ public class ConstraintSolver implements InferenceSolver {
             Collection<Constraint> constraints, QualifierHierarchy qualHierarchy,
             ProcessingEnvironment processingEnvironment) {
         InferenceSolution solution = null;
-
-    
-            configure(configuration);
-            // record constraint size
-            StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
-            // record slot size
-            StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
-            configureLattice(qualHierarchy);
-            Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
-            if (useGraph) {
-                this.graphBuildingStart = System.currentTimeMillis();
+        configure(configuration);
+        configureLattice(qualHierarchy);
+        Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
+        if (useGraph) {
+            this.graphBuildingStart = System.currentTimeMillis();
             this.constraintGraph = generateGraph(slots, constraints, processingEnvironment);
-                this.graphBuildingEnd = System.currentTimeMillis();
-                StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
-                solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
-                        processingEnvironment, defaultSerializer);
-            } else {
-                realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
-                        processingEnvironment, lattice, defaultSerializer);
-                solution = solve();
-            }
+            this.graphBuildingEnd = System.currentTimeMillis();
+            StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME,
+                    (graphBuildingEnd - graphBuildingStart));
+            solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
+                    processingEnvironment, defaultSerializer);
+        } else {
+            realBackEnd = createBackEnd(backEndType, configuration, slots, constraints, qualHierarchy,
+                    processingEnvironment, lattice, defaultSerializer);
+            solution = solve();
+        }
         
         if (solution == null)
             ErrorReporter.errorAbort("null solution detected!");
         if (collectStatistic) {
+            countSlotConstraint(slots, constraints);
             PrintUtils.printStatistic(StatisticPrinter.getStatistic(), StatisticPrinter.getThreadsData());
             PrintUtils.writeStatistic(StatisticPrinter.getStatistic(), StatisticPrinter.getThreadsData());
         }
@@ -99,6 +97,42 @@ public class ConstraintSolver implements InferenceSolver {
      */
     protected void sanitizeConfiguration() {
 
+    }
+
+    private void countSlotConstraint(Collection<Slot> slots, Collection<Constraint> constraints) {
+        // record constraint size
+        StatisticPrinter.record(StatisticKey.CONSTRAINT_SIZE, (long) constraints.size());
+        // record slot size
+        StatisticPrinter.record(StatisticKey.SLOTS_SIZE, (long) slots.size());
+        Map<String, Integer> slotMap = new HashMap<>();
+        Map<String, Integer> constraintMap = new HashMap<>();
+        for (Constraint constraint : constraints) {
+            String simpleName = constraint.getClass().getSimpleName();
+            if (!constraintMap.containsKey(simpleName)) {
+                constraintMap.put(simpleName, 1);
+            } else {
+                constraintMap.put(simpleName, constraintMap.get(simpleName) + 1);
+            }
+        }
+
+        for (Slot slot : slots) {
+            if (slot instanceof ConstantSlot) {
+                if (!slotMap.containsKey("ConstantSlot")) {
+                    slotMap.put("ConstantSlot", 1);
+                } else {
+                    slotMap.put("ConstantSlot", slotMap.get("ConstantSlot") + 1);
+                }
+
+            } else if (slot instanceof VariableSlot) {
+                if (!slotMap.containsKey("VariableSlot")) {
+                    slotMap.put("VariableSlot", 1);
+                } else {
+                    slotMap.put("VariableSlot", slotMap.get("VariableSlot") + 1);
+                }
+            }
+        }
+        System.out.println(slotMap);
+        System.out.println(constraintMap);
     }
 
     protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints,
@@ -169,7 +203,7 @@ public class ConstraintSolver implements InferenceSolver {
             ProcessingEnvironment processingEnvironment, Serializer<?, ?> defaultSerializer) {
         System.out.println("Using ConstraintGraph!");
         List<BackEnd<?, ?>> backEnds = new ArrayList<BackEnd<?, ?>>();
-
+        StatisticPrinter.record(StatisticKey.GRAPH_SIZE, (long) constraintGraph.getIndependentPath().size());
         for (Set<Constraint> independentConstraints : constraintGraph.getIndependentPath()) {
             backEnds.add(createBackEnd(backEndType, configuration, slots, independentConstraints,
                     qualHierarchy, processingEnvironment, lattice, defaultSerializer));

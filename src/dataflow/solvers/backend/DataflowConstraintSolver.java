@@ -15,6 +15,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 
 import util.PrintUtils;
+import util.StatisticPrinter;
+import util.StatisticPrinter.StatisticKey;
 import checkers.inference.DefaultInferenceSolution;
 import checkers.inference.InferenceMain;
 import checkers.inference.InferenceSolution;
@@ -51,16 +53,9 @@ public class DataflowConstraintSolver extends ConstraintSolver {
 
         // this.processingEnvironment = processingEnvironment;
         List<BackEnd<?, ?>> backEnds = new ArrayList<>();
-
+        StatisticPrinter.record(StatisticKey.GRAPH_SIZE, (long) constraintGraph.getConstantPath().size());
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getConstantPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
-            // if (anno.toString()
-            // .equals("@dataflow.qual.DataFlow(typeNames={\"java.util.Vector<pro.javacard.ant.JavaCard.JCCap>\"})"))
-            // {
-            // for (Constraint c : entry.getValue()) {
-            // System.out.println("!!" + c);
-            // }
-            // }
             if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
                 String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                 String[] dataflowRoots = DataflowUtils.getTypeNameRoots(anno);
