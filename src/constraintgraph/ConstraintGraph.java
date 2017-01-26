@@ -1,7 +1,6 @@
 package constraintgraph;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,7 +26,6 @@ public class ConstraintGraph {
     private Map<Vertex, Set<Constraint>> constantPath;
     private Map<Integer, Vertex> verticies;
     private List<Set<Constraint>> independentPath;
-    private Collection<Constraint> missingConstraints = new HashSet<>();
 
     protected ConstraintGraph() {
         this.edges = new HashSet<Edge>();
@@ -63,11 +61,6 @@ public class ConstraintGraph {
         this.constantPath.put(vertex, constraints);
     }
 
-    protected void addEdgeToConstantPath(Vertex vertex, Constraint constraint) {
-        Set<Constraint> constrants = this.constantPath.get(vertex);
-        constrants.add(constraint);
-    }
-
     public List<Set<Constraint>> getIndependentPath() {
         return this.independentPath;
     }
@@ -80,15 +73,6 @@ public class ConstraintGraph {
         if (!this.constantVerticies.contains(vertex)) {
             this.constantVerticies.add(vertex);
         }
-    }
-    
-    public Edge findEdge(Constraint constraint) {
-        for (Edge edge : this.edges) {
-            if (edge.getConstraint().equals(constraint)) {
-                return edge;
-            }
-        }
-        return null;
     }
 
     protected void createEdge(Slot slot1, Slot slot2, Constraint constraint) {
@@ -120,13 +104,5 @@ public class ConstraintGraph {
         }
 
         this.addEdge(edge);
-    }
-
-    public Collection<Constraint> getMissingConstraints() {
-        return this.missingConstraints;
-    }
-
-    public void SetMissingConstraints(Collection<Constraint> missingConstraint) {
-        this.missingConstraints = missingConstraint;
     }
 }

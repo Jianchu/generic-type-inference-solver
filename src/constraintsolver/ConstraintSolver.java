@@ -72,7 +72,7 @@ public class ConstraintSolver implements InferenceSolver {
             Serializer<?, ?> defaultSerializer = createSerializer(backEndType, lattice);
             if (useGraph) {
                 this.graphBuildingStart = System.currentTimeMillis();
-                this.constraintGraph = generateGraph(slots, constraints);
+            this.constraintGraph = generateGraph(slots, constraints, processingEnvironment);
                 this.graphBuildingEnd = System.currentTimeMillis();
                 StatisticPrinter.record(StatisticKey.GRAPH_GENERATION_TIME, (graphBuildingEnd - graphBuildingStart));
                 solution = graphSolve(constraintGraph, configuration, slots, constraints, qualHierarchy,
@@ -101,7 +101,8 @@ public class ConstraintSolver implements InferenceSolver {
 
     }
 
-    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
+    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints,
+            ProcessingEnvironment processingEnvironment) {
         GraphBuilder graphBuilder = new GraphBuilder(slots, constraints);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
         return constraintGraph;
@@ -236,13 +237,8 @@ public class ConstraintSolver implements InferenceSolver {
         for (Map<Integer, AnnotationMirror> inferenceSolutionMap : inferenceSolutionMaps) {
             result.putAll(inferenceSolutionMap);
         }
-        result = inferMissingConstraint(result);
         PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
-    }
-
-    protected Map<Integer, AnnotationMirror> inferMissingConstraint(Map<Integer, AnnotationMirror> result) {
-        return result;
     }
 
     protected BackEnd createBackEnd(String backEndType, Map<String, String> configuration,

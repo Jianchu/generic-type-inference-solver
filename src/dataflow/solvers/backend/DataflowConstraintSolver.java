@@ -23,7 +23,6 @@ import checkers.inference.model.Serializer;
 import checkers.inference.model.Slot;
 import constraintgraph.ConstraintGraph;
 import constraintgraph.GraphBuilder;
-import constraintgraph.GraphBuilder.SubtypeDirection;
 import constraintgraph.Vertex;
 import constraintsolver.BackEnd;
 import constraintsolver.ConstraintSolver;
@@ -31,6 +30,7 @@ import constraintsolver.TwoQualifiersLattice;
 import dataflow.DataflowAnnotatedTypeFactory;
 import dataflow.qual.DataFlow;
 import dataflow.qual.DataFlowInferenceBottom;
+import dataflow.qual.DataFlowTop;
 import dataflow.util.DataflowUtils;
 
 public class DataflowConstraintSolver extends ConstraintSolver {
@@ -49,11 +49,18 @@ public class DataflowConstraintSolver extends ConstraintSolver {
         DATAFLOWBOTTOM = AnnotationUtils.fromClass(processingEnvironment.getElementUtils(),
                 DataFlowInferenceBottom.class);
 
-        this.processingEnvironment = processingEnvironment;
+        // this.processingEnvironment = processingEnvironment;
         List<BackEnd<?, ?>> backEnds = new ArrayList<>();
 
         for (Map.Entry<Vertex, Set<Constraint>> entry : constraintGraph.getConstantPath().entrySet()) {
             AnnotationMirror anno = entry.getKey().getValue();
+            // if (anno.toString()
+            // .equals("@dataflow.qual.DataFlow(typeNames={\"java.util.Vector<pro.javacard.ant.JavaCard.JCCap>\"})"))
+            // {
+            // for (Constraint c : entry.getValue()) {
+            // System.out.println("!!" + c);
+            // }
+            // }
             if (AnnotationUtils.areSameIgnoringValues(anno, DATAFLOW)) {
                 String[] dataflowValues = DataflowUtils.getTypeNames(anno);
                 String[] dataflowRoots = DataflowUtils.getTypeNameRoots(anno);
@@ -76,8 +83,12 @@ public class DataflowConstraintSolver extends ConstraintSolver {
     }
 
     @Override
-    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints) {
-        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, SubtypeDirection.FROMSUBTYPE);
+    protected ConstraintGraph generateGraph(Collection<Slot> slots, Collection<Constraint> constraints,
+            ProcessingEnvironment processingEnvironment) {
+        this.processingEnvironment = processingEnvironment;
+        AnnotationMirror DATAFLOWTOP = AnnotationUtils.fromClass(
+                processingEnvironment.getElementUtils(), DataFlowTop.class);
+        GraphBuilder graphBuilder = new GraphBuilder(slots, constraints, DATAFLOWTOP);
         ConstraintGraph constraintGraph = graphBuilder.buildGraph();
         return constraintGraph;
     }
@@ -134,8 +145,10 @@ public class DataflowConstraintSolver extends ConstraintSolver {
     protected void sanitizeConfiguration() {
         if (!useGraph) {
             useGraph = true;
-            InferenceMain.getInstance().logger.warning("DataflowConstraintSolver: Don't use graph to solve constraints will "
-                    + "cause wrong answers in Dataflow type system. Modified solver argument \"useGraph\" to true.");
+            InferenceMain.getInstance().logger
+                    .warning("DataflowConstraintSolver: Don't use graph to solve constraints will "
+                            + "cause wrong answers in Dataflow type system. Modified solver argument \"useGraph\" to true.");
         }
     }
+    
 }
