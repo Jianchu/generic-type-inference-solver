@@ -117,6 +117,13 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         return true;
     }
     
+    private void recordData() {
+        int totalClauses = hardClauses.size() + softClauses.size();
+        int totalVariable = variableSet.size();
+        StatisticPrinter.record(StatisticKey.CNF_CLAUSES_SIZE, (long) totalClauses);
+        StatisticPrinter.record(StatisticKey.CNF_VARIABLE_SIZE, (long) totalVariable);
+    }
+
     @Override
     public Map<Integer, AnnotationMirror> solve() {
         Map<Integer, AnnotationMirror> result = new HashMap<>();
@@ -127,6 +134,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
         generateWellForm(hardClauses);
         buildCNF();
         collectVals();
+        recordData();
         // saving memory of JVM...
         this.hardClauses.clear();
         int localNth = nth.incrementAndGet();
