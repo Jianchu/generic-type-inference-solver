@@ -91,6 +91,7 @@ public class DataflowInferenceTreeAnnotator extends InferenceTreeAnnotator {
         AnnotationMirror anno = DataflowUtils.genereateDataflowAnnoFromNewClass(atm,
                 this.realTypeFactory.getProcessingEnv());
         replaceATM(atm, anno);
+        variableAnnotator.visit(atm, newArrayTree);
         return null;
     }
 
