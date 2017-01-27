@@ -46,6 +46,7 @@ public class StatisticPrinter {
         CNF_CLAUSES_SIZE,
         LOGIQL_PREDICATES_SIZE,
         LOGIQL_DATA_SIZE,
+        NUMBER_ANNOTATOIN,
         
         CONSTRAINT_GENERATION_TIME,
         GRAPH_GENERATION_TIME,
@@ -110,6 +111,7 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM, (long) 0);
         statistic.put(StatisticKey.SAT_PARALLEL_SOLVING_SUM, (long) 0);
         statistic.put(StatisticKey.GRAPH_SIZE, (long) 0);
+        statistic.put(StatisticKey.NUMBER_ANNOTATOIN, (long) 0);
     }
 
 

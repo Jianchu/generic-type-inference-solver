@@ -301,6 +301,7 @@ public class ConstraintSolver implements InferenceSolver {
 
     protected InferenceSolution solve() {
         Map<Integer, AnnotationMirror> result = realBackEnd.solve();
+        StatisticPrinter.record(StatisticKey.NUMBER_ANNOTATOIN, (long) result.size());
         PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);
     }

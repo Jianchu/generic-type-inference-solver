@@ -133,6 +133,7 @@ public class DataflowConstraintSolver extends ConstraintSolver {
         }
 
         PrintUtils.printResult(result);
+        StatisticPrinter.record(StatisticKey.NUMBER_ANNOTATOIN, (long) result.size());
         return new DefaultInferenceSolution(result);
     }
 
