@@ -156,12 +156,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
             if (parallel) {
                 // StatisticPrinter.recordSingleThread(Pair.<Long, Long> of(
                 // (serializationEnd - serializationStart), solvingTime));
-                // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
-                // (serializationEnd - serializationStart));
-                // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM,
-                // solvingTime);
-                StatisticPrinter
-                        .recordSerializationSingleThread((serializationEnd - serializationStart));
+                StatisticPrinter.recordSerializationSingleThread((serializationEnd - serializationStart));
                 StatisticPrinter.recordSolvingSingleThread(solvingTime);
             } else {
                 StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL, solvingTime);
@@ -169,6 +164,7 @@ public class LingelingBackEnd extends MaxSatBackEnd {
                         (serializationEnd - serializationStart));
             }
         } else {
+            StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,(serializationEnd - serializationStart));
             StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME_LL, solvingTime);
         }
         // saving memory of JVM...

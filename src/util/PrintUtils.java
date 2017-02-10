@@ -49,10 +49,14 @@ public class PrintUtils {
                 System.out.println(j.toString().toLowerCase() + ": " + statistic.get(j));
             }
         }
-        System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM.toString()
-                .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SERIALIZATION_SUM);
-        System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SOLVING_SUM.toString()
-                .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SOLVING_SUM);
+        if (StatisticPrinter.SAT_PARALLEL_SERIALIZATION_SUM.get() != 0) {
+            System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM.toString()
+                    .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SERIALIZATION_SUM);
+        }
+        if (StatisticPrinter.SAT_PARALLEL_SOLVING_SUM.get() != 0) {
+            System.out.println(StatisticPrinter.StatisticKey.SAT_PARALLEL_SOLVING_SUM.toString()
+                    .toLowerCase() + "," + StatisticPrinter.SAT_PARALLEL_SOLVING_SUM);
+        }
         System.out.flush();
         System.out.println("/**********************statistic end****************************/");
     }

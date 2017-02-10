@@ -300,7 +300,11 @@ public class ConstraintSolver implements InferenceSolver {
     }
 
     protected InferenceSolution solve() {
+        solvingStart = System.currentTimeMillis();
         Map<Integer, AnnotationMirror> result = realBackEnd.solve();
+        solvingEnd = System.currentTimeMillis();
+        StatisticPrinter.record(StatisticKey.NEW_SAT_NO_GRAPH_SOLVING,
+                (solvingEnd - solvingStart));
         StatisticPrinter.record(StatisticKey.NUMBER_ANNOTATOIN, (long) result.size());
         PrintUtils.printResult(result);
         return new DefaultInferenceSolution(result);

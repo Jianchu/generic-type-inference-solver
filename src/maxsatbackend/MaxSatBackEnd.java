@@ -211,22 +211,13 @@ public class MaxSatBackEnd extends BackEnd<VecInt[], VecInt[]> {
                     // solvingTime));
                     StatisticPrinter.recordSerializationSingleThread((serializationEnd - serializationStart));
                     StatisticPrinter.recordSolvingSingleThread(solvingTime);
-                    // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SERIALIZATION_SUM,
-                    // (serializationEnd - serializationStart));
-                    // StatisticPrinter.record(StatisticKey.SAT_PARALLEL_SOLVING_SUM,
-                    // solvingTime);
                 } else {
                     StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME, solvingTime);
                     StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
                             (serializationEnd - serializationStart));
                 }
-                // if (!parallel) {
-                // StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME,
-                // solvingTime);
-                // }
             } else {
-                StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME,
-                        (serializationEnd - serializationStart));
+                StatisticPrinter.record(StatisticKey.SAT_SERIALIZATION_TIME, (serializationEnd - serializationStart));
                 StatisticPrinter.record(StatisticKey.SAT_SOLVING_WITHOUT_GRAPH_TIME, solvingTime);
             }
 

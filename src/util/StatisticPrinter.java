@@ -61,6 +61,7 @@ public class StatisticPrinter {
         SAT_SOLVING_GRAPH_SEQUENTIAL_TIME_LL,
         SAT_PARALLEL_SERIALIZATION_SUM,
         SAT_PARALLEL_SOLVING_SUM,
+        NEW_SAT_NO_GRAPH_SOLVING,
         
         LOGIQL_SERIALIZATION_TIME,
         LOGIQL_SOLVING_GRAPH_SEQUENTIAL_TIME,
@@ -112,6 +113,8 @@ public class StatisticPrinter {
         statistic.put(StatisticKey.SAT_PARALLEL_SOLVING_SUM, (long) 0);
         statistic.put(StatisticKey.GRAPH_SIZE, (long) 0);
         statistic.put(StatisticKey.NUMBER_ANNOTATOIN, (long) 0);
+        statistic.put(StatisticKey.NEW_SAT_NO_GRAPH_SOLVING, (long) 0);
+
     }
 
 
