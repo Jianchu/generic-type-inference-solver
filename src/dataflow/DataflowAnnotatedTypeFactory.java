@@ -201,18 +201,6 @@ public class DataflowAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             }
             return super.visitMethodInvocation(node, type);
         }
-
-        // @Override
-        // public Void visitVariable(final VariableTree varTree, final
-        // AnnotatedTypeMirror atm) {
-        // final Element varElem = TreeUtils.elementFromDeclaration(varTree);
-        // if (varElem.getKind() == ElementKind.PARAMETER) {
-        // if (atm.getAnnotations().size() == 0) {
-        // atm.addAnnotation(DATAFLOW);
-        // }
-        // }
-        // return super.visitVariable(varTree, atm);
-        // }
     }
 
     public AnnotationMirror refineDataflow(AnnotationMirror type) {
