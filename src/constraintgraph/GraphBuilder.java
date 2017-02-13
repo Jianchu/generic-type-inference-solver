@@ -12,10 +12,13 @@ import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 
+import checkers.inference.model.AnnotationLocation.Kind;
 import checkers.inference.model.ConstantSlot;
 import checkers.inference.model.Constraint;
+import checkers.inference.model.ExistentialConstraint;
 import checkers.inference.model.Slot;
 import checkers.inference.model.SubtypeConstraint;
+import dataflow.util.DataflowUtils;
 
 /**
  * ConstraintGraph Builder
@@ -45,6 +48,8 @@ public class GraphBuilder {
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
                 addSubtypeEdge((SubtypeConstraint) constraint);
+            } else if (constraint instanceof ExistentialConstraint) {
+                continue;
             } else {
                 ArrayList<Slot> slots = new ArrayList<Slot>();
                 slots.addAll(constraint.getSlots());
@@ -105,9 +110,23 @@ public class GraphBuilder {
                 Vertex next = edge.getToVertex();
                 constantPathConstraints.add(edge.getConstraint());
                 if (!visited.contains(next)) {
-                    if (!(next.isConstant() && AnnotationUtils.areSame(top, next.getValue()))) {
-                        queue.add(next);
+                    if (next.isConstant()) {
+                        if (AnnotationUtils.areSame(top, next.getValue())) {
+                            continue;
+                        } else {
+                            String[] typeNames = DataflowUtils.getTypeNames(next.getValue());
+                            if (typeNames.length == 1 && typeNames[0].length() == 0) {
+                                continue;
+                            }
+                        }
+                    } else {
+                        if (next.getSlot().getLocation() != null) {
+                            if (next.getSlot().getLocation().getKind().equals(Kind.MISSING)) {
+                                continue;
+                            }
+                        }
                     }
+                    queue.add(next);
                 }
             }
         }
