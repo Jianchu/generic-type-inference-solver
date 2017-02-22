@@ -107,7 +107,7 @@ public class LogicBloxRunner {
      */
     private void writeFile(String output) {
         try {
-            String writePath = path + "/logicbloxOutput.txt";
+            String writePath = path + "/logicbloxOutput" + nth + ".txt";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
             pw.write(output);
