@@ -25,10 +25,12 @@ public class LogiQLPredicateGenerator {
     private final String path;
     private final StringBuilder allEncodings = new StringBuilder();
     private final Lattice lattice;
+    private final int nth;
 
-    public LogiQLPredicateGenerator(String path, Lattice lattice) {
+    public LogiQLPredicateGenerator(String path, Lattice lattice, int nth) {
         this.path = path;
         this.lattice = lattice;
+        this.nth = nth;
     }
 
     public void GenerateLogiqlEncoding() {
@@ -176,7 +178,7 @@ public class LogiQLPredicateGenerator {
         String[] lines = output.split("\r\n|\r|\n");
         StatisticPrinter.record(StatisticKey.LOGIQL_PREDICATES_SIZE, (long) lines.length);
         try {
-            String writePath = path + "/logiqlEncoding.logic";
+            String writePath = path + "/logiqlEncoding" + nth + ".logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(writePath);
             pw.write(output);

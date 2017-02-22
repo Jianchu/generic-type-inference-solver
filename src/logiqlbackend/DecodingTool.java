@@ -29,11 +29,13 @@ public class DecodingTool {
     private final String path;
     private final Set<Integer> varSlotIds;
     private final Lattice lattice;
+    private final int nth;
 
-    public DecodingTool(Set<Integer> varSlotIds, String path, Lattice lattice) {
+    public DecodingTool(Set<Integer> varSlotIds, String path, Lattice lattice, int nth) {
         this.varSlotIds = varSlotIds;
         this.path = path;
         this.lattice = lattice;
+        this.nth = nth;
     }
 
     public Map<Integer, AnnotationMirror> decodeResult() {
@@ -54,7 +56,7 @@ public class DecodingTool {
      */
     private void decodeLogicBloxOutput() throws FileNotFoundException {
         Map<String, AnnotationMirror> nameMap = mapStringToAnnoMirror();
-        String readPath = path + "/logicbloxOutput.txt";
+        String readPath = path + "/logicbloxOutput" + nth + ".txt";
         InputStream in = new FileInputStream(readPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;

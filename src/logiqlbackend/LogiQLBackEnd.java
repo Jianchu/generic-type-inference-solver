@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -24,7 +25,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     private final StringBuilder logiQLText = new StringBuilder();
     private final File logiqldata = new File(new File("").getAbsolutePath() + "/logiqldata");
-
+    public static AtomicInteger nth = new AtomicInteger(0);
     private long serializationStart;
     private long serializationEnd;
     private long solvingStart;
@@ -41,6 +42,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
 
     @Override
     public Map<Integer, AnnotationMirror> solve() {
+        int localNth = nth.incrementAndGet();
         String logiqldataPath = logiqldata.getAbsolutePath();
         Map<Integer, AnnotationMirror> result = new HashMap<>();
         /**
@@ -48,7 +50,8 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
          * GenerateLogiqlEncoding method, in order to generate the logiql fixed
          * encoding part of current type system.
          */
-        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(logiqldataPath, lattice);
+        LogiQLPredicateGenerator constraintGenerator = new LogiQLPredicateGenerator(logiqldataPath,
+                lattice, localNth);
         constraintGenerator.GenerateLogiqlEncoding();
         this.serializationStart = System.currentTimeMillis();
         this.convertAll();
@@ -57,12 +60,12 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
                 (serializationEnd - serializationStart));
         addVariables();
         addConstants();
-        writeLogiQLData(logiqldataPath);
+        writeLogiQLData(logiqldataPath, localNth);
         // System.out.println(logiQLText.toString());
         // delete and create new workspace in local machine for testing.
         // writeDeleteData(logiqldataPath);
         this.solvingStart = System.currentTimeMillis();
-        LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath);
+        LogicBloxRunner runLogicBlox = new LogicBloxRunner(logiqldataPath, localNth);
         runLogicBlox.runLogicBlox();
         this.solvingEnd = System.currentTimeMillis();
         boolean graph = (configuration.get("useGraph") == null || configuration.get("useGraph").equals(
@@ -74,7 +77,7 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
             StatisticPrinter.record(StatisticKey.LOGIQL_SOLVING_WITHOUT_GRAPH_TIME,
                     (solvingEnd - solvingStart));
         }
-        DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath, lattice);
+        DecodingTool DecodeTool = new DecodingTool(varSlotIds, logiqldataPath, lattice, localNth);
         result = DecodeTool.decodeResult();
         // PrintUtils.printResult(result);
 
@@ -105,11 +108,11 @@ public class LogiQLBackEnd extends BackEnd<String, String> {
         }
     }
 
-    private void writeLogiQLData(String path) {
+    private void writeLogiQLData(String path, int nth) {
         String[] lines = logiQLText.toString().split("\r\n|\r|\n");
         StatisticPrinter.record(StatisticKey.LOGIQL_DATA_SIZE, (long) lines.length);
         try {
-            String writePath = path + "/data.logic";
+            String writePath = path + "/data" + nth + ".logic";
             File f = new File(writePath);
             PrintWriter pw = new PrintWriter(f);
             pw.write(logiQLText.toString());
