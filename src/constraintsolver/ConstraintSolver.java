@@ -272,6 +272,7 @@ public class ConstraintSolver implements InferenceSolver {
             result.putAll(inferenceSolutionMap);
         }
         PrintUtils.printResult(result);
+        StatisticPrinter.record(StatisticKey.NUMBER_ANNOTATOIN, (long) result.size());
         return new DefaultInferenceSolution(result);
     }
 
