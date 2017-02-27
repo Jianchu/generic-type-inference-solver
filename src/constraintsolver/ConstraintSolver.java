@@ -231,10 +231,12 @@ public class ConstraintSolver implements InferenceSolver {
 
     protected List<Map<Integer, AnnotationMirror>> solveInSequential(List<BackEnd<?, ?>> backEnds) {
         List<Map<Integer, AnnotationMirror>> solutions = new ArrayList<>();
-
+        solvingStart = System.currentTimeMillis();
         for (final BackEnd backEnd : backEnds) {
             solutions.add(backEnd.solve());
         }
+        solvingEnd = System.currentTimeMillis();
+        StatisticPrinter.record(StatisticKey.SAT_SOLVING_GRAPH_SEQUENTIAL_TIME, (solvingEnd - solvingStart));
         return solutions;
     }
 
